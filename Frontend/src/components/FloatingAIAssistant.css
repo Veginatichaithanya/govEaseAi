@@ -1,0 +1,922 @@
+/* GovEaseAI Draggable Floating Chatbot Styles (Pure Vanilla CSS) */
+
+.govease-floating-widget-wrapper {
+  position: fixed !important;
+  z-index: 1000 !important;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  pointer-events: auto;
+  font-family: var(--font-body, system-ui, -apple-system, sans-serif);
+}
+
+.govease-floating-widget-wrapper * {
+  box-sizing: border-box;
+}
+
+/* ── Collapsed Pill ── */
+.govease-floating-pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 300px;
+  min-width: 64px;
+  max-width: 420px;
+  height: 68px;
+  padding: 0.5rem 0.85rem;
+  background-color: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border-subtle, #E2E8F0);
+  border-radius: 9999px;
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.15), 0 4px 12px -2px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease, width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.govease-floating-pill.is-resizing {
+  transition: none !important;
+  user-select: none !important;
+}
+
+/* Bubble (Circular FAB) state */
+.govease-floating-pill.is-bubble {
+  width: 64px !important;
+  height: 64px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  justify-content: center !important;
+}
+
+.govease-floating-pill.is-bubble .govease-pill-badge {
+  margin: 0 !important;
+  width: 50px !important;
+  height: 50px !important;
+}
+
+.govease-floating-pill.is-compact {
+  padding: 0.4rem 0.65rem !important;
+}
+
+/* Pill Left Edge Resize Handle */
+.govease-pill-resize-handle {
+  position: absolute;
+  left: -5px;
+  top: 14px;
+  bottom: 14px;
+  width: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: ew-resize;
+  touch-action: none;
+  z-index: 10;
+}
+
+.govease-pill-resize-bar {
+  width: 4px;
+  height: 22px;
+  border-radius: 4px;
+  background-color: var(--text-muted, #94A3B8);
+  opacity: 0.45;
+  transition: all 0.15s ease;
+}
+
+.govease-pill-resize-handle:hover .govease-pill-resize-bar,
+.govease-floating-pill.is-resizing .govease-pill-resize-bar {
+  opacity: 1;
+  background-color: var(--accent-blue, #2563EB);
+  height: 32px;
+  transform: scaleX(1.3);
+}
+
+/* Pill Quick Size Preset Cycle Button */
+.govease-pill-size-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--bg-secondary, #F1F5F9);
+  color: var(--text-secondary, #64748B);
+  border: 1px solid var(--border-subtle, #E2E8F0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+.govease-pill-size-btn:hover {
+  background: var(--accent-blue, #2563EB);
+  color: #FFFFFF;
+  border-color: var(--accent-blue, #2563EB);
+}
+
+/* Pill Dimension Tooltip */
+.govease-pill-size-tooltip {
+  position: absolute;
+  top: -36px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.92);
+  color: #FFFFFF;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 100;
+  animation: fadeIn 0.15s ease;
+}
+
+.govease-floating-pill:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-blue, #2563EB);
+  box-shadow: 0 16px 32px -6px rgba(37, 99, 235, 0.2), 0 6px 16px -2px rgba(0, 0, 0, 0.1);
+}
+
+.govease-pill-drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 4px;
+  color: var(--text-muted, #94A3B8);
+  cursor: grab;
+  touch-action: none;
+  transition: color 0.15s ease;
+}
+
+.govease-pill-drag-handle:active,
+.govease-floating-widget-wrapper.is-dragging .govease-pill-drag-handle {
+  cursor: grabbing;
+  color: var(--accent-blue, #2563EB);
+}
+
+.govease-pill-badge {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--accent-blue, #2563EB);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: 0.35rem;
+}
+
+[data-theme="dark"] .govease-pill-badge {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60A5FA;
+}
+
+.govease-pill-status-dot {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 10px;
+  height: 10px;
+  background-color: #10B981;
+  border-radius: 50%;
+  border: 2px solid var(--bg-card, #FFFFFF);
+}
+
+.govease-pill-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  margin: 0 0.65rem;
+  text-align: left;
+}
+
+.govease-pill-title {
+  font-family: var(--font-display, sans-serif);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary, #0F172A);
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.govease-pill-subtitle {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-secondary, #64748B);
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.govease-pill-toggle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--bg-secondary, #F1F5F9);
+  color: var(--text-secondary, #64748B);
+  border: 1px solid var(--border-subtle, #E2E8F0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.govease-pill-toggle:hover {
+  background: var(--accent-blue, #2563EB);
+  color: #FFFFFF;
+  border-color: var(--accent-blue, #2563EB);
+}
+
+/* ── Expanded Chat Window ── */
+.govease-chat-window {
+  position: relative;
+  width: 460px;
+  max-width: calc(100vw - 24px);
+  height: 640px;
+  max-height: calc(100vh - 32px);
+  min-width: 340px;
+  min-height: 420px;
+  background-color: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border-subtle, #E2E8F0);
+  border-radius: 20px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35), 0 0 0 1px var(--border-subtle, rgba(0, 0, 0, 0.05));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+}
+
+.govease-chat-window.is-resizing {
+  user-select: none !important;
+  transition: none !important;
+}
+
+/* Resize Corner Handles */
+.govease-resize-handle {
+  position: absolute;
+  z-index: 50;
+  width: 20px;
+  height: 20px;
+  touch-action: none;
+}
+
+.govease-resize-nw {
+  top: 0;
+  left: 0;
+  cursor: nwse-resize;
+  border-top-left-radius: 20px;
+}
+
+.govease-resize-ne {
+  top: 0;
+  right: 0;
+  cursor: nesw-resize;
+  border-top-right-radius: 20px;
+}
+
+.govease-resize-sw {
+  bottom: 0;
+  left: 0;
+  cursor: nesw-resize;
+  border-bottom-left-radius: 20px;
+}
+
+.govease-resize-se {
+  bottom: 0;
+  right: 0;
+  cursor: nwse-resize;
+  border-bottom-right-radius: 20px;
+}
+
+/* Corner visual grip accents */
+.govease-resize-nw::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid var(--text-muted, #94A3B8);
+  border-left: 2px solid var(--text-muted, #94A3B8);
+  opacity: 0.55;
+  transition: all 0.15s ease;
+}
+
+.govease-resize-se::after {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-bottom: 2px solid var(--text-muted, #94A3B8);
+  border-right: 2px solid var(--text-muted, #94A3B8);
+  opacity: 0.55;
+  transition: all 0.15s ease;
+}
+
+.govease-resize-handle:hover::after,
+.govease-chat-window.is-resizing .govease-resize-handle::after {
+  opacity: 1;
+  border-color: var(--accent-blue, #2563EB);
+  transform: scale(1.15);
+}
+
+/* Resize Edge Handles */
+.govease-resize-edge {
+  position: absolute;
+  z-index: 45;
+  touch-action: none;
+}
+
+.govease-resize-n {
+  top: 0;
+  left: 20px;
+  right: 20px;
+  height: 8px;
+  cursor: ns-resize;
+}
+
+.govease-resize-w {
+  top: 20px;
+  bottom: 20px;
+  left: 0;
+  width: 8px;
+  cursor: ew-resize;
+}
+
+/* Size Preset Buttons in Header */
+.govease-size-presets-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border-subtle, #E2E8F0);
+  border-radius: 8px;
+  padding: 2px;
+  margin-right: 0.25rem;
+}
+
+.govease-size-preset-btn {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 4px 6px;
+  border-radius: 5px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #64748B);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.govease-size-preset-btn:hover {
+  background: var(--bg-secondary, #F1F5F9);
+  color: var(--text-primary, #0F172A);
+}
+
+.govease-size-preset-btn.active {
+  background: var(--accent-blue, #2563EB);
+  color: #FFFFFF;
+}
+
+/* Live Dimension Tooltip */
+.govease-size-tooltip {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.92);
+  color: #FFFFFF;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  z-index: 100;
+  animation: fadeIn 0.15s ease;
+}
+
+.govease-chat-window.is-fullscreen {
+  position: fixed !important;
+  top: 16px !important;
+  left: 16px !important;
+  right: 16px !important;
+  bottom: 16px !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: none !important;
+  max-height: none !important;
+  border-radius: 16px;
+}
+
+/* Header (Draggable) */
+.govease-chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background-color: var(--bg-secondary, #F8FAFC);
+  border-bottom: 1px solid var(--border-subtle, #E2E8F0);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.govease-chat-header:active,
+.govease-floating-widget-wrapper.is-dragging .govease-chat-header {
+  cursor: grabbing;
+}
+
+.govease-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.govease-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.govease-btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 8px;
+  color: var(--text-secondary, #64748B);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.govease-btn-icon:hover {
+  background-color: var(--bg-card, rgba(0, 0, 0, 0.05));
+  color: var(--text-primary, #0F172A);
+}
+
+.govease-btn-icon.active {
+  background-color: rgba(37, 99, 235, 0.12);
+  color: var(--accent-blue, #2563EB);
+}
+
+/* Service Selector */
+.govease-service-picker-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.65rem;
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border-subtle, #E2E8F0);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text-primary, #0F172A);
+  transition: border-color 0.15s ease;
+  max-width: 190px;
+}
+
+.govease-service-picker-trigger:hover {
+  border-color: var(--accent-blue, #2563EB);
+}
+
+.govease-service-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 280px;
+  background-color: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border-subtle, #E2E8F0);
+  border-radius: 12px;
+  box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  padding: 0.35rem;
+  max-height: 280px;
+  overflow-y: auto;
+  backdrop-filter: blur(16px);
+}
+
+[data-theme="dark"] .govease-service-dropdown {
+  background-color: #0F172A;
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
+.govease-service-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+
+.govease-service-item:hover {
+  background-color: var(--bg-secondary, #F1F5F9);
+}
+
+[data-theme="dark"] .govease-service-item:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.govease-service-item.selected {
+  background-color: rgba(37, 99, 235, 0.15);
+  color: var(--accent-blue, #2563EB);
+  font-weight: 600;
+}
+
+/* Main Body with History Drawer + Chat */
+.govease-chat-body {
+  flex: 1;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+/* History Drawer (Clean Overlay) */
+.govease-history-drawer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-card, #FFFFFF);
+  display: flex;
+  flex-direction: column;
+  z-index: 30;
+}
+
+[data-theme="dark"] .govease-history-drawer {
+  background-color: #0F172A;
+}
+
+.govease-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--border-subtle, #E2E8F0);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary, #64748B);
+}
+
+.govease-history-search {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border-subtle, #E2E8F0);
+}
+
+.govease-history-search input {
+  width: 100%;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.78rem;
+  border-radius: 6px;
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border-subtle, #E2E8F0);
+  color: var(--text-primary, #0F172A);
+  outline: none;
+}
+
+.govease-history-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.govease-history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  color: var(--text-secondary, #64748B);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-bottom: 2px;
+}
+
+.govease-history-item:hover {
+  background-color: var(--bg-card, #FFFFFF);
+  color: var(--text-primary, #0F172A);
+}
+
+.govease-history-item.active {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: var(--accent-blue, #2563EB);
+  font-weight: 600;
+}
+
+/* Chat Main Area */
+.govease-messages-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--bg-card, #FFFFFF);
+}
+
+.govease-disclaimer-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.85rem;
+  background-color: var(--bg-secondary, #F8FAFC);
+  border-bottom: 1px solid var(--border-subtle, #E2E8F0);
+  font-size: 0.68rem;
+  color: var(--text-secondary, #64748B);
+  flex-shrink: 0;
+}
+
+.govease-messages-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+/* Welcome Box */
+.govease-chat-welcome {
+  text-align: center;
+  padding: 1.5rem 0.75rem;
+  margin: auto;
+  max-width: 340px;
+}
+
+.govease-welcome-icon {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 0.75rem;
+  border-radius: 16px;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--accent-blue, #2563EB);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+}
+
+.govease-welcome-title {
+  font-family: var(--font-display, sans-serif);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary, #0F172A);
+  margin-bottom: 0.35rem;
+}
+
+.govease-welcome-desc {
+  font-size: 0.78rem;
+  color: var(--text-secondary, #64748B);
+  line-height: 1.4;
+  margin-bottom: 1rem;
+}
+
+.govease-suggestions-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, #94A3B8);
+  margin-bottom: 0.5rem;
+}
+
+.govease-suggestions-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+}
+
+.govease-chip-btn {
+  padding: 0.35rem 0.7rem;
+  border-radius: 9999px;
+  background-color: var(--bg-secondary, #F1F5F9);
+  border: 1px solid var(--border-subtle, #E2E8F0);
+  font-size: 0.72rem;
+  color: var(--text-primary, #0F172A);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.govease-chip-btn:hover {
+  background-color: rgba(37, 99, 235, 0.1);
+  border-color: var(--accent-blue, #2563EB);
+  color: var(--accent-blue, #2563EB);
+}
+
+/* Chat Message Row */
+.govease-msg-row {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+}
+
+.govease-msg-row.user {
+  justify-content: flex-end;
+}
+
+.govease-msg-row.assistant {
+  justify-content: flex-start;
+}
+
+.govease-msg-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.govease-msg-avatar.asst {
+  background: linear-gradient(135deg, #2563EB 0%, #06B6D4 100%);
+  color: #FFFFFF;
+}
+
+.govease-msg-avatar.usr {
+  background: var(--bg-secondary, #E2E8F0);
+  color: var(--text-primary, #0F172A);
+  border: 1px solid var(--border-subtle, #CBD5E1);
+}
+
+.govease-msg-bubble {
+  max-width: 82%;
+  padding: 0.65rem 0.85rem;
+  border-radius: 14px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.govease-msg-bubble.user {
+  background-color: var(--accent-blue, #2563EB);
+  color: #FFFFFF;
+  border-bottom-right-radius: 4px;
+}
+
+.govease-msg-bubble.assistant {
+  background-color: var(--bg-secondary, #F1F5F9);
+  color: var(--text-primary, #0F172A);
+  border: 1px solid var(--border-subtle, #E2E8F0);
+  border-bottom-left-radius: 4px;
+}
+
+[data-theme="dark"] .govease-msg-bubble.assistant {
+  background-color: #1E293B;
+  border-color: rgba(148, 163, 184, 0.15);
+  color: #F8FAFC;
+}
+
+/* Footer / Composer */
+.govease-composer-wrapper {
+  padding: 0.65rem 0.85rem;
+  background-color: var(--bg-secondary, #F8FAFC);
+  border-top: 1px solid var(--border-subtle, #E2E8F0);
+  flex-shrink: 0;
+}
+
+.govease-attachment-preview-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.govease-att-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border-subtle, #E2E8F0);
+  font-size: 0.72rem;
+  color: var(--text-primary, #0F172A);
+}
+
+.govease-composer-box {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.4rem;
+  padding: 0.4rem 0.5rem;
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border-subtle, #CBD5E1);
+  border-radius: 14px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.govease-composer-box:focus-within {
+  border-color: var(--accent-blue, #2563EB);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.govease-composer-textarea {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  resize: none;
+  font-family: inherit;
+  font-size: 0.82rem;
+  color: var(--text-primary, #0F172A);
+  padding: 0.35rem 0.25rem;
+  min-height: 24px;
+  max-height: 120px;
+  line-height: 1.4;
+}
+
+.govease-composer-textarea::placeholder {
+  color: var(--text-muted, #94A3B8);
+}
+
+.govease-composer-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.govease-composer-btn.attach {
+  background: transparent;
+  color: var(--text-secondary, #64748B);
+}
+
+.govease-composer-btn.attach:hover {
+  background: var(--bg-secondary, #F1F5F9);
+  color: var(--accent-blue, #2563EB);
+}
+
+.govease-composer-btn.send {
+  background: var(--accent-blue, #2563EB);
+  color: #FFFFFF;
+}
+
+.govease-composer-btn.send:hover:not(:disabled) {
+  background: #1D4ED8;
+}
+
+.govease-composer-btn.send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.govease-composer-btn.stop {
+  background: #EF4444;
+  color: #FFFFFF;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+  .govease-floating-pill {
+    width: 270px;
+    height: 60px;
+    padding: 0.4rem 0.65rem;
+  }
+  .govease-chat-window {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 85vh !important;
+    max-height: 85vh !important;
+    border-radius: 20px 20px 0 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    top: auto !important;
+  }
+}

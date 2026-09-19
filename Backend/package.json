@@ -1,0 +1,16 @@
+{
+  "name": "goveaseai-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "python -m uvicorn app.main:app --host 127.0.0.1 --port 5000",
+    "dev": "python -m uvicorn app.main:app --host 127.0.0.1 --port 5000 --reload",
+    "node:server": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}

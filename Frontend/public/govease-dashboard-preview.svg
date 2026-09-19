@@ -1,0 +1,253 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="100%" height="100%">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#07111F" />
+      <stop offset="50%" stop-color="#0A182C" />
+      <stop offset="100%" stop-color="#0D223F" />
+    </linearGradient>
+
+    <linearGradient id="panelGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(14, 32, 58, 0.85)" />
+      <stop offset="100%" stop-color="rgba(9, 21, 38, 0.95)" />
+    </linearGradient>
+
+    <linearGradient id="accentCyan" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3B82F6" />
+      <stop offset="50%" stop-color="#06B6D4" />
+      <stop offset="100%" stop-color="#22D3EE" />
+    </linearGradient>
+
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="rgba(19, 43, 76, 0.6)" />
+      <stop offset="100%" stop-color="rgba(11, 25, 46, 0.8)" />
+    </linearGradient>
+
+    <!-- Filters -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <pattern id="gridPattern" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(59, 130, 246, 0.05)" stroke-width="1" />
+      <circle cx="60" cy="60" r="1.5" fill="rgba(6, 182, 212, 0.15)" />
+    </pattern>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="1920" height="1080" fill="url(#bgGrad)" />
+  <rect width="1920" height="1080" fill="url(#gridPattern)" />
+
+  <!-- Ambient Light Orbs -->
+  <circle cx="450" cy="300" r="320" fill="rgba(6, 182, 212, 0.08)" filter="url(#glow)" />
+  <circle cx="1500" cy="650" r="380" fill="rgba(59, 130, 246, 0.07)" filter="url(#glow)" />
+
+  <!-- Top System Header Bar -->
+  <rect x="80" y="50" width="1760" height="70" rx="14" fill="url(#panelGrad)" stroke="rgba(148, 163, 184, 0.18)" stroke-width="1" />
+  
+  <g transform="translate(110, 72)">
+    <!-- Emblem -->
+    <rect width="28" height="28" rx="7" fill="#2563EB" />
+    <path d="M14 6 L22 10 L22 17 C22 21 14 24 14 24 C14 24 6 21 6 17 L6 10 Z" fill="none" stroke="#FFFFFF" stroke-width="1.8" />
+    <!-- Title -->
+    <text x="42" y="20" fill="#FFFFFF" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="18" letter-spacing="-0.01em">
+      GovEaseAI <tspan fill="#38BDF8">Platform Console</tspan>
+    </text>
+    <rect x="235" y="4" width="130" height="22" rx="11" fill="rgba(56, 189, 248, 0.12)" stroke="rgba(56, 189, 248, 0.3)" />
+    <text x="300" y="19" fill="#38BDF8" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="600" text-anchor="middle">
+      SERVICE AUDIT VIEW
+    </text>
+  </g>
+
+  <g transform="translate(1550, 72)">
+    <circle cx="10" cy="14" r="5" fill="#10B981" />
+    <text x="24" y="19" fill="#94A3B8" font-family="'JetBrains Mono', monospace" font-size="13">SYSTEM ONLINE • PROTOTYPE</text>
+  </g>
+
+  <!-- Left Main Workspace: Live Document Ingestion & Verification -->
+  <g transform="translate(80, 150)">
+    <!-- Outer Container -->
+    <rect width="1120" height="860" rx="20" fill="url(#panelGrad)" stroke="rgba(59, 130, 246, 0.22)" stroke-width="1.5" />
+    
+    <!-- Top Accent Stripe -->
+    <path d="M 0 20 Q 0 0 20 0 L 1100 0 Q 1120 0 1120 20 L 1120 23 L 0 23 Z" fill="url(#accentCyan)" />
+
+    <!-- Panel Title -->
+    <text x="40" y="65" fill="#FFFFFF" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="24">
+      Application Scrutiny &amp; Multimodal AI Processing Desk
+    </text>
+    <text x="40" y="95" fill="#94A3B8" font-family="'Public Sans', sans-serif" font-size="14">
+      Trade License Application: GEAI-2026-000001 • Applicant: Ravi Kumar (Commercial Retail)
+    </text>
+
+    <!-- Sub-Cards Grid -->
+    <!-- Card 1: Uploaded Ingestion Stream -->
+    <g transform="translate(40, 130)">
+      <rect width="500" height="340" rx="14" fill="url(#cardGrad)" stroke="rgba(148, 163, 184, 0.15)" stroke-width="1" />
+      <text x="25" y="40" fill="#38BDF8" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="600">
+        INGESTED ATTACHMENTS (4/4)
+      </text>
+
+      <!-- Ingested items -->
+      <g transform="translate(25, 60)">
+        <rect width="450" height="52" rx="8" fill="rgba(7, 17, 31, 0.7)" stroke="rgba(16, 185, 129, 0.25)" />
+        <circle cx="28" cy="26" r="10" fill="rgba(16, 185, 129, 0.2)" />
+        <path d="M24 26 L27 29 L32 23" fill="none" stroke="#10B981" stroke-width="2" />
+        <text x="50" y="24" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-size="13" font-weight="600">Aadhaar_Card_Proof.pdf</text>
+        <text x="50" y="40" fill="#94A3B8" font-family="'JetBrains Mono', monospace" font-size="11">1.2 MB • Scanned Clean • OCR Confidence 98.6%</text>
+      </g>
+
+      <g transform="translate(25, 125)">
+        <rect width="450" height="52" rx="8" fill="rgba(7, 17, 31, 0.7)" stroke="rgba(16, 185, 129, 0.25)" />
+        <circle cx="28" cy="26" r="10" fill="rgba(16, 185, 129, 0.2)" />
+        <path d="M24 26 L27 29 L32 23" fill="none" stroke="#10B981" stroke-width="2" />
+        <text x="50" y="24" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-size="13" font-weight="600">Registered_Lease_Deed.pdf</text>
+        <text x="50" y="40" fill="#94A3B8" font-family="'JetBrains Mono', monospace" font-size="11">4.5 MB • 8 Pages • Extraction Finished</text>
+      </g>
+
+      <g transform="translate(25, 190)">
+        <rect width="450" height="52" rx="8" fill="rgba(7, 17, 31, 0.7)" stroke="rgba(16, 185, 129, 0.25)" />
+        <circle cx="28" cy="26" r="10" fill="rgba(16, 185, 129, 0.2)" />
+        <path d="M24 26 L27 29 L32 23" fill="none" stroke="#10B981" stroke-width="2" />
+        <text x="50" y="24" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-size="13" font-weight="600">Fire_NOC_Certificate.pdf</text>
+        <text x="50" y="40" fill="#94A3B8" font-family="'JetBrains Mono', monospace" font-size="11">890 KB • Valid until Dec 2027</text>
+      </g>
+
+      <g transform="translate(25, 255)">
+        <rect width="450" height="52" rx="8" fill="rgba(7, 17, 31, 0.7)" stroke="rgba(16, 185, 129, 0.25)" />
+        <circle cx="28" cy="26" r="10" fill="rgba(16, 185, 129, 0.2)" />
+        <path d="M24 26 L27 29 L32 23" fill="none" stroke="#10B981" stroke-width="2" />
+        <text x="50" y="24" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-size="13" font-weight="600">Architect_Sanctioned_Plan.dwg</text>
+        <text x="50" y="40" fill="#94A3B8" font-family="'JetBrains Mono', monospace" font-size="11">650 sq ft Commercial Layout Verified</text>
+      </g>
+    </g>
+
+    <!-- Card 2: Field Matching Heuristics -->
+    <g transform="translate(580, 130)">
+      <rect width="500" height="340" rx="14" fill="url(#cardGrad)" stroke="rgba(148, 163, 184, 0.15)" stroke-width="1" />
+      <text x="25" y="40" fill="#38BDF8" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="600">
+        AI ENTITY CROSS-MATCH ANALYSIS
+      </text>
+
+      <g transform="translate(25, 60)">
+        <rect width="450" height="70" rx="8" fill="rgba(7, 17, 31, 0.7)" stroke="rgba(16, 185, 129, 0.3)" />
+        <text x="20" y="28" fill="#94A3B8" font-family="'JetBrains Mono', monospace" font-size="11">APPLICANT LEGAL NAME</text>
+        <text x="20" y="52" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-size="15" font-weight="600">Ravi Kumar</text>
+        <rect x="360" y="22" width="70" height="26" rx="13" fill="rgba(16, 185, 129, 0.18)" stroke="#10B981" />
+        <text x="395" y="39" fill="#34D399" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" text-anchor="middle">MATCH</text>
+      </g>
+
+      <g transform="translate(25, 145)">
+        <rect width="450" height="85" rx="8" fill="rgba(245, 158, 11, 0.08)" stroke="rgba(245, 158, 11, 0.35)" />
+        <text x="20" y="26" fill="#FBBF24" font-family="'JetBrains Mono', monospace" font-size="11">REGISTERED PREMISES ADDRESS</text>
+        <text x="20" y="48" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-size="13">Form: Flat 42B, Jubilee Hills</text>
+        <text x="20" y="68" fill="#94A3B8" font-family="'Public Sans', sans-serif" font-size="12">Deed: Plot 42, Road 10, Jubilee Hills</text>
+        <rect x="330" y="26" width="105" height="26" rx="13" fill="rgba(245, 158, 11, 0.2)" stroke="#F59E0B" />
+        <text x="382" y="43" fill="#FBBF24" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" text-anchor="middle">REVIEW REQ.</text>
+      </g>
+
+      <g transform="translate(25, 245)">
+        <rect width="450" height="60" rx="8" fill="rgba(7, 17, 31, 0.7)" stroke="rgba(16, 185, 129, 0.3)" />
+        <text x="20" y="24" fill="#94A3B8" font-family="'JetBrains Mono', monospace" font-size="11">COMMERCIAL AREA</text>
+        <text x="20" y="46" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-size="14" font-weight="600">650 sq ft (Class-B Retail)</text>
+        <rect x="360" y="17" width="70" height="26" rx="13" fill="rgba(16, 185, 129, 0.18)" stroke="#10B981" />
+        <text x="395" y="34" fill="#34D399" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" text-anchor="middle">VALID</text>
+      </g>
+    </g>
+
+    <!-- Bottom Wide Panel: Officer Human Scrutiny Bar -->
+    <g transform="translate(40, 500)">
+      <rect width="1040" height="310" rx="14" fill="url(#cardGrad)" stroke="rgba(59, 130, 246, 0.25)" stroke-width="1" />
+      <text x="30" y="45" fill="#FFFFFF" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="18">
+        Administrative Officer Determination Summary
+      </text>
+      <text x="30" y="75" fill="#94A3B8" font-family="'Public Sans', sans-serif" font-size="14">
+        AI engine pre-validation complete with 1 flagged item. Statutory authority remains with Municipal Licensing Officer.
+      </text>
+
+      <g transform="translate(30, 110)">
+        <rect width="310" height="150" rx="10" fill="rgba(7, 17, 31, 0.7)" stroke="rgba(16, 185, 129, 0.25)" />
+        <circle cx="40" cy="40" r="16" fill="rgba(16, 185, 129, 0.15)" />
+        <text x="70" y="46" fill="#FFFFFF" font-family="'Plus Jakarta Sans', sans-serif" font-size="15" font-weight="600">Approve Permit</text>
+        <text x="30" y="90" fill="#94A3B8" font-family="'Public Sans', sans-serif" font-size="12">Sanction application upon discretionary satisfaction with physical premises inspection.</text>
+      </g>
+
+      <g transform="translate(365, 110)">
+        <rect width="310" height="150" rx="10" fill="rgba(7, 17, 31, 0.7)" stroke="rgba(245, 158, 11, 0.3)" />
+        <circle cx="40" cy="40" r="16" fill="rgba(245, 158, 11, 0.15)" />
+        <text x="70" y="46" fill="#FBBF24" font-family="'Plus Jakarta Sans', sans-serif" font-size="15" font-weight="600">Request Clarification</text>
+        <text x="30" y="90" fill="#94A3B8" font-family="'Public Sans', sans-serif" font-size="12">Prompt citizen applicant to rectify registered address discrepancy before approval.</text>
+      </g>
+
+      <g transform="translate(700, 110)">
+        <rect width="310" height="150" rx="10" fill="rgba(7, 17, 31, 0.7)" stroke="rgba(239, 68, 68, 0.25)" />
+        <circle cx="40" cy="40" r="16" fill="rgba(239, 68, 68, 0.15)" />
+        <text x="70" y="46" fill="#F87171" font-family="'Plus Jakarta Sans', sans-serif" font-size="15" font-weight="600">Reject on Grounds</text>
+        <text x="30" y="90" fill="#94A3B8" font-family="'Public Sans', sans-serif" font-size="12">Enter official administrative reason for permit rejection into citizen digital record.</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Right Sidebar: Real-Time Application Timeline -->
+  <g transform="translate(1240, 150)">
+    <rect width="600" height="860" rx="20" fill="url(#panelGrad)" stroke="rgba(59, 130, 246, 0.22)" stroke-width="1.5" />
+    
+    <text x="40" y="60" fill="#FFFFFF" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="22">
+      Service Lifecycle Timeline
+    </text>
+    <text x="40" y="88" fill="#94A3B8" font-family="'JetBrains Mono', monospace" font-size="12">
+      TOKEN #GEAI-2026-000001
+    </text>
+
+    <!-- Stepper Line -->
+    <line x1="60" y1="140" x2="60" y2="700" stroke="rgba(148, 163, 184, 0.2)" stroke-width="2" />
+
+    <!-- Node 1 -->
+    <g transform="translate(60, 140)">
+      <circle cx="0" cy="0" r="12" fill="#10B981" />
+      <path d="M-4 0 L-1 3 L4 -2" fill="none" stroke="#FFFFFF" stroke-width="2" />
+      <text x="30" y="5" fill="#FFFFFF" font-family="'Plus Jakarta Sans', sans-serif" font-size="16" font-weight="600">Application Submitted</text>
+      <text x="30" y="26" fill="#94A3B8" font-family="'Public Sans', sans-serif" font-size="12">Online intake completed &amp; statutory fee token logged</text>
+    </g>
+
+    <!-- Node 2 -->
+    <g transform="translate(60, 250)">
+      <circle cx="0" cy="0" r="12" fill="#10B981" />
+      <path d="M-4 0 L-1 3 L4 -2" fill="none" stroke="#FFFFFF" stroke-width="2" />
+      <text x="30" y="5" fill="#FFFFFF" font-family="'Plus Jakarta Sans', sans-serif" font-size="16" font-weight="600">Documents Ingested</text>
+      <text x="30" y="26" fill="#94A3B8" font-family="'Public Sans', sans-serif" font-size="12">4 attachments validated against municipal criteria</text>
+    </g>
+
+    <!-- Node 3 -->
+    <g transform="translate(60, 360)">
+      <circle cx="0" cy="0" r="14" fill="#06B6D4" filter="url(#glow)" />
+      <circle cx="0" cy="0" r="7" fill="#07111F" />
+      <text x="30" y="5" fill="#22D3EE" font-family="'Plus Jakarta Sans', sans-serif" font-size="16" font-weight="700">AI Verification Active</text>
+      <text x="30" y="26" fill="#CBD5E1" font-family="'Public Sans', sans-serif" font-size="12">OCR tokenization &amp; heuristic anomaly detection</text>
+    </g>
+
+    <!-- Node 4 -->
+    <g transform="translate(60, 480)">
+      <circle cx="0" cy="0" r="10" fill="#1E293B" stroke="#64748B" stroke-width="2" />
+      <text x="30" y="5" fill="#94A3B8" font-family="'Plus Jakarta Sans', sans-serif" font-size="16" font-weight="500">Officer Desk Scrutiny</text>
+      <text x="30" y="26" fill="#64748B" font-family="'Public Sans', sans-serif" font-size="12">Awaiting municipal licensing officer determination</text>
+    </g>
+
+    <!-- Node 5 -->
+    <g transform="translate(60, 600)">
+      <circle cx="0" cy="0" r="10" fill="#1E293B" stroke="#64748B" stroke-width="2" />
+      <text x="30" y="5" fill="#94A3B8" font-family="'Plus Jakarta Sans', sans-serif" font-size="16" font-weight="500">Statutory Sanction</text>
+      <text x="30" y="26" fill="#64748B" font-family="'Public Sans', sans-serif" font-size="12">Officer approval seal or correction notice release</text>
+    </g>
+
+    <!-- Bottom Notice -->
+    <g transform="translate(40, 720)">
+      <rect width="520" height="90" rx="10" fill="rgba(15, 34, 58, 0.6)" stroke="rgba(59, 130, 246, 0.2)" />
+      <text x="25" y="38" fill="#38BDF8" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700">PROTOTYPE SAFEGUARD</text>
+      <text x="25" y="62" fill="#94A3B8" font-family="'Public Sans', sans-serif" font-size="12">
+        AI assists the workflow. Final approval always rests with authorized officers.
+      </text>
+    </g>
+  </g>
+</svg>
