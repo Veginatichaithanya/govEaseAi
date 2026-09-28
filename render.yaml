@@ -64,8 +64,6 @@ services:
     name: goveaseai-frontend
     runtime: static
     rootDir: Frontend
-    plan: free
-    region: oregon
     buildCommand: npm install && npm run build
     staticPublishPath: dist
     routes:
