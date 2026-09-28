@@ -162,12 +162,15 @@ export async function fileToAttachment(file: File): Promise<FileAttachment> {
 
 // ── URL & API Helpers ─────────────────────────────────────────────────────────
 
-const RAW_API_BASE = (import.meta.env.VITE_API_BASE_URL || '/api').trim();
-const API_BASE = RAW_API_BASE.replace(/\/+$/, '');
+let RAW_API_BASE = (import.meta.env.VITE_API_BASE_URL || '/api').trim().replace(/\/+$/, '');
+if (RAW_API_BASE && !RAW_API_BASE.startsWith('/') && !RAW_API_BASE.startsWith('http://') && !RAW_API_BASE.startsWith('https://')) {
+  RAW_API_BASE = `https://${RAW_API_BASE}`;
+}
+const API_BASE = RAW_API_BASE.endsWith('/api') ? RAW_API_BASE : `${RAW_API_BASE}/api`;
 
 export function resolveUrl(endpoint: string): string {
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  if (API_BASE.endsWith('/api') && cleanEndpoint.startsWith('/api')) {
+  if (cleanEndpoint.startsWith('/api')) {
     return `${API_BASE}${cleanEndpoint.slice(4)}`;
   }
   return `${API_BASE}${cleanEndpoint}`;
