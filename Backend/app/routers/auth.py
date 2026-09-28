@@ -448,18 +448,18 @@ def request_forgot_password(req: ForgotPasswordRequest, db: Session = Depends(ge
     import secrets
     from datetime import datetime, timezone, timedelta
 
-    identifier = req.identifier.strip()
-    if not identifier:
+    email_clean = req.identifier.strip().lower()
+    if not email_clean or "@" not in email_clean:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Please provide your registered email or mobile number."
+            detail="Please provide your registered email address."
         )
 
-    user = find_user_by_identifier(identifier, db)
+    user = db.query(User).filter(User.email.ilike(email_clean)).first()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="No account found matching this email or mobile number."
+            detail="No account found matching this email address."
         )
 
     if not user.email:
@@ -516,11 +516,11 @@ def verify_reset_otp(req: VerifyOtpRequest, db: Session = Depends(get_db)):
     """
     from datetime import datetime, timezone
 
-    user = find_user_by_identifier(req.identifier, db)
+    user = db.query(User).filter(User.email.ilike(req.identifier.strip().lower())).first()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Invalid account identifier."
+            detail="Account email not found."
         )
 
     otp_clean = req.otp.strip()
@@ -563,11 +563,11 @@ def reset_password(req: ResetPasswordRequest, db: Session = Depends(get_db)):
             detail="Password must be at least 8 characters long."
         )
 
-    user = find_user_by_identifier(req.identifier, db)
+    user = db.query(User).filter(User.email.ilike(req.identifier.strip().lower())).first()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="User account not found."
+            detail="Account email not found."
         )
 
     # Verify active token

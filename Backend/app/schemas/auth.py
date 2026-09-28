@@ -73,7 +73,7 @@ class OfficerLoginResponse(BaseModel):
 
 
 class ForgotPasswordRequest(BaseModel):
-    identifier: str  # Email or Mobile Number
+    identifier: str  # Registered Email Address
 
 
 class ForgotPasswordResponse(BaseModel):

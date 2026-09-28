@@ -127,7 +127,12 @@ export const ForgotPasswordPage: React.FC = () => {
   const handleRequestOtp = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!identifier.trim()) {
-      setErrorMsg('Please enter your registered email address or mobile number.');
+      setErrorMsg('Please enter your registered email address.');
+      return;
+    }
+
+    if (!identifier.includes('@') || !identifier.includes('.')) {
+      setErrorMsg('Please enter a valid email address.');
       return;
     }
 
@@ -309,7 +314,7 @@ export const ForgotPasswordPage: React.FC = () => {
               }}
             >
               {step === 1 &&
-                'Enter your registered email address or mobile number to receive a 6-digit OTP code.'}
+                'Enter your registered email address to receive a 6-digit verification code.'}
               {step === 2 &&
                 (maskedEmail
                   ? `We sent a 6-digit verification code to ${maskedEmail}.`
@@ -383,18 +388,18 @@ export const ForgotPasswordPage: React.FC = () => {
             >
               <div style={fieldWrap}>
                 <label htmlFor="reset-identifier" className="form-label">
-                  Email or Registered Mobile Number
+                  Registered Email Address
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
                     id="reset-identifier"
-                    type="text"
+                    type="email"
                     value={identifier}
                     onChange={(e) => {
                       setIdentifier(e.target.value);
                       setErrorMsg(null);
                     }}
-                    placeholder="e.g. name@example.com or 9876543210"
+                    placeholder="name@example.com"
                     className="login-input"
                     disabled={isLoading}
                     autoFocus
