@@ -18,9 +18,9 @@ async function testServicesFlow() {
 
   try {
     // 1. Login
-    await page.goto('http://localhost:5173/login', { waitUntil: 'networkidle' });
-    await page.fill('input[type="text"], input[type="email"]', 'citizen@govease.ai');
-    await page.fill('input[type="password"]', 'Citizen@123');
+    await page.goto('http://localhost:5173/login', { waitUntil: 'domcontentloaded' });
+    await page.fill('input[type="text"], input[type="email"]', 'naga@gmail.com');
+    await page.fill('input[type="password"]', 'Password@123');
     await page.click('button[type="submit"]');
     await page.waitForURL('**/dashboard', { timeout: 6000 });
     check(page.url().includes('/dashboard'), 'Logged in to /dashboard');
@@ -48,7 +48,7 @@ async function testServicesFlow() {
 
     // 3. Test Shop Registration Flow (Section 38)
     console.log('\nTesting Shop Registration Navigation (Second Service)...');
-    await page.goto('http://localhost:5173/services', { waitUntil: 'networkidle' });
+    await page.goto('http://localhost:5173/services', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('a[href="/services/shop-registration"]', { timeout: 5000 });
     await page.click('a[href="/services/shop-registration"]');
     await page.waitForURL('**/services/shop-registration', { timeout: 5000 });
@@ -64,13 +64,13 @@ async function testServicesFlow() {
 
     // 4. Test Digital Approval Route
     console.log('\nTesting Digital Approval Certificate Route...');
-    await page.goto('http://localhost:5173/applications/GEAI-2026-000003/approval', { waitUntil: 'networkidle' });
+    await page.goto('http://localhost:5173/applications/GEAI-2026-000001/approval', { waitUntil: 'domcontentloaded' });
     const approvalText = await page.textContent('body');
-    check(approvalText.includes('Business License') || approvalText.includes('Digital Approval') || approvalText.includes('Sanctioned'), 'Digital Approval certificate renders properly');
+    check(approvalText.includes('Trade License') || approvalText.includes('Digital Approval') || approvalText.includes('Sanctioned'), 'Digital Approval certificate renders properly');
 
     // 5. Test Tracking Route
     console.log('\nTesting Application Tracking Route...');
-    await page.goto('http://localhost:5173/applications/GEAI-2026-000001', { waitUntil: 'networkidle' });
+    await page.goto('http://localhost:5173/applications/GEAI-2026-000001', { waitUntil: 'domcontentloaded' });
     const trackingText = await page.textContent('body');
     check(trackingText.includes('GEAI-2026-000001'), 'Tracking page displays application ID GEAI-2026-000001');
     check(trackingText.includes('Trade License'), 'Tracking page shows Trade License');

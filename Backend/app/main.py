@@ -1,3 +1,4 @@
+import os
 import logging
 from datetime import datetime, timezone
 from fastapi import FastAPI, Request
@@ -6,7 +7,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import text
 
 from app.config import settings
-from app.database import engine
+from app.database import engine, Base
 from app.routers import (
     auth_router,
     services_router,
@@ -33,16 +34,26 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS configuration — explicit origins required when allow_credentials=True
+# CORS configuration — explicit origins + dynamic Render onrender.com origin regex
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:5000",
+    "http://127.0.0.1:5000",
+    "http://localhost:3000",
+]
+
+extra_origins = os.getenv("CORS_ORIGINS", "") or os.getenv("FRONTEND_URL", "")
+if extra_origins:
+    for o in extra_origins.split(","):
+        clean_o = o.strip().rstrip("/")
+        if clean_o and clean_o not in origins:
+            origins.append(clean_o)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:5000",
-        "http://127.0.0.1:5000",
-        "http://localhost:3000",
-    ],
+    allow_origins=origins,
+    allow_origin_regex=r"^https://.*\.onrender\.com$",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
@@ -93,12 +104,29 @@ app.include_router(government_auth_router)
 @app.on_event("startup")
 def on_startup():
     logger.info("=" * 60)
-    logger.info("GovEaseAI FastAPI Backend initializing on port 5000...")
+    logger.info(f"GovEaseAI FastAPI Backend initializing on port {settings.PORT}...")
     try:
+        from app.database import SessionLocal
+        from app.models.service import GovernmentService
+        from app.seed import seed_database
+
+        # 1. Automatically create all tables if they don't exist
+        Base.metadata.create_all(bind=engine)
+        logger.info("PostgreSQL database tables verified/created successfully.")
+
+        # 2. Check if database needs initial seeding
+        with SessionLocal() as db:
+            svc_count = db.query(GovernmentService).count()
+            if svc_count == 0:
+                logger.info("Empty database detected. Running initial seed data...")
+                seed_database()
+            else:
+                logger.info(f"Database ready: found {svc_count} active statutory services.")
+
         with engine.connect() as conn:
             res = conn.execute(text("SELECT current_database();")).scalar()
             logger.info(f"Connected to PostgreSQL database: '{res}'")
     except Exception as e:
-        logger.error(f"Failed to connect to PostgreSQL: {e}")
-    logger.info(f"OpenRouter Model configured: {settings.OPENROUTER_MODEL}")
+        logger.error(f"Database initialization notice: {e}")
+    logger.info(f"Active AI Provider: {settings.AI_PROVIDER}")
     logger.info("=" * 60)

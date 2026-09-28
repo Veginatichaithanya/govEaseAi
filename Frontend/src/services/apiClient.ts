@@ -55,8 +55,13 @@ export async function apiRequest<T = any>(
     headers['Authorization'] = `Bearer ${token}`;
   }
 
+  const configuredBase = (import.meta.env.VITE_API_BASE_URL || '/api').trim().replace(/\/+$/, '');
+  const baseWithoutApi = configuredBase.replace(/\/api$/, '');
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  const url = cleanEndpoint.startsWith('/api') ? cleanEndpoint : `/api${cleanEndpoint}`;
+  const path = cleanEndpoint.startsWith('/api') ? cleanEndpoint : `/api${cleanEndpoint}`;
+  const url = (configuredBase.startsWith('http://') || configuredBase.startsWith('https://'))
+    ? `${baseWithoutApi}${path}`
+    : path;
 
   try {
     const response = await fetch(url, {

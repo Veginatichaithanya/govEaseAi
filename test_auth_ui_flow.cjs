@@ -27,7 +27,7 @@ async function runAuthUITests() {
     // TEST 1: Phone + WRONG Password MUST NOT Log In
     // ----------------------------------------------------
     console.log('\n--- Test 1: Phone + WRONG Password Rejection ---');
-    await page.goto('http://localhost:5173/login', { waitUntil: 'networkidle' });
+    await page.goto('http://localhost:5173/login', { waitUntil: 'domcontentloaded' });
     assert(page.url().includes('/login'), 'Loaded /login');
 
     await page.fill('#login-identifier', '9876543210');
@@ -101,7 +101,7 @@ async function runAuthUITests() {
     assert(tokenAfterLogout === null, 'Token cleared from localStorage after logout');
 
     // Attempt direct navigation to /dashboard without session
-    await page.goto('http://localhost:5173/dashboard', { waitUntil: 'networkidle' });
+    await page.goto('http://localhost:5173/dashboard', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1000);
     assert(page.url().includes('/login'), 'Direct visit to /dashboard unauthenticated redirected to /login');
 
@@ -110,7 +110,7 @@ async function runAuthUITests() {
     // ----------------------------------------------------
     console.log('\n--- Test 4: Citizen B Login & Personalization ---');
     // Log in with the newly created test citizen from audit
-    await page.goto('http://localhost:5173/login', { waitUntil: 'networkidle' });
+    await page.goto('http://localhost:5173/login', { waitUntil: 'domcontentloaded' });
     await page.fill('#login-identifier', '9889788946');
     await page.fill('#login-password', 'TestCitizen@2026');
     await page.click('#citizen-signin-btn');
@@ -139,7 +139,7 @@ async function runAuthUITests() {
     // TEST 5: Officer Login & Wrong Password Rejection
     // ----------------------------------------------------
     console.log('\n--- Test 5: Officer Login & Password Verification ---');
-    await page.goto('http://localhost:5173/officer/login', { waitUntil: 'networkidle' });
+    await page.goto('http://localhost:5173/officer/login', { waitUntil: 'domcontentloaded' });
     assert(page.url().includes('/officer/login'), 'Loaded /officer/login');
 
     // Select Municipal Licensing Division

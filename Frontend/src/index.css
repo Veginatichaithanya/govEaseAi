@@ -771,7 +771,8 @@ html.theme-transition *::after {
 }
 
 @media (max-width: 720px) {
-  .header-search-container {
+  .header-search-container,
+  .dashboard-header-center {
     display: none !important;
   }
 }
