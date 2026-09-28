@@ -71,3 +71,38 @@ class OfficerLoginResponse(BaseModel):
     token: str
     user: OfficerUserInfo
 
+
+class ForgotPasswordRequest(BaseModel):
+    identifier: str  # Email or Mobile Number
+
+
+class ForgotPasswordResponse(BaseModel):
+    success: bool
+    message: str
+    maskedEmail: Optional[str] = None
+
+
+class VerifyOtpRequest(BaseModel):
+    identifier: str
+    otp: str
+
+
+class VerifyOtpResponse(BaseModel):
+    success: bool
+    resetToken: str
+    message: str
+
+
+class ResetPasswordRequest(BaseModel):
+    identifier: str
+    otp: str
+    resetToken: Optional[str] = None
+    newPassword: str
+    confirmPassword: str
+
+
+class ResetPasswordResponse(BaseModel):
+    success: bool
+    message: str
+
+

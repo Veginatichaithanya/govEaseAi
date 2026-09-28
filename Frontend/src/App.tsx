@@ -18,6 +18,7 @@ import NotificationsPage from './pages/NotificationsPage';
 import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
 import SignupPage from './pages/SignupPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import OfficerLoginPage from './pages/officer/OfficerLoginPage';
 import OfficerDashboardPage from './pages/officer/OfficerDashboardPage';
 import OfficerReviewPage from './pages/officer/OfficerReviewPage';
@@ -70,6 +71,7 @@ export const App: React.FC = () => {
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
               {/* ── Citizen Portal Protected Routes ── */}
               <Route path="/dashboard" element={<CitizenProtectedRoute><CitizenDashboardPage /></CitizenProtectedRoute>} />

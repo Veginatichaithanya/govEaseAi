@@ -326,16 +326,21 @@ export const LoginPage: React.FC = () => {
                 <label htmlFor="login-password" className="form-label" style={{ marginBottom: 0 }}>
                   Password
                 </label>
-                <span
+                <Link
+                  to="/forgot-password"
+                  id="forgot-password-link"
                   style={{
                     fontSize: '0.78rem',
                     color: 'var(--accent-blue-light)',
                     fontWeight: 600,
+                    textDecoration: 'none',
                     cursor: 'pointer'
                   }}
+                  onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
+                  onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
                 >
                   Forgot Password?
-                </span>
+                </Link>
               </div>
 
               <div style={passwordWrap}>

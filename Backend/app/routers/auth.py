@@ -1,3 +1,5 @@
+import uuid
+import logging
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -5,6 +7,7 @@ from app.database import get_db
 from app.models.user import User
 from app.models.profile import CitizenProfile
 from app.models.department import GovernmentDepartment
+from app.models.password_reset import PasswordResetToken
 from app.schemas.auth import (
     LoginRequest,
     LoginResponse,
@@ -13,11 +16,19 @@ from app.schemas.auth import (
     OfficerLoginRequest,
     OfficerLoginResponse,
     OfficerUserInfo,
+    ForgotPasswordRequest,
+    ForgotPasswordResponse,
+    VerifyOtpRequest,
+    VerifyOtpResponse,
+    ResetPasswordRequest,
+    ResetPasswordResponse,
 )
-from app.services.auth_service import verify_password, create_access_token
+from app.services.auth_service import verify_password, create_access_token, hash_password
+from app.services.email_service import send_password_reset_email, send_password_changed_notification
 from app.routers.deps import get_current_user
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
+logger = logging.getLogger("goveaseai")
 
 ALL_OFFICER_PERMISSIONS = [
     "VIEW_APPLICATIONS",
@@ -393,4 +404,205 @@ def officer_login(req: OfficerLoginRequest, db: Session = Depends(get_db)):
             permissions=ALL_OFFICER_PERMISSIONS,
         )
     )
+
+
+# ── Password Reset Endpoints (Email OTP & Token) ───────────────────────────
+
+def mask_email(email: str) -> str:
+    """Masks an email for security display, e.g. ve****@gmail.com."""
+    if "@" not in email:
+        return email
+    name_part, domain_part = email.split("@", 1)
+    if len(name_part) <= 2:
+        masked_name = name_part[0] + "*"
+    else:
+        masked_name = name_part[:2] + "*" * (len(name_part) - 2)
+    return f"{masked_name}@{domain_part}"
+
+def find_user_by_identifier(identifier: str, db: Session) -> Optional[User]:
+    """Helper to locate user by email or Indian phone number."""
+    raw = identifier.strip()
+    if "@" in raw:
+        return db.query(User).filter(User.email.ilike(raw.lower())).first()
+    norm = normalize_indian_phone(raw)
+    candidates = {raw}
+    if norm:
+        candidates.add(norm)
+        candidates.add(f"+91{norm}")
+        candidates.add(f"+91 {norm}")
+        candidates.add(f"91{norm}")
+        if len(norm) == 10:
+            candidates.add(f"+91 {norm[:5]} {norm[5:]}")
+    user = db.query(User).filter(User.phone.in_(list(candidates))).first()
+    if not user:
+        user = db.query(User).filter(User.email.ilike(raw.lower())).first()
+    return user
+
+
+@router.post("/forgot-password", response_model=ForgotPasswordResponse)
+def request_forgot_password(req: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    """
+    Initiates the password reset workflow.
+    Generates a 6-digit verification code and emails it via Gmail SMTP.
+    """
+    import secrets
+    from datetime import datetime, timezone, timedelta
+
+    identifier = req.identifier.strip()
+    if not identifier:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Please provide your registered email or mobile number."
+        )
+
+    user = find_user_by_identifier(identifier, db)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No account found matching this email or mobile number."
+        )
+
+    if not user.email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This account does not have a verified email address on record."
+        )
+
+    # Invalidate previous unused reset tokens for this user
+    db.query(PasswordResetToken).filter(
+        PasswordResetToken.user_id == user.id,
+        PasswordResetToken.is_used == False
+    ).update({"is_used": True})
+
+    # Generate 6-digit random OTP and secure URL-safe token
+    otp = f"{secrets.randbelow(900000) + 100000}"
+    reset_token = secrets.token_urlsafe(32)
+    now = datetime.now(timezone.utc)
+    expires_at = now + timedelta(minutes=15)
+
+    reset_record = PasswordResetToken(
+        id=str(uuid.uuid4()),
+        user_id=user.id,
+        email=user.email,
+        otp=otp,
+        token=reset_token,
+        expires_at=expires_at,
+        is_used=False
+    )
+    db.add(reset_record)
+    db.commit()
+
+    # Dispatch branded HTML email via Gmail SMTP
+    sent, err = send_password_reset_email(user.email, user.full_name, otp, reset_token)
+    if not sent:
+        logger.error(f"Failed to deliver reset email: {err}")
+        # Note: In development/demo, we still provide the response
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unable to send verification email: {err or 'Mail service error'}"
+        )
+
+    return ForgotPasswordResponse(
+        success=True,
+        message=f"A 6-digit verification code has been dispatched to {mask_email(user.email)}.",
+        maskedEmail=mask_email(user.email)
+    )
+
+
+@router.post("/verify-reset-otp", response_model=VerifyOtpResponse)
+def verify_reset_otp(req: VerifyOtpRequest, db: Session = Depends(get_db)):
+    """
+    Verifies that the entered 6-digit OTP is valid and within the 15-minute window.
+    """
+    from datetime import datetime, timezone
+
+    user = find_user_by_identifier(req.identifier, db)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Invalid account identifier."
+        )
+
+    otp_clean = req.otp.strip()
+    token_record = db.query(PasswordResetToken).filter(
+        PasswordResetToken.user_id == user.id,
+        PasswordResetToken.otp == otp_clean,
+        PasswordResetToken.is_used == False
+    ).order_by(PasswordResetToken.created_at.desc()).first()
+
+    now = datetime.now(timezone.utc)
+    if not token_record or token_record.expires_at < now:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The verification code is invalid or has expired. Please request a new one."
+        )
+
+    return VerifyOtpResponse(
+        success=True,
+        resetToken=token_record.token,
+        message="Verification code validated successfully."
+    )
+
+
+@router.post("/reset-password", response_model=ResetPasswordResponse)
+def reset_password(req: ResetPasswordRequest, db: Session = Depends(get_db)):
+    """
+    Consumes the verified OTP/token and resets the user's password.
+    """
+    from datetime import datetime, timezone
+
+    if req.newPassword != req.confirmPassword:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Passwords do not match."
+        )
+
+    if len(req.newPassword) < 8:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Password must be at least 8 characters long."
+        )
+
+    user = find_user_by_identifier(req.identifier, db)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User account not found."
+        )
+
+    # Verify active token
+    otp_clean = req.otp.strip()
+    query = db.query(PasswordResetToken).filter(
+        PasswordResetToken.user_id == user.id,
+        PasswordResetToken.otp == otp_clean,
+        PasswordResetToken.is_used == False
+    )
+    if req.resetToken:
+        query = query.filter(PasswordResetToken.token == req.resetToken.strip())
+
+    token_record = query.order_by(PasswordResetToken.created_at.desc()).first()
+    now = datetime.now(timezone.utc)
+
+    if not token_record or token_record.expires_at < now:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired reset session. Please start over."
+        )
+
+    # Update password hash
+    user.password_hash = hash_password(req.newPassword)
+    token_record.is_used = True
+    db.commit()
+
+    # Send confirmation alert email in background
+    try:
+        send_password_changed_notification(user.email, user.full_name)
+    except Exception as e:
+        logger.warning(f"Could not send password change notice: {e}")
+
+    return ResetPasswordResponse(
+        success=True,
+        message="Your password has been successfully reset. You may now sign in."
+    )
+
 
