@@ -62,10 +62,12 @@ export const authService = {
 
   async loginAsync(email: string, password: string): Promise<{ success: boolean; user?: AuthUser; error?: string }> {
     try {
+      const cleanIdent = email.trim();
+      const cleanPass = password.trim();
       const res = await apiClient.post('/auth/login', {
-        identifier: email,
-        email,
-        password,
+        identifier: cleanIdent,
+        email: cleanIdent,
+        password: cleanPass,
         role: 'CITIZEN'
       });
 
@@ -126,11 +128,11 @@ export const authService = {
   ): Promise<{ success: boolean; message?: string; error?: string }> {
     try {
       const res = await apiClient.post('/auth/signup', {
-        fullName,
-        email,
-        mobile,
-        password,
-        confirmPassword
+        fullName: fullName.trim(),
+        email: email.trim().toLowerCase(),
+        mobile: mobile.trim(),
+        password: password.trim(),
+        confirmPassword: confirmPassword.trim()
       });
 
       if (res.ok) {

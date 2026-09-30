@@ -12,8 +12,23 @@ def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify plain password against hashed password."""
-    return pwd_context.verify(plain_password, hashed_password)
+    """Verify plain password against hashed password, handling accidental whitespace gracefully."""
+    if not plain_password or not hashed_password:
+        return False
+    try:
+        if pwd_context.verify(plain_password, hashed_password):
+            return True
+    except Exception:
+        pass
+
+    try:
+        stripped = plain_password.strip()
+        if stripped != plain_password and pwd_context.verify(stripped, hashed_password):
+            return True
+    except Exception:
+        pass
+
+    return False
 
 def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
     """Generate cryptographically signed JWT access token."""

@@ -73,13 +73,14 @@ def signup(req: SignupRequest, db: Session = Depends(get_db)):
     import uuid
     from app.services.auth_service import hash_password
 
-    if req.password != req.confirmPassword:
+    clean_password = req.password.strip()
+    if req.password != req.confirmPassword and clean_password != req.confirmPassword.strip():
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Passwords do not match."
         )
 
-    if len(req.password) < 8:
+    if len(clean_password) < 8:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Password must be at least 8 characters long."
@@ -101,14 +102,17 @@ def signup(req: SignupRequest, db: Session = Depends(get_db)):
 
     # Check mobile uniqueness
     if mobile_to_store:
-        phone_candidates = {mobile_to_store}
+        phone_candidates = {mobile_to_store, raw_mobile}
         if norm_mobile:
             phone_candidates.add(norm_mobile)
             phone_candidates.add(f"+91{norm_mobile}")
             phone_candidates.add(f"+91 {norm_mobile}")
             phone_candidates.add(f"91{norm_mobile}")
+            phone_candidates.add(f"0{norm_mobile}")
             if len(norm_mobile) == 10:
                 phone_candidates.add(f"+91 {norm_mobile[:5]} {norm_mobile[5:]}")
+                phone_candidates.add(f"{norm_mobile[:5]} {norm_mobile[5:]}")
+                phone_candidates.add(f"{norm_mobile[:5]}-{norm_mobile[5:]}")
         existing_mobile = db.query(User).filter(User.phone.in_(list(phone_candidates))).first()
         if existing_mobile:
             raise HTTPException(
@@ -119,7 +123,7 @@ def signup(req: SignupRequest, db: Session = Depends(get_db)):
     new_user = User(
         id=str(uuid.uuid4()),
         email=email,
-        password_hash=hash_password(req.password),
+        password_hash=hash_password(clean_password),
         full_name=full_name,
         phone=mobile_to_store,
         applicant_id=f"CIT-{uuid.uuid4().hex[:8].upper()}",
@@ -162,10 +166,19 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
             detail="Invalid phone number/email or password."
         )
 
-    # 1. Look up user by email or normalized phone
+    # 1. Look up user by email, phone, applicant ID, or full name
+    user = None
+
+    # Check by email if '@' present
     if "@" in raw_identifier:
         user = db.query(User).filter(User.email.ilike(raw_identifier.lower())).first()
-    else:
+
+    # Check by Applicant ID if formatted as CIT-* or APP-*
+    if not user and (raw_identifier.upper().startswith("CIT-") or raw_identifier.upper().startswith("APP-")):
+        user = db.query(User).filter(User.applicant_id.ilike(raw_identifier)).first()
+
+    # Check by Phone number (normalizing spaces, country codes, dashes)
+    if not user:
         norm = normalize_indian_phone(raw_identifier)
         phone_candidates = {raw_identifier}
         if norm:
@@ -173,14 +186,26 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
             phone_candidates.add(f"+91{norm}")
             phone_candidates.add(f"+91 {norm}")
             phone_candidates.add(f"91{norm}")
+            phone_candidates.add(f"0{norm}")
             if len(norm) == 10:
                 phone_candidates.add(f"+91 {norm[:5]} {norm[5:]}")
+                phone_candidates.add(f"{norm[:5]} {norm[5:]}")
+                phone_candidates.add(f"{norm[:5]}-{norm[5:]}")
         user = db.query(User).filter(User.phone.in_(list(phone_candidates))).first()
-        if not user:
-            # Fallback to check email in case identifier didn't contain @
-            user = db.query(User).filter(User.email.ilike(raw_identifier.lower())).first()
 
-    # 2. Strict password verification
+    # Fallback 1: check email case-insensitively even without '@'
+    if not user:
+        user = db.query(User).filter(User.email.ilike(raw_identifier.lower())).first()
+
+    # Fallback 2: check applicant ID
+    if not user:
+        user = db.query(User).filter(User.applicant_id.ilike(raw_identifier)).first()
+
+    # Fallback 3: check exact full name
+    if not user:
+        user = db.query(User).filter(User.full_name.ilike(raw_identifier)).first()
+
+    # 2. Strict password verification (handles exact match and trimmed match)
     if not user or not verify_password(req.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -551,13 +576,15 @@ def reset_password(req: ResetPasswordRequest, db: Session = Depends(get_db)):
     """
     from datetime import datetime, timezone
 
-    if req.newPassword != req.confirmPassword:
+    clean_new_pass = req.newPassword.strip()
+    clean_confirm_pass = req.confirmPassword.strip()
+    if req.newPassword != req.confirmPassword and clean_new_pass != clean_confirm_pass:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Passwords do not match."
         )
 
-    if len(req.newPassword) < 8:
+    if len(clean_new_pass) < 8:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Password must be at least 8 characters long."
@@ -590,7 +617,7 @@ def reset_password(req: ResetPasswordRequest, db: Session = Depends(get_db)):
         )
 
     # Update password hash
-    user.password_hash = hash_password(req.newPassword)
+    user.password_hash = hash_password(clean_new_pass)
     token_record.is_used = True
     db.commit()
 

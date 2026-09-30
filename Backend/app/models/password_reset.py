@@ -16,4 +16,4 @@ class PasswordResetToken(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationship to user
-    user = relationship("User", backref="password_resets")
+    user = relationship("User", back_populates="password_resets")

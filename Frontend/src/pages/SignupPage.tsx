@@ -24,6 +24,16 @@ import ThemeToggle from '../components/ThemeToggle';
 const INDIAN_MOBILE_REGEX = /^[6-9]\d{9}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+export function extractIndianMobileDigits(mobile: string): string {
+  if (!mobile) return '';
+  const cleaned = mobile.trim().replace(/[\s-]/g, '');
+  let digits = cleaned;
+  if (digits.startsWith('+91')) digits = digits.slice(3);
+  else if (digits.startsWith('91') && digits.length === 12) digits = digits.slice(2);
+  else if (digits.startsWith('0') && digits.length === 11) digits = digits.slice(1);
+  return digits;
+}
+
 function validateEmail(email: string): string {
   if (!email.trim()) return 'Email is required.';
   if (!EMAIL_REGEX.test(email.trim())) return 'Please enter a valid email address.';
@@ -32,14 +42,14 @@ function validateEmail(email: string): string {
 
 function validateMobile(mobile: string): string {
   if (!mobile.trim()) return 'Mobile number is required.';
-  const digits = mobile.trim().replace(/\s/g, '');
-  if (!INDIAN_MOBILE_REGEX.test(digits)) return 'Enter a valid 10-digit Indian mobile number.';
+  const digits = extractIndianMobileDigits(mobile);
+  if (!INDIAN_MOBILE_REGEX.test(digits)) return 'Enter a valid 10-digit Indian mobile number (e.g. 9876543210).';
   return '';
 }
 
 function validatePassword(password: string): string {
   if (!password) return 'Password is required.';
-  if (password.length < 8) return 'Password must be at least 8 characters.';
+  if (password.trim().length < 8) return 'Password must be at least 8 characters.';
   return '';
 }
 
@@ -190,20 +200,33 @@ export const SignupPage: React.FC = () => {
     setIsLoading(true);
     setApiError(null);
 
+    const cleanPass = password.trim();
+    const cleanConfirm = confirmPassword.trim();
+    const cleanMob = extractIndianMobileDigits(mobile);
+    const cleanMail = email.trim().toLowerCase();
+    const cleanName = fullName.trim();
+
     const result = await authService.signupAsync(
-      fullName.trim(),
-      email.trim().toLowerCase(),
-      mobile.trim(),
-      password,
-      confirmPassword
+      cleanName,
+      cleanMail,
+      cleanMob,
+      cleanPass,
+      cleanConfirm
     );
 
     setIsLoading(false);
 
     if (result.success) {
       setSuccessState(true);
-      // Redirect to login after short delay
-      setTimeout(() => navigate('/login'), 2500);
+      // Redirect to login with pre-populated identifier state
+      setTimeout(() => {
+        navigate('/login', {
+          state: {
+            registeredIdentifier: cleanMail,
+            registeredName: cleanName
+          }
+        });
+      }, 2000);
     } else {
       setApiError(result.error || 'Signup failed. Please try again.');
     }
@@ -473,6 +496,9 @@ export const SignupPage: React.FC = () => {
                     placeholder="Min. 8 characters"
                     className="login-input"
                     autoComplete="new-password"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
                     disabled={isLoading}
                     style={{ paddingLeft: '2.6rem', paddingRight: '3rem' }}
                   />
@@ -520,6 +546,9 @@ export const SignupPage: React.FC = () => {
                     placeholder="Re-enter password"
                     className="login-input"
                     autoComplete="new-password"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
                     disabled={isLoading}
                     style={{ paddingLeft: '2.6rem', paddingRight: '3rem' }}
                   />

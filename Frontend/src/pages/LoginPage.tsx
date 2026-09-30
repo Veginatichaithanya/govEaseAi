@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   ShieldCheck,
   User,
@@ -9,6 +9,7 @@ import {
   Eye,
   EyeOff,
   AlertCircle,
+  CheckCircle2,
   Loader2
 } from 'lucide-react';
 
@@ -56,20 +57,49 @@ const errorBanner: React.CSSProperties = {
   lineHeight: '1.4'
 };
 
+const successBanner: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.65rem',
+  padding: '0.85rem 1rem',
+  borderRadius: 'var(--radius-sm)',
+  backgroundColor: 'rgba(16, 185, 129, 0.12)',
+  border: '1px solid rgba(16, 185, 129, 0.35)',
+  color: '#34D399',
+  fontSize: '0.84rem',
+  lineHeight: '1.4'
+};
+
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
 
-  // Form state — empty by default (no pre-filled demo credentials)
-  const [identifier, setIdentifier] = useState('');
+  const regIdentifier = (location.state as any)?.registeredIdentifier || '';
+  const regName = (location.state as any)?.registeredName || '';
+
+  const passwordInputRef = useRef<HTMLInputElement>(null);
+
+  // Form state
+  const [identifier, setIdentifier] = useState(regIdentifier);
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successNotice, setSuccessNotice] = useState<string | null>(
+    regIdentifier ? `Account created for ${regName || regIdentifier}! Please enter your password to sign in.` : null
+  );
 
   // Field-level validation errors
   const [identifierError, setIdentifierError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+
+  // If redirected from signup, focus password field immediately
+  useEffect(() => {
+    if (regIdentifier && passwordInputRef.current) {
+      passwordInputRef.current.focus();
+    }
+  }, [regIdentifier]);
 
   const validateForm = (): boolean => {
     let valid = true;
@@ -81,7 +111,7 @@ export const LoginPage: React.FC = () => {
       setIdentifierError('Email or Mobile Number is required.');
       valid = false;
     }
-    if (!password) {
+    if (!password.trim()) {
       setPasswordError('Password is required.');
       valid = false;
     }
@@ -95,9 +125,12 @@ export const LoginPage: React.FC = () => {
 
     setIsLoading(true);
     setErrorMsg(null);
+    setSuccessNotice(null);
 
     try {
-      const result = await login(identifier.trim(), password);
+      const cleanIdent = identifier.trim();
+      const cleanPass = password.trim();
+      const result = await login(cleanIdent, cleanPass);
 
       if (result.success) {
         navigate('/dashboard');
@@ -282,6 +315,14 @@ export const LoginPage: React.FC = () => {
             noValidate
             style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}
           >
+            {/* Success notice after registration */}
+            {successNotice && (
+              <div style={successBanner} role="status">
+                <CheckCircle2 size={18} style={{ flexShrink: 0 }} />
+                <span>{successNotice}</span>
+              </div>
+            )}
+
             {/* Email / Mobile */}
             <div style={fieldWrap}>
               <label htmlFor="login-identifier" className="form-label">
@@ -295,6 +336,7 @@ export const LoginPage: React.FC = () => {
                   setIdentifier(e.target.value);
                   setIdentifierError('');
                   setErrorMsg(null);
+                  setSuccessNotice(null);
                 }}
                 placeholder="Enter email or mobile number"
                 className="login-input"
@@ -345,6 +387,7 @@ export const LoginPage: React.FC = () => {
 
               <div style={passwordWrap}>
                 <input
+                  ref={passwordInputRef}
                   id="login-password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
@@ -352,11 +395,15 @@ export const LoginPage: React.FC = () => {
                     setPassword(e.target.value);
                     setPasswordError('');
                     setErrorMsg(null);
+                    setSuccessNotice(null);
                   }}
                   placeholder="Enter your password"
                   className="login-input"
                   style={{ paddingRight: '3rem' }}
                   autoComplete="current-password"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
                   disabled={isLoading}
                   aria-invalid={!!passwordError}
                   aria-describedby={passwordError ? 'password-error' : undefined}

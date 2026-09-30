@@ -14,6 +14,7 @@ from app.models.knowledge import (
     ServiceDocumentRequirement,
     ServiceApplicationStep,
 )
+from app.models.password_reset import PasswordResetToken
 
 __all__ = [
     "GovernmentDepartment",
@@ -31,5 +32,6 @@ __all__ = [
     "ServiceKnowledgeDocument",
     "ServiceDocumentRequirement",
     "ServiceApplicationStep",
+    "PasswordResetToken",
 ]
 
