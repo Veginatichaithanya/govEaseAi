@@ -10,11 +10,22 @@ import {
   EyeOff,
   AlertCircle,
   CheckCircle2,
-  Loader2
+  Loader2,
+  RefreshCw,
+  Sliders,
+  Server,
+  Zap
 } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext';
 import ThemeToggle from '../components/ThemeToggle';
+import {
+  pingApiHealth,
+  getApiBaseUrl,
+  getStoredApiUrl,
+  setStoredApiUrl,
+  type HealthCheckResult
+} from '../services/apiClient';
 
 /* ─────────────────────────────────────────────────
    Inline helper styles
@@ -57,6 +68,19 @@ const errorBanner: React.CSSProperties = {
   lineHeight: '1.4'
 };
 
+const warningBanner: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'flex-start',
+  gap: '0.65rem',
+  padding: '0.75rem 0.95rem',
+  borderRadius: 'var(--radius-sm)',
+  backgroundColor: 'rgba(245, 158, 11, 0.12)',
+  border: '1px solid rgba(245, 158, 11, 0.35)',
+  color: '#FBBF24',
+  fontSize: '0.82rem',
+  lineHeight: '1.4'
+};
+
 const successBanner: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
@@ -79,12 +103,14 @@ export const LoginPage: React.FC = () => {
   const regName = (location.state as any)?.registeredName || '';
 
   const passwordInputRef = useRef<HTMLInputElement>(null);
+  const wakeUpTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Form state
   const [identifier, setIdentifier] = useState(regIdentifier);
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isWakingUp, setIsWakingUp] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successNotice, setSuccessNotice] = useState<string | null>(
     regIdentifier ? `Account created for ${regName || regIdentifier}! Please enter your password to sign in.` : null
@@ -94,12 +120,55 @@ export const LoginPage: React.FC = () => {
   const [identifierError, setIdentifierError] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
+  // Backend Health Diagnostic & Cloud URL Config State
+  const [apiHealth, setApiHealth] = useState<HealthCheckResult | null>(null);
+  const [isCheckingHealth, setIsCheckingHealth] = useState(false);
+  const [showApiConfig, setShowApiConfig] = useState(false);
+  const [customUrlInput, setCustomUrlInput] = useState(getStoredApiUrl() || getApiBaseUrl());
+
+  const probeBackendHealth = async () => {
+    setIsCheckingHealth(true);
+    try {
+      const result = await pingApiHealth(10000);
+      setApiHealth(result);
+    } catch {
+      setApiHealth({ ok: false, status: 0, latencyMs: 0, url: getApiBaseUrl() });
+    } finally {
+      setIsCheckingHealth(false);
+    }
+  };
+
+  useEffect(() => {
+    probeBackendHealth();
+  }, []);
+
   // If redirected from signup, focus password field immediately
   useEffect(() => {
     if (regIdentifier && passwordInputRef.current) {
       passwordInputRef.current.focus();
     }
   }, [regIdentifier]);
+
+  const handleApplyDemoAccount = (demoIdent: string, demoPass: string) => {
+    setIdentifier(demoIdent);
+    setPassword(demoPass);
+    setIdentifierError('');
+    setPasswordError('');
+    setErrorMsg(null);
+  };
+
+  const handleSaveApiUrl = () => {
+    setStoredApiUrl(customUrlInput);
+    setShowApiConfig(false);
+    probeBackendHealth();
+  };
+
+  const handleResetApiUrl = () => {
+    setStoredApiUrl(null);
+    setCustomUrlInput(getApiBaseUrl());
+    setShowApiConfig(false);
+    probeBackendHealth();
+  };
 
   const validateForm = (): boolean => {
     let valid = true;
@@ -124,13 +193,21 @@ export const LoginPage: React.FC = () => {
     if (isLoading) return;
 
     setIsLoading(true);
+    setIsWakingUp(false);
     setErrorMsg(null);
     setSuccessNotice(null);
+
+    // If server takes longer than 2.5 seconds (Render cold-start spin-up), inform user
+    wakeUpTimerRef.current = setTimeout(() => {
+      setIsWakingUp(true);
+    }, 2500);
 
     try {
       const cleanIdent = identifier.trim();
       const cleanPass = password.trim();
       const result = await login(cleanIdent, cleanPass);
+
+      if (wakeUpTimerRef.current) clearTimeout(wakeUpTimerRef.current);
 
       if (result.success) {
         navigate('/dashboard');
@@ -153,15 +230,17 @@ export const LoginPage: React.FC = () => {
           msg.toLowerCase().includes('network') ||
           msg.toLowerCase().includes('server')
         ) {
-          setErrorMsg('Unable to connect to the server. Please try again.');
+          setErrorMsg('Unable to connect to the backend server. If the server is in sleep mode, it may take up to 45 seconds to wake up. Please try again.');
         } else {
           setErrorMsg(msg);
         }
       }
     } catch {
-      setErrorMsg('Unable to connect to the server. Please try again.');
+      setErrorMsg('Unable to connect to the backend server. If Render free tier is waking up, please wait a few seconds and try again.');
     } finally {
+      if (wakeUpTimerRef.current) clearTimeout(wakeUpTimerRef.current);
       setIsLoading(false);
+      setIsWakingUp(false);
     }
   };
 
@@ -231,7 +310,7 @@ export const LoginPage: React.FC = () => {
           }}
         >
           {/* Brand header */}
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
             <div
               style={{
                 width: '50px',
@@ -270,8 +349,148 @@ export const LoginPage: React.FC = () => {
             </p>
           </div>
 
+          {/* Backend Status Diagnostic Pill */}
+          <div
+            style={{
+              marginBottom: '1.25rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '0.45rem 0.75rem',
+              borderRadius: 'var(--radius-sm)',
+              background: 'rgba(255, 255, 255, 0.03)',
+              border: '1px solid var(--border-subtle)',
+              fontSize: '0.78rem'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', overflow: 'hidden' }}>
+              <div
+                style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  flexShrink: 0,
+                  backgroundColor: isCheckingHealth
+                    ? '#FBBF24'
+                    : apiHealth?.ok
+                    ? '#10B981'
+                    : '#F87171',
+                  boxShadow: apiHealth?.ok ? '0 0 8px rgba(16, 185, 129, 0.6)' : undefined
+                }}
+              />
+              <span style={{ color: 'var(--text-muted)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                {isCheckingHealth ? (
+                  'Checking API status...'
+                ) : apiHealth?.ok ? (
+                  <>Backend Online ({apiHealth.latencyMs}ms)</>
+                ) : (
+                  'Backend Offline / Waking up'
+                )}
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
+              <button
+                type="button"
+                onClick={probeBackendHealth}
+                disabled={isCheckingHealth}
+                title="Ping backend server"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--text-muted)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '2px'
+                }}
+              >
+                <RefreshCw size={13} style={{ animation: isCheckingHealth ? 'spin 1s linear infinite' : 'none' }} />
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowApiConfig(!showApiConfig)}
+                title="Configure Backend URL"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--text-muted)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '2px'
+                }}
+              >
+                <Sliders size={13} />
+              </button>
+            </div>
+          </div>
+
+          {/* Collapsible API URL Configurator for Render */}
+          {showApiConfig && (
+            <div
+              style={{
+                marginBottom: '1.25rem',
+                padding: '0.75rem',
+                borderRadius: 'var(--radius-sm)',
+                backgroundColor: 'rgba(30, 41, 59, 0.5)',
+                border: '1px solid var(--border-accent)',
+                fontSize: '0.8rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.5rem'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ color: 'var(--text-primary)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <Server size={13} color="var(--accent-blue-light)" /> Backend API URL
+                </span>
+                <button
+                  type="button"
+                  onClick={handleResetApiUrl}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: 'var(--accent-blue-light)',
+                    fontSize: '0.74rem',
+                    textDecoration: 'underline'
+                  }}
+                >
+                  Reset default
+                </button>
+              </div>
+              <input
+                type="text"
+                value={customUrlInput}
+                onChange={(e) => setCustomUrlInput(e.target.value)}
+                placeholder="https://goveaseai-backend.onrender.com"
+                className="login-input"
+                style={{ fontSize: '0.8rem', padding: '0.45rem 0.65rem' }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '0.2rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowApiConfig(false)}
+                  className="btn btn-secondary"
+                  style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveApiUrl}
+                  className="btn btn-primary"
+                  style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem' }}
+                >
+                  Save & Connect
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Portal selector tabs */}
-          <div className="role-selector-container" style={{ marginBottom: '2rem' }}>
+          <div className="role-selector-container" style={{ marginBottom: '1.5rem' }}>
             {/* Citizen tab — active */}
             <button
               type="button"
@@ -292,8 +511,49 @@ export const LoginPage: React.FC = () => {
             </button>
           </div>
 
-          {/* Card heading */}
+          {/* Quick Demo Credentials Bar */}
           <div style={{ marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.5rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              <Zap size={13} color="var(--accent-blue-light)" /> Quick Demo Credentials:
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={() => handleApplyDemoAccount('citizen@govease.ai', 'Citizen@123')}
+                style={{
+                  background: 'rgba(59, 130, 246, 0.08)',
+                  border: '1px solid rgba(59, 130, 246, 0.25)',
+                  color: 'var(--accent-blue-light)',
+                  borderRadius: '16px',
+                  padding: '0.25rem 0.65rem',
+                  fontSize: '0.74rem',
+                  cursor: 'pointer',
+                  fontWeight: 500
+                }}
+              >
+                Ravi Kumar (citizen@govease.ai)
+              </button>
+              <button
+                type="button"
+                onClick={() => handleApplyDemoAccount('naga@gmail.com', 'Password@123')}
+                style={{
+                  background: 'rgba(16, 185, 129, 0.08)',
+                  border: '1px solid rgba(16, 185, 129, 0.25)',
+                  color: '#34D399',
+                  borderRadius: '16px',
+                  padding: '0.25rem 0.65rem',
+                  fontSize: '0.74rem',
+                  cursor: 'pointer',
+                  fontWeight: 500
+                }}
+              >
+                Naga (naga@gmail.com)
+              </button>
+            </div>
+          </div>
+
+          {/* Card heading */}
+          <div style={{ marginBottom: '1.25rem' }}>
             <h2
               style={{
                 fontSize: '1.25rem',
@@ -320,6 +580,16 @@ export const LoginPage: React.FC = () => {
               <div style={successBanner} role="status">
                 <CheckCircle2 size={18} style={{ flexShrink: 0 }} />
                 <span>{successNotice}</span>
+              </div>
+            )}
+
+            {/* Adaptive Render Cold-Start Notice */}
+            {isWakingUp && !errorMsg && (
+              <div style={warningBanner} role="status">
+                <Loader2 size={17} style={{ flexShrink: 0, marginTop: '2px', animation: 'spin 1s linear infinite' }} />
+                <span>
+                  <strong>Waking up server:</strong> Render free-tier instances sleep when inactive and take ~30–45s to spin up. Authenticating...
+                </span>
               </div>
             )}
 
@@ -455,7 +725,7 @@ export const LoginPage: React.FC = () => {
               {isLoading ? (
                 <>
                   <Loader2 size={17} style={{ animation: 'spin 1s linear infinite' }} />
-                  Signing In...
+                  {isWakingUp ? 'Waking up Server...' : 'Signing In...'}
                 </>
               ) : (
                 <>

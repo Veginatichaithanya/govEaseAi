@@ -232,13 +232,70 @@ CITIZEN_PASSWORD_HASH = hash_password("Citizen@123")
 OFFICER_PASSWORD_HASH = hash_password("Officer@123")
 
 OFFICER_USERS = [
+    # ── Official Government Officers (matching frontend department presets) ──
+    {
+        "id": "OFF-MLD-001",
+        "email": "licensing@goveaseai.gov",
+        "full_name": "S. Narayanan",
+        "role": "OFFICER",
+        "department_id": "municipal-licensing",
+        "officer_title": "Senior Licensing Officer",
+        "password_hash": hash_password("License@123")
+    },
+    {
+        "id": "OFF-DOL-002",
+        "email": "labour@goveaseai.gov",
+        "full_name": "P. Ramesh Babu",
+        "role": "OFFICER",
+        "department_id": "department-labour",
+        "officer_title": "Labour Enforcement Officer",
+        "password_hash": hash_password("Labour@123")
+    },
+    {
+        "id": "OFF-DOI-003",
+        "email": "industry@goveaseai.gov",
+        "full_name": "K. Ananya Sharma",
+        "role": "OFFICER",
+        "department_id": "directorate-industries",
+        "officer_title": "Industries Promotion Officer",
+        "password_hash": hash_password("Industry@123")
+    },
+    {
+        "id": "OFF-UDTP-004",
+        "email": "building@goveaseai.gov",
+        "full_name": "M. Venkat Reddy",
+        "role": "OFFICER",
+        "department_id": "urban-development",
+        "officer_title": "Town Planning Officer",
+        "password_hash": hash_password("Building@123")
+    },
+    {
+        "id": "OFF-IOF-005",
+        "email": "factory@goveaseai.gov",
+        "full_name": "G. Harish Chandra",
+        "role": "OFFICER",
+        "department_id": "inspectorate-factories",
+        "officer_title": "Factory Licensing Officer",
+        "password_hash": hash_password("Factory@123")
+    },
+    {
+        "id": "OFF-PCB-006",
+        "email": "pollution@goveaseai.gov",
+        "full_name": "Dr. S. Radhika",
+        "role": "OFFICER",
+        "department_id": "pollution-control",
+        "officer_title": "Pollution Control Officer",
+        "password_hash": hash_password("Pollution@123")
+    },
+    # ── Alternative Officer Email Aliases ──
     {
         "id": "OFF-MLD-4091",
         "email": "trade.officer@govease.ai",
         "full_name": "S. Narayanan",
         "role": "OFFICER",
         "department_id": "municipal-licensing",
-        "officer_title": "Municipal Licensing Officer"
+        "officer_title": "Municipal Licensing Officer",
+        "password_hash": hash_password("Officer@123")
     },
     {
         "id": "OFF-DOL-2018",
@@ -246,7 +303,8 @@ OFFICER_USERS = [
         "full_name": "P. Ramesh Babu",
         "role": "OFFICER",
         "department_id": "department-labour",
-        "officer_title": "Labour Enforcement Officer"
+        "officer_title": "Labour Enforcement Officer",
+        "password_hash": hash_password("Officer@123")
     },
     {
         "id": "OFF-DOI-3105",
@@ -254,7 +312,8 @@ OFFICER_USERS = [
         "full_name": "K. Ananya Sharma",
         "role": "OFFICER",
         "department_id": "directorate-industries",
-        "officer_title": "Industries Promotion Officer"
+        "officer_title": "Industries Promotion Officer",
+        "password_hash": hash_password("Officer@123")
     },
     {
         "id": "OFF-UDTP-1102",
@@ -262,7 +321,8 @@ OFFICER_USERS = [
         "full_name": "M. Venkat Reddy",
         "role": "OFFICER",
         "department_id": "urban-development",
-        "officer_title": "Town Planning Officer"
+        "officer_title": "Town Planning Officer",
+        "password_hash": hash_password("Officer@123")
     },
     {
         "id": "OFF-IOF-5204",
@@ -270,7 +330,8 @@ OFFICER_USERS = [
         "full_name": "G. Harish Chandra",
         "role": "OFFICER",
         "department_id": "inspectorate-factories",
-        "officer_title": "Factory Licensing Officer"
+        "officer_title": "Factory Licensing Officer",
+        "password_hash": hash_password("Officer@123")
     },
     {
         "id": "OFF-PCB-6309",
@@ -278,12 +339,14 @@ OFFICER_USERS = [
         "full_name": "Dr. S. Radhika",
         "role": "OFFICER",
         "department_id": "pollution-control",
-        "officer_title": "Pollution Control Officer"
+        "officer_title": "Pollution Control Officer",
+        "password_hash": hash_password("Officer@123")
     }
 ]
 
 CITIZEN_USERS = [
-    {"id": "demo-citizen-001", "email": "citizen@govease.ai", "full_name": "Ravi Kumar"},
+    {"id": "demo-citizen-001", "email": "citizen@govease.ai", "full_name": "Ravi Kumar", "password_hash": hash_password("Citizen@123")},
+    {"id": "demo-citizen-000", "email": "naga@gmail.com", "full_name": "Naga Chaithanya", "password_hash": hash_password("Password@123")},
     {"id": "demo-citizen-002", "email": "ramesh.kumar@example.com", "full_name": "Ramesh Kumar"},
     {"id": "demo-citizen-003", "email": "farooq.auto@example.com", "full_name": "Mohammed Farooq"},
     {"id": "demo-citizen-004", "email": "vikram.rao@example.com", "full_name": "K. Vikramaditya Rao"},
@@ -700,12 +763,15 @@ def seed_database():
 
         # 3. Officers
         for off in OFFICER_USERS:
-            existing = db.query(User).filter(User.id == off["id"]).first()
+            existing = db.query(User).filter(
+                (User.id == off["id"]) | (User.email.ilike(off["email"]))
+            ).first()
+            pass_hash = off.get("password_hash") or OFFICER_PASSWORD_HASH
             if not existing:
                 user = User(
                     id=off["id"],
                     email=off["email"],
-                    password_hash=OFFICER_PASSWORD_HASH,
+                    password_hash=pass_hash,
                     full_name=off["full_name"],
                     role=off["role"],
                     department_id=off["department_id"],
@@ -718,18 +784,21 @@ def seed_database():
                 existing.role = off["role"]
                 existing.department_id = off["department_id"]
                 existing.officer_title = off["officer_title"]
-                existing.password_hash = OFFICER_PASSWORD_HASH
+                existing.password_hash = pass_hash
         db.commit()
         logger.info(f"Seeded {len(OFFICER_USERS)} authorized officer accounts.")
 
         # 4. Citizens
         for cit in CITIZEN_USERS:
-            existing = db.query(User).filter(User.id == cit["id"]).first()
+            existing = db.query(User).filter(
+                (User.id == cit["id"]) | (User.email.ilike(cit["email"]))
+            ).first()
+            pass_hash = cit.get("password_hash") or CITIZEN_PASSWORD_HASH
             if not existing:
                 user = User(
                     id=cit["id"],
                     email=cit["email"],
-                    password_hash=CITIZEN_PASSWORD_HASH,
+                    password_hash=pass_hash,
                     full_name=cit["full_name"],
                     role="CITIZEN"
                 )
@@ -738,7 +807,7 @@ def seed_database():
                 existing.email = cit["email"]
                 existing.full_name = cit["full_name"]
                 existing.role = "CITIZEN"
-                existing.password_hash = CITIZEN_PASSWORD_HASH
+                existing.password_hash = pass_hash
         db.commit()
         logger.info(f"Seeded {len(CITIZEN_USERS)} citizen accounts.")
 

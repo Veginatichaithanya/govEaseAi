@@ -36,6 +36,10 @@ services:
         value: HS256
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
         value: 1440
+      - key: CORS_ORIGINS
+        value: https://goveaseai-frontend.onrender.com,http://localhost:5173
+      - key: FRONTEND_URL
+        value: https://goveaseai-frontend.onrender.com
       - key: AI_PROVIDER
         value: agentrouter
       - key: AGENTROUTER_API_KEY

@@ -41,6 +41,7 @@ origins = [
     "http://localhost:5000",
     "http://127.0.0.1:5000",
     "http://localhost:3000",
+    "https://goveaseai-frontend.onrender.com",
 ]
 
 extra_origins = os.getenv("CORS_ORIGINS", "") or os.getenv("FRONTEND_URL", "")
@@ -53,7 +54,7 @@ if extra_origins:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_origin_regex=r".*",
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?|https://.*\.onrender\.com",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
@@ -115,13 +116,15 @@ def on_startup():
         logger.info("PostgreSQL database tables verified/created successfully.")
 
         # 2. Check if database needs initial seeding
+        from app.models.user import User
         with SessionLocal() as db:
             svc_count = db.query(GovernmentService).count()
-            if svc_count == 0:
-                logger.info("Empty database detected. Running initial seed data...")
+            user_count = db.query(User).count()
+            if svc_count == 0 or user_count < 10:
+                logger.info(f"Database requires initial/updated seed data (services: {svc_count}, users: {user_count}). Seeding now...")
                 seed_database()
             else:
-                logger.info(f"Database ready: found {svc_count} active statutory services.")
+                logger.info(f"Database ready: found {svc_count} active statutory services and {user_count} users.")
 
         with engine.connect() as conn:
             res = conn.execute(text("SELECT current_database();")).scalar()
