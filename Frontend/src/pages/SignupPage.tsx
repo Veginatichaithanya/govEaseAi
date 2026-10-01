@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ShieldCheck,
@@ -15,7 +15,9 @@ import {
   Lock
 } from 'lucide-react';
 
-import { authService } from '../mock/auth';
+import { type AuthUser } from '../mock/auth';
+import { useAuth } from '../context/AuthContext';
+import { pingApiHealth } from '../services/apiClient';
 import ThemeToggle from '../components/ThemeToggle';
 
 /* ─────────────────────────────────────────────────
@@ -151,6 +153,7 @@ const InputField: React.FC<InputFieldProps> = ({
 ───────────────────────────────────────────────── */
 export const SignupPage: React.FC = () => {
   const navigate = useNavigate();
+  const { signup: authSignup } = useAuth();
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -161,8 +164,13 @@ export const SignupPage: React.FC = () => {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isWakingUp, setIsWakingUp] = useState(false);
   const [successState, setSuccessState] = useState(false);
+  const [registeredUser, setRegisteredUser] = useState<AuthUser | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
+
+  const wakeUpTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Field errors
   const [errors, setErrors] = useState({
@@ -172,6 +180,15 @@ export const SignupPage: React.FC = () => {
     password: '',
     confirmPassword: ''
   });
+
+  // Pre-warm backend on mount so Render spins up in the background while user fills the form
+  useEffect(() => {
+    pingApiHealth(8000).catch(() => {});
+    return () => {
+      if (wakeUpTimerRef.current) clearTimeout(wakeUpTimerRef.current);
+      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+    };
+  }, []);
 
   const clearApiError = () => setApiError(null);
 
@@ -198,7 +215,13 @@ export const SignupPage: React.FC = () => {
     if (isLoading) return;
 
     setIsLoading(true);
+    setIsWakingUp(false);
     setApiError(null);
+
+    // If server takes longer than 2.5 seconds (Render cold-start), inform citizen
+    wakeUpTimerRef.current = setTimeout(() => {
+      setIsWakingUp(true);
+    }, 2500);
 
     const cleanPass = password.trim();
     const cleanConfirm = confirmPassword.trim();
@@ -206,29 +229,35 @@ export const SignupPage: React.FC = () => {
     const cleanMail = email.trim().toLowerCase();
     const cleanName = fullName.trim();
 
-    const result = await authService.signupAsync(
-      cleanName,
-      cleanMail,
-      cleanMob,
-      cleanPass,
-      cleanConfirm
-    );
+    try {
+      // Authenticates and creates account in one seamless step
+      const result = await authSignup(
+        cleanName,
+        cleanMail,
+        cleanMob,
+        cleanPass,
+        cleanConfirm
+      );
 
-    setIsLoading(false);
+      if (wakeUpTimerRef.current) clearTimeout(wakeUpTimerRef.current);
+      setIsWakingUp(false);
+      setIsLoading(false);
 
-    if (result.success) {
-      setSuccessState(true);
-      // Redirect to login with pre-populated identifier state
-      setTimeout(() => {
-        navigate('/login', {
-          state: {
-            registeredIdentifier: cleanMail,
-            registeredName: cleanName
-          }
-        });
-      }, 2000);
-    } else {
-      setApiError(result.error || 'Signup failed. Please try again.');
+      if (result.success) {
+        setRegisteredUser(result.user || null);
+        setSuccessState(true);
+        // Automatically direct citizen straight to dashboard without redundant login!
+        redirectTimerRef.current = setTimeout(() => {
+          navigate('/dashboard');
+        }, 1800);
+      } else {
+        setApiError(result.error || 'Signup failed. Please try again.');
+      }
+    } catch (err: any) {
+      if (wakeUpTimerRef.current) clearTimeout(wakeUpTimerRef.current);
+      setIsWakingUp(false);
+      setIsLoading(false);
+      setApiError('Unable to connect to the database. If the server is waking up, please wait a few seconds and try again.');
     }
   };
 
@@ -249,44 +278,85 @@ export const SignupPage: React.FC = () => {
         <div
           className="glass-panel"
           style={{
-            maxWidth: '440px',
+            maxWidth: '460px',
             width: '100%',
             padding: '3rem 2.5rem',
             textAlign: 'center',
-            border: '1px solid rgba(16, 185, 129, 0.4)'
+            border: '1px solid rgba(16, 185, 129, 0.4)',
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3)'
           }}
         >
           <div
             style={{
-              width: '60px',
-              height: '60px',
+              width: '64px',
+              height: '64px',
               borderRadius: '50%',
               background: 'rgba(16, 185, 129, 0.15)',
-              border: '1px solid rgba(16, 185, 129, 0.4)',
+              border: '1.5px solid rgba(16, 185, 129, 0.5)',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '1.25rem'
             }}
           >
-            <CheckCircle2 size={30} color="#10B981" />
+            <CheckCircle2 size={34} color="#10B981" />
           </div>
           <h2
             style={{
-              fontSize: '1.35rem',
+              fontSize: '1.45rem',
               fontWeight: 700,
               color: 'var(--text-primary)',
-              marginBottom: '0.5rem'
+              marginBottom: '0.4rem',
+              letterSpacing: '-0.02em'
             }}
           >
-            Account Created Successfully
+            Account Created & Logged In!
           </h2>
-          <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
-            Your citizen account has been created. Please sign in to continue.
+          <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary)', marginBottom: '1.25rem', lineHeight: '1.5' }}>
+            Welcome, <strong>{registeredUser?.fullName || fullName}</strong>! Your citizen details have been securely saved to the database.
           </p>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            Redirecting to Sign In…
-          </p>
+
+          {registeredUser?.applicantId && (
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.4rem 0.85rem',
+                borderRadius: '9999px',
+                background: 'rgba(59, 130, 246, 0.12)',
+                border: '1px solid rgba(59, 130, 246, 0.3)',
+                color: 'var(--accent-blue-light, #60A5FA)',
+                fontSize: '0.82rem',
+                fontFamily: 'monospace',
+                marginBottom: '1.75rem'
+              }}
+            >
+              <span>Citizen ID:</span>
+              <strong style={{ letterSpacing: '0.05em' }}>{registeredUser.applicantId}</strong>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', alignItems: 'center' }}>
+            <button
+              onClick={() => {
+                if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+                navigate('/dashboard');
+              }}
+              className="btn btn-primary"
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+                padding: '0.85rem 1.25rem',
+                fontSize: '0.95rem'
+              }}
+            >
+              Go to Citizen Dashboard <ArrowRight size={17} />
+            </button>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>
+              Opening your citizen portal in a moment…
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -568,14 +638,34 @@ export const SignupPage: React.FC = () => {
               </div>
             </div>
 
+            {/* Cloud Database Cold Start Indicator */}
+            {isWakingUp && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.65rem',
+                  padding: '0.75rem 1rem',
+                  borderRadius: 'var(--radius-sm)',
+                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                  border: '1px solid rgba(59, 130, 246, 0.3)',
+                  color: '#93C5FD',
+                  fontSize: '0.82rem'
+                }}
+              >
+                <Loader2 size={16} style={{ animation: 'spin 1.2s linear infinite', flexShrink: 0 }} />
+                <span>Saving details to cloud database... (Free cloud instances may take ~20s to wake up)</span>
+              </div>
+            )}
+
             {/* API Error Banner */}
             {apiError && (
               <div
                 role="alert"
                 style={{
                   display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '0.65rem',
+                  flexDirection: 'column',
+                  gap: '0.5rem',
                   padding: '0.85rem 1rem',
                   borderRadius: 'var(--radius-sm)',
                   backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -585,15 +675,30 @@ export const SignupPage: React.FC = () => {
                   lineHeight: '1.4'
                 }}
               >
-                <AlertCircle size={18} style={{ flexShrink: 0, marginTop: '1px' }} />
-                <span>
-                  {apiError}{' '}
-                  {apiError.includes('email') && (
-                    <Link to="/login" style={{ color: '#FCA5A5', fontWeight: 600 }}>
-                      Go to Sign In
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+                  <AlertCircle size={18} style={{ flexShrink: 0, marginTop: '1px' }} />
+                  <span>{apiError}</span>
+                </div>
+                {(apiError.toLowerCase().includes('already exists') ||
+                  apiError.toLowerCase().includes('sign in')) && (
+                  <div style={{ paddingLeft: '1.75rem' }}>
+                    <Link
+                      to="/login"
+                      state={{ registeredIdentifier: email.trim() || mobile.trim() }}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        color: '#FCA5A5',
+                        fontWeight: 600,
+                        textDecoration: 'underline',
+                        fontSize: '0.82rem'
+                      }}
+                    >
+                      Click here to Sign In with this account <ArrowRight size={13} />
                     </Link>
-                  )}
-                </span>
+                  </div>
+                )}
               </div>
             )}
 

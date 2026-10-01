@@ -8,6 +8,13 @@ interface AuthContextType {
   loading: boolean;
   error: string | null;
   login: (email: string, password: string) => Promise<{ success: boolean; user?: AuthUser; error?: string }>;
+  signup: (
+    fullName: string,
+    email: string,
+    mobile: string,
+    password: string,
+    confirmPassword: string
+  ) => Promise<{ success: boolean; user?: AuthUser; message?: string; error?: string }>;
   logout: () => void;
   refreshUser: () => Promise<void>;
   updateUserLocally: (partial: Partial<AuthUser>) => void;
@@ -105,6 +112,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const signup = async (
+    fullName: string,
+    email: string,
+    mobile: string,
+    password: string,
+    confirmPassword: string
+  ) => {
+    setError(null);
+    setLoading(true);
+    try {
+      const res = await authService.signupAsync(fullName, email, mobile, password, confirmPassword);
+      if (res.success && res.user) {
+        setCurrentUser(res.user);
+        setLoading(false);
+        return { success: true, user: res.user, message: res.message };
+      } else {
+        setError(res.error || 'Registration failed');
+        setLoading(false);
+        return { success: false, error: res.error };
+      }
+    } catch (err: any) {
+      const msg = err.message || 'Registration failed';
+      setError(msg);
+      setLoading(false);
+      return { success: false, error: msg };
+    }
+  };
+
   const logout = () => {
     authService.logout();
     setCurrentUser(null);
@@ -127,6 +162,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         error,
         login,
+        signup,
         logout,
         refreshUser,
         updateUserLocally

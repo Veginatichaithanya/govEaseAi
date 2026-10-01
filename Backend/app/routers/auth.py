@@ -13,6 +13,7 @@ from app.schemas.auth import (
     LoginResponse,
     UserInfo,
     SignupRequest,
+    SignupResponse,
     OfficerLoginRequest,
     OfficerLoginResponse,
     OfficerUserInfo,
@@ -67,11 +68,11 @@ def normalize_indian_phone(phone_str: Optional[str]) -> Optional[str]:
         return digits
     return digits if digits else None
 
-@router.post("/signup")
+@router.post("/signup", response_model=SignupResponse)
 def signup(req: SignupRequest, db: Session = Depends(get_db)):
-    """Register a new citizen account in PostgreSQL."""
+    """Register a new citizen account in PostgreSQL, auto-generate JWT token, and establish session."""
     import uuid
-    from app.services.auth_service import hash_password
+    from app.services.auth_service import hash_password, create_access_token
 
     clean_password = req.password.strip()
     if req.password != req.confirmPassword and clean_password != req.confirmPassword.strip():
@@ -97,7 +98,7 @@ def signup(req: SignupRequest, db: Session = Depends(get_db)):
     if existing_email:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="An account with this email already exists."
+            detail="An account with this email address already exists. Please sign in instead."
         )
 
     # Check mobile uniqueness
@@ -117,16 +118,17 @@ def signup(req: SignupRequest, db: Session = Depends(get_db)):
         if existing_mobile:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail="An account with this mobile number already exists."
+                detail="An account with this mobile number already exists. Please sign in instead."
             )
 
+    applicant_id = f"CIT-{uuid.uuid4().hex[:8].upper()}"
     new_user = User(
         id=str(uuid.uuid4()),
         email=email,
         password_hash=hash_password(clean_password),
         full_name=full_name,
         phone=mobile_to_store,
-        applicant_id=f"CIT-{uuid.uuid4().hex[:8].upper()}",
+        applicant_id=applicant_id,
         role="CITIZEN",
         is_active=True,
         profile_completion="20"
@@ -146,16 +148,62 @@ def signup(req: SignupRequest, db: Session = Depends(get_db)):
         db.refresh(new_user)
     except Exception as e:
         db.rollback()
+        logger.error(f"[Auth Signup] Error committing new citizen {email}: {e}", exc_info=True)
+        err_str = str(e).lower()
+        if "users_email_key" in err_str or ("unique" in err_str and "email" in err_str):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="An account with this email address already exists. Please sign in instead."
+            )
+        if "users_phone_key" in err_str or ("unique" in err_str and "phone" in err_str):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="An account with this mobile number already exists. Please sign in instead."
+            )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to create account. Please try again."
+            detail="Failed to create account. Please check your details and try again."
         )
 
-    return {
-        "success": True,
-        "message": "Citizen account created successfully.",
-        "userId": new_user.id
+    # Immediately generate JWT auth token so the citizen is signed in automatically without repetitive login
+    token_data = {
+        "sub": new_user.id,
+        "email": new_user.email,
+        "role": new_user.role.lower(),
+        "dept": None
     }
+    access_token = create_access_token(token_data)
+
+    user_info = UserInfo(
+        id=new_user.id,
+        email=new_user.email,
+        name=new_user.full_name,
+        fullName=new_user.full_name,
+        full_name=new_user.full_name,
+        role=new_user.role.lower(),
+        phone=new_user.phone,
+        applicantId=new_user.applicant_id,
+        applicant_id=new_user.applicant_id,
+        profileCompletion=int(new_user.profile_completion or 20),
+        departmentId=None,
+        departmentName=None,
+        departmentCode=None,
+        officerTitle=None,
+        permissions=[],
+        serviceIds=[]
+    )
+
+    logger.info(f"[Auth Signup] Successfully registered and authenticated citizen {new_user.email} (ID: {new_user.id})")
+
+    return SignupResponse(
+        success=True,
+        message="Citizen account created successfully.",
+        userId=new_user.id,
+        token=access_token,
+        access_token=access_token,
+        token_type="bearer",
+        user=user_info
+    )
 
 @router.post("/login", response_model=LoginResponse)
 def login(req: LoginRequest, db: Session = Depends(get_db)):

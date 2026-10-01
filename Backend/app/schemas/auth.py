@@ -15,11 +15,6 @@ class SignupRequest(BaseModel):
     password: str
     confirmPassword: str
 
-class SignupResponse(BaseModel):
-    success: bool
-    message: str
-    userId: Optional[str] = None
-
 class UserInfo(BaseModel):
     id: str
     email: str
@@ -37,6 +32,15 @@ class UserInfo(BaseModel):
     officerTitle: Optional[str] = None
     permissions: List[str] = []
     serviceIds: List[str] = []
+
+class SignupResponse(BaseModel):
+    success: bool = True
+    message: str
+    userId: Optional[str] = None
+    token: Optional[str] = None
+    access_token: Optional[str] = None
+    token_type: Optional[str] = "bearer"
+    user: Optional[UserInfo] = None
 
 class LoginResponse(BaseModel):
     success: bool = True

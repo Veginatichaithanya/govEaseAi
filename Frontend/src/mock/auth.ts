@@ -125,23 +125,67 @@ export const authService = {
     mobile: string,
     password: string,
     confirmPassword: string
-  ): Promise<{ success: boolean; message?: string; error?: string }> {
+  ): Promise<{ success: boolean; user?: AuthUser; token?: string; message?: string; error?: string }> {
     try {
-      const res = await apiClient.post('/auth/signup', {
-        fullName: fullName.trim(),
-        email: email.trim().toLowerCase(),
-        mobile: mobile.trim(),
-        password: password.trim(),
+      const cleanMail = email.trim().toLowerCase();
+      const cleanPass = password.trim();
+      const cleanMob = mobile.trim();
+      const cleanName = fullName.trim();
+
+      const res = await apiClient.post<any>('/auth/signup', {
+        fullName: cleanName,
+        email: cleanMail,
+        mobile: cleanMob,
+        password: cleanPass,
         confirmPassword: confirmPassword.trim()
       });
 
       if (res.ok) {
+        const token = res.data?.token || res.data?.access_token;
+        const rawUser = res.data?.user;
+
+        // Auto-login citizen: set token, profile and trigger auth event
+        if (token && rawUser) {
+          setAuthToken(token);
+          const realName = rawUser.fullName || rawUser.full_name || rawUser.name || cleanName;
+          const user: AuthUser = {
+            id: rawUser.id,
+            name: realName,
+            fullName: realName,
+            email: rawUser.email || cleanMail,
+            mobile: rawUser.phone || rawUser.mobile || cleanMob,
+            phone: rawUser.phone || rawUser.mobile || cleanMob,
+            role: 'citizen',
+            applicantId: rawUser.applicantId || rawUser.applicant_id,
+            profileCompletion: rawUser.profileCompletion ?? 20,
+            department: undefined,
+            departmentId: undefined
+          };
+          localStorage.setItem(CITIZEN_AUTH_STORAGE_KEY, JSON.stringify(user));
+          window.dispatchEvent(new Event('govease_auth_change'));
+          return { success: true, user, token, message: res.data?.message || 'Account created successfully.' };
+        }
+
+        // Resilient fallback: auto-login using credentials if token was not in the payload
+        const loginRes = await this.loginAsync(cleanMail, cleanPass);
+        if (loginRes.success && loginRes.user) {
+          return {
+            success: true,
+            user: loginRes.user,
+            token: getAuthToken() || undefined,
+            message: 'Account created and signed in successfully.'
+          };
+        }
+
         return { success: true, message: res.data?.message || 'Account created successfully.' };
       }
 
       // Map status codes to friendly messages
       if (res.status === 409) {
-        return { success: false, error: res.error || 'An account with this email or mobile already exists.' };
+        return {
+          success: false,
+          error: res.error || 'An account with this email or mobile already exists. Please sign in.'
+        };
       }
       if (res.status === 422) {
         return { success: false, error: res.error || 'Please check your input and try again.' };
