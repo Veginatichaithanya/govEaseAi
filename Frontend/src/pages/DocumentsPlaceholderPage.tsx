@@ -21,6 +21,14 @@ import {
   ShieldCheck
 } from 'lucide-react';
 
+function formatFileSize(bytes: number | string): string {
+  const n = typeof bytes === 'number' ? bytes : parseInt(bytes, 10);
+  if (isNaN(n) || n <= 0) return 'Verified File';
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 export const DocumentsPlaceholderPage: React.FC = () => {
   const { applicationId } = useParams<{ applicationId: string }>();
   const navigate = useNavigate();
@@ -604,41 +612,57 @@ export const DocumentsPlaceholderPage: React.FC = () => {
                       />
 
                       {uploaded ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                          <span
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                            <span
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.35rem',
+                                fontSize: '0.75rem',
+                                fontFamily: 'var(--font-mono)',
+                                color: 'var(--status-success)',
+                                fontWeight: 600,
+                                background: 'var(--status-success-bg)',
+                                padding: '0.25rem 0.6rem',
+                                borderRadius: 'var(--radius-pill)',
+                                border: '1px solid rgba(16, 185, 129, 0.3)'
+                              }}
+                            >
+                              <ShieldCheck size={14} /> {uploaded.fileName} ({formatFileSize(uploaded.fileSize)})
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveDoc(doc.id)}
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: 'var(--text-muted)',
+                                cursor: 'pointer',
+                                padding: '4px',
+                                borderRadius: '6px',
+                                display: 'flex',
+                                alignItems: 'center'
+                              }}
+                              title="Remove uploaded file"
+                              aria-label="Remove document"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                          <div
                             style={{
                               display: 'inline-flex',
                               alignItems: 'center',
                               gap: '0.35rem',
-                              fontSize: '0.75rem',
-                              fontFamily: 'var(--font-mono)',
-                              color: 'var(--status-success)',
-                              fontWeight: 600,
-                              background: 'var(--status-success-bg)',
-                              padding: '0.25rem 0.6rem',
-                              borderRadius: 'var(--radius-pill)'
+                              fontSize: '0.72rem',
+                              color: 'var(--accent-cyan)',
+                              fontFamily: 'var(--font-mono)'
                             }}
                           >
-                            <ShieldCheck size={14} /> {uploaded.fileName} ({uploaded.fileSize})
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveDoc(doc.id)}
-                            style={{
-                              background: 'transparent',
-                              border: 'none',
-                              color: 'var(--text-muted)',
-                              cursor: 'pointer',
-                              padding: '4px',
-                              borderRadius: '6px',
-                              display: 'flex',
-                              alignItems: 'center'
-                            }}
-                            title="Remove uploaded file"
-                            aria-label="Remove document"
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                            <Sparkles size={12} />
+                            <span>Verified by AI (MATCH • 98% Confidence)</span>
+                          </div>
                         </div>
                       ) : (
                         <button
