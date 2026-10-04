@@ -186,107 +186,9 @@ export const CitizenDashboardPage: React.FC = () => {
         </header>
 
         {/* ==================================================
-            2. Priority Attention: Correction Required Banner (Sleek Inline Ribbon)
+            2. Unified Metrics Ribbon (1 Cohesive Bar - No Separate Box Cards)
         ================================================== */}
-        {correctionApp && (
-          <div className="citizen-alert-ribbon warning">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
-              <div
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '8px',
-                  background: 'rgba(217, 119, 6, 0.15)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#D97706',
-                  flexShrink: 0
-                }}
-              >
-                <AlertTriangle size={18} />
-              </div>
-              <div>
-                <span style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-primary)', marginRight: '0.5rem' }}>
-                  Action Required: Your {correctionApp.serviceName} application requires correction
-                </span>
-                <span className="badge badge-warning" style={{ fontSize: '0.7rem', padding: '0.15rem 0.45rem' }}>
-                  {correctionApp.id}
-                </span>
-                <span style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', marginLeft: '0.5rem' }}>
-                  — {correctionApp.remarks || 'Please upload a high-resolution copy of the commercial establishment Electricity Bill or Property Tax Receipt matching the business address.'}
-                </span>
-              </div>
-            </div>
-
-            <Link
-              to={`/applications/${correctionApp.id}`}
-              className="btn btn-primary hover-lift"
-              style={{
-                padding: '0.45rem 1rem',
-                fontSize: '0.8rem',
-                background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
-                borderColor: 'rgba(217, 119, 6, 0.4)'
-              }}
-            >
-              Fix Application <ArrowRight size={14} />
-            </Link>
-          </div>
-        )}
-
-        {/* ==================================================
-            3. Priority Attention: Digital Approval Banner (Sleek Inline Ribbon)
-        ================================================== */}
-        {approvedApp && (
-          <div className="citizen-alert-ribbon success">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
-              <div
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '8px',
-                  background: 'rgba(16, 185, 129, 0.15)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#059669',
-                  flexShrink: 0
-                }}
-              >
-                <Award size={18} />
-              </div>
-              <div>
-                <span style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-primary)', marginRight: '0.5rem' }}>
-                  Application Approved: {approvedApp.serviceName}
-                </span>
-                <span className="badge badge-success" style={{ fontSize: '0.7rem', padding: '0.15rem 0.45rem' }}>
-                  {approvedApp.id}
-                </span>
-                <span style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', marginLeft: '0.5rem' }}>
-                  — Sanctioned on {formatDate(approvedApp.updatedAt)}. Ready for download.
-                </span>
-              </div>
-            </div>
-
-            <Link
-              to={`/applications/${approvedApp.id}/approval`}
-              className="btn btn-primary hover-lift"
-              style={{
-                padding: '0.45rem 1rem',
-                fontSize: '0.8rem',
-                background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                borderColor: 'rgba(5, 150, 105, 0.4)'
-              }}
-            >
-              View Digital Approval <ExternalLink size={14} />
-            </Link>
-          </div>
-        )}
-
-        {/* ==================================================
-            4. Unified Metrics Ribbon (1 Cohesive Bar - No Separate Box Cards)
-        ================================================== */}
-        <section style={{ marginBottom: '2.5rem' }}>
+        <section style={{ marginBottom: '1.75rem' }}>
           <div className="unified-metrics-ribbon">
             {/* Total Applications */}
             <Link to="/applications" className="metric-ribbon-col">
@@ -361,6 +263,104 @@ export const CitizenDashboardPage: React.FC = () => {
             </Link>
           </div>
         </section>
+
+        {/* ==================================================
+            3. Priority Attention: Correction Required Banner (Sleek Inline Ribbon)
+        ================================================== */}
+        {correctionApp && (
+          <div className="citizen-alert-ribbon warning">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
+              <div
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
+                  background: 'rgba(217, 119, 6, 0.15)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#D97706',
+                  flexShrink: 0
+                }}
+              >
+                <AlertTriangle size={18} />
+              </div>
+              <div>
+                <span style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-primary)', marginRight: '0.5rem' }}>
+                  Action Required: Your {correctionApp.serviceName} application requires correction
+                </span>
+                <span className="badge badge-warning" style={{ fontSize: '0.7rem', padding: '0.15rem 0.45rem' }}>
+                  {correctionApp.id}
+                </span>
+                <span style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', marginLeft: '0.5rem' }}>
+                  — {correctionApp.remarks || 'Please upload a high-resolution copy of the commercial establishment Electricity Bill or Property Tax Receipt matching the business address.'}
+                </span>
+              </div>
+            </div>
+
+            <Link
+              to={`/applications/${correctionApp.id}`}
+              className="btn btn-primary hover-lift"
+              style={{
+                padding: '0.45rem 1rem',
+                fontSize: '0.8rem',
+                background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
+                borderColor: 'rgba(217, 119, 6, 0.4)'
+              }}
+            >
+              Fix Application <ArrowRight size={14} />
+            </Link>
+          </div>
+        )}
+
+        {/* ==================================================
+            4. Priority Attention: Digital Approval Banner (Sleek Inline Ribbon)
+        ================================================== */}
+        {approvedApp && (
+          <div className="citizen-alert-ribbon success">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
+              <div
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#059669',
+                  flexShrink: 0
+                }}
+              >
+                <Award size={18} />
+              </div>
+              <div>
+                <span style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-primary)', marginRight: '0.5rem' }}>
+                  Application Approved: {approvedApp.serviceName}
+                </span>
+                <span className="badge badge-success" style={{ fontSize: '0.7rem', padding: '0.15rem 0.45rem' }}>
+                  {approvedApp.id}
+                </span>
+                <span style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', marginLeft: '0.5rem' }}>
+                  — Sanctioned on {formatDate(approvedApp.updatedAt)}. Ready for download.
+                </span>
+              </div>
+            </div>
+
+            <Link
+              to={`/applications/${approvedApp.id}/approval`}
+              className="btn btn-primary hover-lift"
+              style={{
+                padding: '0.45rem 1rem',
+                fontSize: '0.8rem',
+                background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                borderColor: 'rgba(5, 150, 105, 0.4)'
+              }}
+            >
+              View Digital Approval <ExternalLink size={14} />
+            </Link>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );
