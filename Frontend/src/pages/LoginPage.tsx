@@ -13,8 +13,7 @@ import {
   Loader2,
   RefreshCw,
   Sliders,
-  Server,
-  Zap
+  Server
 } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext';
@@ -139,13 +138,6 @@ export const LoginPage: React.FC = () => {
     }
   }, [regIdentifier]);
 
-  const handleApplyDemoAccount = (demoIdent: string, demoPass: string) => {
-    setIdentifier(demoIdent);
-    setPassword(demoPass);
-    setIdentifierError('');
-    setPasswordError('');
-    setErrorMsg(null);
-  };
 
   const handleSaveApiUrl = () => {
     setStoredApiUrl(customUrlInput);
@@ -457,30 +449,7 @@ export const LoginPage: React.FC = () => {
             </button>
           </div>
 
-          {/* Quick Demo Credentials Bar */}
-          <div style={{ marginBottom: '1.35rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.5rem', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-              <Zap size={13} color="var(--accent-blue)" /> Quick Demo Credentials:
-            </div>
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-              <button
-                type="button"
-                onClick={() => handleApplyDemoAccount('citizen@govease.ai', 'Citizen@123')}
-                className="demo-chip-btn citizen-chip"
-                title="Click to auto-fill Ravi Kumar credentials"
-              >
-                Ravi Kumar (citizen@govease.ai)
-              </button>
-              <button
-                type="button"
-                onClick={() => handleApplyDemoAccount('naga@gmail.com', 'Password@123')}
-                className="demo-chip-btn naga-chip"
-                title="Click to auto-fill Naga credentials"
-              >
-                Naga (naga@gmail.com)
-              </button>
-            </div>
-          </div>
+
 
           {/* Card heading */}
           <div style={{ marginBottom: '1.25rem' }}>
