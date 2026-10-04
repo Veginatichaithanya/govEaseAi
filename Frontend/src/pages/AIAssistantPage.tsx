@@ -37,10 +37,11 @@ import {
   ChevronDown,
   Info,
   Menu,
-  Sparkles,
   ArrowDown,
   RotateCcw,
   BookOpen,
+  Compass,
+  ShieldCheck,
 } from 'lucide-react';
 import { ASSISTANT_SERVICES } from '../components/FloatingAIAssistant';
 
@@ -110,7 +111,7 @@ const SERVICE_PROMPTS: Record<string, string[]> = {
   ],
 };
 
-const SERVICE_TOPICS: Record<string, string[]> = {
+export const SERVICE_TOPICS: Record<string, string[]> = {
   'trade-license': [
     'Required documents & commercial proof',
     'Municipal Licensing Division workflow',
@@ -152,6 +153,227 @@ const SERVICE_TOPICS: Record<string, string[]> = {
     'Digital application workflows',
     'AI document verification explanation',
     'Application status tracking',
+  ],
+};
+
+export const GeminiSparkleIcon: React.FC<{ size?: number; className?: string }> = ({
+  size = 20,
+  className = '',
+}) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    style={{ flexShrink: 0 }}
+    aria-hidden="true"
+  >
+    <path
+      d="M12 0C12 6.62742 6.62742 12 0 12C6.62742 12 12 17.3726 12 24C12 17.3726 17.3726 12 24 12C17.3726 12 12 6.62742 12 0Z"
+      fill="url(#geminiGradAssistant)"
+    />
+    <defs>
+      <linearGradient id="geminiGradAssistant" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+        <stop stopColor="#4285F4" />
+        <stop offset="0.32" stopColor="#9B72CB" />
+        <stop offset="0.68" stopColor="#D96570" />
+        <stop offset="1" stopColor="#1E88E5" />
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
+interface GeminiCardItem {
+  title: string;
+  subtitle: string;
+  prompt: string;
+  icon: 'docs' | 'workflow' | 'fee' | 'verify';
+}
+
+const GEMINI_SERVICE_CARDS: Record<string, GeminiCardItem[]> = {
+  'trade-license': [
+    {
+      title: 'Required Documents',
+      subtitle: 'Commercial proof & address records checklist',
+      prompt: 'What documents are required to apply for a Trade License?',
+      icon: 'docs',
+    },
+    {
+      title: 'Municipal Workflow',
+      subtitle: 'Inspection, scrutiny & approval stages',
+      prompt: 'Can you explain the step-by-step Municipal Licensing Division workflow?',
+      icon: 'workflow',
+    },
+    {
+      title: 'Statutory Fees & Validity',
+      subtitle: 'Category-wise fee scale & annual renewal norms',
+      prompt: 'What are the statutory fees and validity period for a Trade License?',
+      icon: 'fee',
+    },
+    {
+      title: 'AI Document Checklist',
+      subtitle: 'Pre-screen your ownership proof & tenancy deeds',
+      prompt: 'Check my uploaded documents and tell me what else I need for a Trade License.',
+      icon: 'verify',
+    },
+  ],
+  'building-permission': [
+    {
+      title: 'Architectural Drawings',
+      subtitle: 'Structural blueprints & site layout guidelines',
+      prompt: 'What architectural drawings and structural plans are needed for Building Permission?',
+      icon: 'docs',
+    },
+    {
+      title: 'Zonal & Land Use',
+      subtitle: 'Master plan clearance & setback requirements',
+      prompt: 'What are the zonal master plan and land use clearance requirements?',
+      icon: 'workflow',
+    },
+    {
+      title: 'Statutory Fee Schedule',
+      subtitle: 'Scrutiny fees, development charges & validity',
+      prompt: 'What are the scrutiny fees, development charges, and permit validity?',
+      icon: 'fee',
+    },
+    {
+      title: 'Fire & Safety NOC',
+      subtitle: 'Environmental clearances & town planning rules',
+      prompt: 'What fire safety and environmental NOC documents are mandatory?',
+      icon: 'verify',
+    },
+  ],
+  'shop-registration': [
+    {
+      title: 'Form A Filing',
+      subtitle: 'Establishment details & ownership documents',
+      prompt: 'What documents and proofs are required for Shop & Establishment Form A filing?',
+      icon: 'docs',
+    },
+    {
+      title: 'Labour Regulations',
+      subtitle: 'Operating hours, weekly offs & employee rules',
+      prompt: 'What are the Department of Labour regulations on operating hours and staff records?',
+      icon: 'workflow',
+    },
+    {
+      title: 'Registration Fee & Term',
+      subtitle: 'Worker slab calculation & validity renewals',
+      prompt: 'What is the fee schedule and renewal validity for Shop Registration?',
+      icon: 'fee',
+    },
+    {
+      title: 'Document Pre-Verification',
+      subtitle: 'Verify rental agreement, PAN & electricity bills',
+      prompt: 'How do I ensure my Shop Registration documents pass AI verification without rejection?',
+      icon: 'verify',
+    },
+  ],
+  'factory-registration': [
+    {
+      title: 'Factories Act 1948',
+      subtitle: 'Factory blueprints & worker safety clearances',
+      prompt: 'What documents and safety clearances are required under the Factories Act 1948?',
+      icon: 'docs',
+    },
+    {
+      title: 'Site Scrutiny Process',
+      subtitle: 'Chief Inspector of Factories audit & inspection',
+      prompt: 'How does the Inspectorate of Factories site scrutiny and approval process work?',
+      icon: 'workflow',
+    },
+    {
+      title: 'Power & Worker Slabs',
+      subtitle: 'Horsepower thresholds & statutory license fees',
+      prompt: 'What are the license fee slabs based on electric horsepower and worker headcount?',
+      icon: 'fee',
+    },
+    {
+      title: 'Machinery & Pollution NOC',
+      subtitle: 'Pollution Control Board & machinery approvals',
+      prompt: 'What machinery layout drawings and pollution consent records do I need to attach?',
+      icon: 'verify',
+    },
+  ],
+  'pollution-certificate': [
+    {
+      title: 'CTE vs CTO Guidelines',
+      subtitle: 'Consent to Establish and Consent to Operate',
+      prompt: 'What is the difference between CTE and CTO, and which consent applies to my unit?',
+      icon: 'workflow',
+    },
+    {
+      title: 'Industrial Categories',
+      subtitle: 'Red, Orange, Green & White industrial classifications',
+      prompt: 'How are Red, Orange, Green, and White industrial categories classified under CPCB?',
+      icon: 'docs',
+    },
+    {
+      title: 'ETP & STP Requirements',
+      subtitle: 'Effluent treatment plant reports & emission norms',
+      prompt: 'What Effluent Treatment Plant (ETP/STP) reports and emission parameters are mandatory?',
+      icon: 'verify',
+    },
+    {
+      title: 'Consent Validity & Fees',
+      subtitle: 'Capital investment slabs & renewal schedules',
+      prompt: 'What are the statutory consent fees and validity periods for pollution certificates?',
+      icon: 'fee',
+    },
+  ],
+  'business-license': [
+    {
+      title: 'Directorate Clearances',
+      subtitle: 'MSME Udyam, entity certificate & trade proofs',
+      prompt: 'What clearances are needed from the Directorate of Industries for a Business License?',
+      icon: 'docs',
+    },
+    {
+      title: 'Single Window Clearance',
+      subtitle: 'Inter-departmental approval workflow',
+      prompt: 'How does the single-window digital clearance workflow work for business licenses?',
+      icon: 'workflow',
+    },
+    {
+      title: 'Statutory Fee Schedule',
+      subtitle: 'Government charges & annual compliance terms',
+      prompt: 'What is the statutory fee structure and renewal process for a commercial business license?',
+      icon: 'fee',
+    },
+    {
+      title: 'AI Document Pre-Check',
+      subtitle: 'Validate GSTIN, PAN & partnership deed files',
+      prompt: 'Check my business documentation and verify if any mandatory annexures are missing.',
+      icon: 'verify',
+    },
+  ],
+  'other': [
+    {
+      title: 'Citizen Portal Guide',
+      subtitle: 'Learn about all automated government services',
+      prompt: 'What government services can I apply for on GovEaseAI?',
+      icon: 'docs',
+    },
+    {
+      title: 'AI Verification System',
+      subtitle: 'How multimodal document OCR and matching works',
+      prompt: 'How does the GovEaseAI multimodal AI verify my uploaded documents?',
+      icon: 'verify',
+    },
+    {
+      title: 'Application Tracking',
+      subtitle: 'Monitor officer reviews and digital approvals',
+      prompt: 'How do I track my submitted application through the officer review stages?',
+      icon: 'workflow',
+    },
+    {
+      title: 'Digital Approval Certificate',
+      subtitle: 'Download tamper-proof approval certificates',
+      prompt: 'What happens after officer approval, and how do I download the digital approval certificate?',
+      icon: 'fee',
+    },
   ],
 };
 
@@ -297,8 +519,8 @@ export const AIAssistantPage: React.FC = () => {
     return SERVICE_PROMPTS[activeServiceId] || SERVICE_PROMPTS['trade-license'];
   }, [activeServiceId]);
 
-  const serviceTopics = useMemo(() => {
-    return SERVICE_TOPICS[activeServiceId] || SERVICE_TOPICS['trade-license'];
+  const activeGeminiCards = useMemo(() => {
+    return GEMINI_SERVICE_CARDS[activeServiceId] || GEMINI_SERVICE_CARDS['trade-license'] || GEMINI_SERVICE_CARDS['other'];
   }, [activeServiceId]);
 
   const officialPortalUrl = useMemo(() => {
@@ -667,30 +889,27 @@ export const AIAssistantPage: React.FC = () => {
     <>
       <div className="ai-history-header">
         <div className="ai-history-header-top">
-          <h2 className="ai-history-title">Conversations</h2>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+          <button
+            type="button"
+            onClick={() => handleStartNewChat()}
+            className="gemini-new-chat-pill"
+            title="Start new conversation"
+            aria-label="New chat"
+          >
+            <Plus size={16} />
+            <span>New chat</span>
+          </button>
+          {isMobileView && (
             <button
               type="button"
-              onClick={() => handleStartNewChat()}
-              className="ai-new-chat-btn"
-              title="Start new conversation"
-              aria-label="New chat"
+              onClick={() => setIsHistoryOpen(false)}
+              className="ai-drawer-close-inline-btn"
+              aria-label="Close history"
+              title="Close drawer"
             >
-              <Plus size={14} />
-              <span>New Chat</span>
+              <X size={16} />
             </button>
-            {isMobileView && (
-              <button
-                type="button"
-                onClick={() => setIsHistoryOpen(false)}
-                className="ai-drawer-close-inline-btn"
-                aria-label="Close history"
-                title="Close drawer"
-              >
-                <X size={16} />
-              </button>
-            )}
-          </div>
+          )}
         </div>
 
         <div className="ai-history-search-box">
@@ -874,29 +1093,43 @@ export const AIAssistantPage: React.FC = () => {
             className="ai-messages-scroll-area"
           >
             <div className="ai-chat-column">
-              {/* Empty Chat Welcome Hero */}
+              {/* Empty Chat Welcome Hero (Gemini Style) */}
               {messages.length === 0 && (
-                <div className="ai-welcome-hero">
-                  <div className="ai-welcome-icon-circle">
-                    <Sparkles size={26} />
+                <div className="gemini-hero-container">
+                  <div className="gemini-hero-badge">
+                    <GeminiSparkleIcon size={34} />
                   </div>
-                  <h2 className="ai-welcome-title">{activeServiceObj.name} Assistant</h2>
-                  <p className="ai-welcome-subtitle">
-                    Hello <strong>{citizenName}</strong>! I'm your AI guide for{' '}
-                    <strong>{activeServiceObj.name}</strong> under the {activeServiceObj.department}.
+                  <h1 className="gemini-hero-greeting">
+                    <span className="gemini-gradient-text">Hello, {citizenName}</span>
+                    <span className="gemini-subheading">How can I help you with {activeServiceObj.name} today?</span>
+                  </h1>
+                  <p className="gemini-hero-desc">
+                    Ask about eligibility criteria, required documents, fee schedules, or upload paperwork for instant AI pre-verification.
                   </p>
 
-                  <div className="ai-welcome-topics-grid">
-                    {serviceTopics.map((topic, idx) => (
-                      <div key={idx} className="ai-welcome-topic-card">
-                        <div className="ai-welcome-topic-dot" />
-                        <span>{topic}</span>
-                      </div>
+                  <div className="gemini-cards-grid">
+                    {activeGeminiCards.map((card, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => handleSend(card.prompt)}
+                        className="gemini-card"
+                        disabled={isStreaming}
+                      >
+                        <div className="gemini-card-top">
+                          <span className="gemini-card-title">{card.title}</span>
+                          <span className="gemini-card-desc">{card.subtitle}</span>
+                        </div>
+                        <div className="gemini-card-bottom">
+                          <span className="gemini-card-icon-pill">
+                            {card.icon === 'docs' && <FileText size={16} />}
+                            {card.icon === 'workflow' && <Compass size={16} />}
+                            {card.icon === 'fee' && <BookOpen size={16} />}
+                            {card.icon === 'verify' && <ShieldCheck size={16} />}
+                          </span>
+                        </div>
+                      </button>
                     ))}
-                  </div>
-
-                  <div className="ai-welcome-prompt-hint">
-                    Choose a suggested question below or type your question in the box to begin:
                   </div>
                 </div>
               )}
@@ -909,8 +1142,8 @@ export const AIAssistantPage: React.FC = () => {
                 >
                   {/* AI Avatar */}
                   {msg.role === 'assistant' && (
-                    <div className="ai-msg-avatar" aria-hidden="true">
-                      <Sparkles size={16} />
+                    <div className="gemini-msg-avatar" aria-hidden="true">
+                      <GeminiSparkleIcon size={20} />
                     </div>
                   )}
 
@@ -1007,15 +1240,18 @@ export const AIAssistantPage: React.FC = () => {
               {/* Streaming Assistant Row */}
               {isStreaming && (
                 <div className="ai-msg-row assistant">
-                  <div className="ai-msg-avatar" aria-hidden="true">
-                    <Sparkles size={16} />
+                  <div className="gemini-msg-avatar" aria-hidden="true">
+                    <GeminiSparkleIcon size={20} />
                   </div>
 
                   <div className="ai-msg-bubble-wrapper assistant">
                     <div className="ai-msg-header-line">
                       <div className="ai-msg-header-identity">
                         <span className="ai-msg-author-name">GovEaseAI</span>
-                        <span className="ai-msg-badge streaming">Generating</span>
+                        <span className="ai-msg-badge streaming">
+                          <Loader2 size={11} className="animate-spin" />
+                          <span>Generating</span>
+                        </span>
                       </div>
                     </div>
 
@@ -1091,8 +1327,8 @@ export const AIAssistantPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Composer Box */}
-              <div className="ai-composer-wrapper">
+              {/* Gemini Floating Prompt Bar */}
+              <div className="gemini-prompt-wrapper">
                 {/* Attached files preview chips */}
                 {attachedFiles.length > 0 && (
                   <div className="ai-composer-attachments-row">
@@ -1118,7 +1354,7 @@ export const AIAssistantPage: React.FC = () => {
                   </div>
                 )}
 
-                <div className="ai-composer-input-card">
+                <div className="gemini-prompt-bar">
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -1133,11 +1369,11 @@ export const AIAssistantPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="ai-composer-tool-btn"
+                    className="gemini-tool-btn"
                     title="Attach documents or images (PDF, JPG, PNG)"
                     aria-label="Attach file"
                   >
-                    <Paperclip size={18} />
+                    <Paperclip size={19} />
                   </button>
 
                   <textarea
@@ -1152,26 +1388,26 @@ export const AIAssistantPage: React.FC = () => {
                       }
                     }}
                     placeholder={`Ask ${activeServiceObj.name} Assistant...`}
-                    className="ai-composer-native-textarea"
+                    className="gemini-native-textarea"
                   />
 
                   {isStreaming ? (
                     <button
                       type="button"
                       onClick={handleStop}
-                      className="ai-composer-action-btn stop"
+                      className="gemini-action-btn stop"
                       title="Stop generation"
                       aria-label="Stop generation"
                     >
-                      <Square size={14} />
+                      <Square size={13} />
                     </button>
                   ) : (
                     <button
                       type="button"
                       onClick={() => handleSend()}
                       disabled={!input.trim() && attachedFiles.length === 0}
-                      className="ai-composer-action-btn send"
-                      title="Send question (Enter)"
+                      className="gemini-action-btn send"
+                      title="Send message (Enter)"
                       aria-label="Send message"
                     >
                       <Send size={15} />
@@ -1179,8 +1415,8 @@ export const AIAssistantPage: React.FC = () => {
                   )}
                 </div>
 
-                <div className="ai-composer-hint">
-                  Enter to send · Shift + Enter for newline
+                <div className="gemini-footer-disclaimer">
+                  GovEaseAI can make mistakes. Verify official government requirements with authorized municipal authorities.
                 </div>
               </div>
             </div>
