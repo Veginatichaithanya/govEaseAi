@@ -35,7 +35,6 @@ import {
   Search,
   ExternalLink,
   ChevronDown,
-  Info,
   Menu,
   ArrowDown,
   RotateCcw,
@@ -53,7 +52,7 @@ interface AttachedFile {
   loading: boolean;
 }
 
-const OFFICIAL_PORTALS: Record<string, string> = {
+export const OFFICIAL_PORTALS: Record<string, string> = {
   'trade-license': 'https://services.india.gov.in',
   'shop-registration': 'https://eshram.gov.in',
   'business-license': 'https://www.nsws.gov.in',
@@ -521,10 +520,6 @@ export const AIAssistantPage: React.FC = () => {
 
   const activeGeminiCards = useMemo(() => {
     return GEMINI_SERVICE_CARDS[activeServiceId] || GEMINI_SERVICE_CARDS['trade-license'] || GEMINI_SERVICE_CARDS['other'];
-  }, [activeServiceId]);
-
-  const officialPortalUrl = useMemo(() => {
-    return OFFICIAL_PORTALS[activeServiceId] || 'https://services.india.gov.in';
   }, [activeServiceId]);
 
   const getServiceLabel = (serviceId?: string | null) => {
@@ -1068,24 +1063,6 @@ export const AIAssistantPage: React.FC = () => {
             </div>
           </header>
 
-          {/* Compact Disclaimer Bar */}
-          <div className="ai-disclaimer-bar">
-            <div className="ai-disclaimer-left">
-              <Info size={14} className="ai-disclaimer-icon" />
-              <span>AI-assisted guidance. Verify official requirements with the authorized department.</span>
-            </div>
-            <a
-              href={officialPortalUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ai-official-portal-link"
-              title="Open Department Portal"
-            >
-              <span>Official Portal</span>
-              <ExternalLink size={11} />
-            </a>
-          </div>
-
           {/* Scrollable Conversation Container */}
           <div
             ref={scrollContainerRef}
@@ -1096,9 +1073,6 @@ export const AIAssistantPage: React.FC = () => {
               {/* Empty Chat Welcome Hero (Gemini Style) */}
               {messages.length === 0 && (
                 <div className="gemini-hero-container">
-                  <div className="gemini-hero-badge">
-                    <GeminiSparkleIcon size={34} />
-                  </div>
                   <h1 className="gemini-hero-greeting">
                     <span className="gemini-gradient-text">Hello, {citizenName}</span>
                     <span className="gemini-subheading">How can I help you with {activeServiceObj.name} today?</span>
