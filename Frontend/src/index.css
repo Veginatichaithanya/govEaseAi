@@ -1156,33 +1156,19 @@ html.theme-transition *::after {
 }
 
 /* ==================================================
-   Elevated Citizen Dashboard Master Tokens & Components
+   Modern Unified Dashboard Architecture (Non-Boxy / Fluid Canvas)
 ================================================== */
-/* 1. Citizen Workspace Hero Banner */
-.citizen-workspace-hero {
-  padding: 2.25rem 2.5rem;
-  margin-bottom: 2rem;
-  border-radius: 18px;
-  position: relative;
-  overflow: hidden;
+
+/* 1. Open Canvas Page Header (No heavy card enclosure) */
+.citizen-canvas-header {
+  padding: 1.5rem 0 2rem 0;
+  margin-bottom: 1.75rem;
+  border-bottom: 1px solid var(--border-subtle);
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 1.5rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-[data-theme="light"] .citizen-workspace-hero {
-  background: linear-gradient(135deg, #FFFFFF 0%, #F0F7FF 50%, #E0F2FE 100%) !important;
-  border: 1px solid #BFDBFE !important;
-  box-shadow: 0 4px 20px -2px rgba(37, 99, 235, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04) !important;
-}
-
-[data-theme="dark"] .citizen-workspace-hero {
-  background: linear-gradient(135deg, rgba(15, 34, 58, 0.9) 0%, rgba(10, 23, 40, 0.95) 100%) !important;
-  border: 1px solid rgba(59, 130, 246, 0.3) !important;
-  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.5), 0 0 35px -5px rgba(59, 130, 246, 0.15) !important;
 }
 
 .citizen-hero-eyebrow {
@@ -1195,26 +1181,17 @@ html.theme-transition *::after {
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.06em;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.65rem;
+  background: var(--bg-accent-subtle);
+  border: 1px solid var(--border-accent);
+  color: var(--accent-blue);
 }
 
-[data-theme="light"] .citizen-hero-eyebrow {
-  background: #EFF6FF !important;
-  border: 1px solid #BFDBFE !important;
-  color: #1D4ED8 !important;
-}
-
-[data-theme="dark"] .citizen-hero-eyebrow {
-  background: rgba(37, 99, 235, 0.16) !important;
-  border: 1px solid rgba(59, 130, 246, 0.35) !important;
-  color: #93C5FD !important;
-}
-
-/* 2. Priority Attention Banners */
-.attention-banner-warning {
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 1.75rem;
-  border-radius: 14px;
+/* 2. Sleek Inline Alert Ribbons (Minimalist, integrated notification bar) */
+.citizen-alert-ribbon {
+  padding: 0.85rem 1.25rem;
+  margin-bottom: 1.25rem;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1223,215 +1200,238 @@ html.theme-transition *::after {
   transition: all 0.2s ease;
 }
 
-[data-theme="light"] .attention-banner-warning {
-  background: #FFFBEB !important;
-  border: 1.5px solid #FDE68A !important;
-  border-left: 5px solid #D97706 !important;
-  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.08) !important;
+.citizen-alert-ribbon.warning {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.28);
 }
 
-[data-theme="dark"] .attention-banner-warning {
-  background: rgba(245, 158, 11, 0.12) !important;
-  border: 1px solid rgba(245, 158, 11, 0.35) !important;
-  border-left: 5px solid #F59E0B !important;
+[data-theme="dark"] .citizen-alert-ribbon.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
 }
 
-.attention-banner-success {
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 1.75rem;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1rem;
-  transition: all 0.2s ease;
+.citizen-alert-ribbon.success {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.28);
 }
 
-[data-theme="light"] .attention-banner-success {
-  background: #F0FDF4 !important;
-  border: 1.5px solid #BBF7D0 !important;
-  border-left: 5px solid #059669 !important;
-  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.08) !important;
+[data-theme="dark"] .citizen-alert-ribbon.success {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
 }
 
-[data-theme="dark"] .attention-banner-success {
-  background: rgba(16, 185, 129, 0.12) !important;
-  border: 1px solid rgba(16, 185, 129, 0.35) !important;
-  border-left: 5px solid #10B981 !important;
-}
-
-/* 3. Application Overview KPI Stat Cards */
-.kpi-stat-card {
-  padding: 1.5rem;
+/* 3. Unified Metrics Ribbon (1 cohesive continuous bar, NO separate box cards) */
+.unified-metrics-ribbon {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   border-radius: 16px;
-  position: relative;
-  text-decoration: none;
-  display: block;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
+  margin-bottom: 2.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 }
 
-[data-theme="light"] .kpi-stat-card {
-  background: #FFFFFF !important;
-  border: 1px solid #E2E8F0 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03), 0 6px 16px -2px rgba(15, 23, 42, 0.05) !important;
+[data-theme="dark"] .unified-metrics-ribbon {
+  background: rgba(12, 26, 46, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
-[data-theme="light"] .kpi-stat-card:hover {
-  transform: translateY(-3px);
-  border-color: #CBD5E1 !important;
-  box-shadow: 0 12px 24px -4px rgba(15, 23, 42, 0.09) !important;
+@media (max-width: 860px) {
+  .unified-metrics-ribbon {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .metric-ribbon-col:nth-child(2) {
+    border-right: none !important;
+  }
+  .metric-ribbon-col:nth-child(1),
+  .metric-ribbon-col:nth-child(2) {
+    border-bottom: 1px solid var(--border-subtle);
+  }
 }
 
-[data-theme="dark"] .kpi-stat-card {
-  background: rgba(12, 26, 46, 0.75) !important;
-  border: 1px solid rgba(148, 163, 184, 0.15) !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+@media (max-width: 520px) {
+  .unified-metrics-ribbon {
+    grid-template-columns: 1fr;
+  }
+  .metric-ribbon-col {
+    border-right: none !important;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .metric-ribbon-col:last-child {
+    border-bottom: none;
+  }
 }
 
-[data-theme="dark"] .kpi-stat-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(59, 130, 246, 0.4) !important;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45), 0 0 20px -3px rgba(59, 130, 246, 0.2) !important;
+.metric-ribbon-col {
+  padding: 1.5rem 1.75rem;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 1px solid var(--border-subtle);
+  transition: all 0.2s ease;
+  position: relative;
 }
 
-.kpi-icon-pill {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+.metric-ribbon-col:last-child {
+  border-right: none;
+}
+
+.metric-ribbon-col:hover {
+  background: var(--bg-secondary);
+}
+
+.metric-icon-indicator {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: transform 0.2s ease;
 }
 
-.kpi-stat-card:hover .kpi-icon-pill {
-  transform: scale(1.08);
+.metric-ribbon-col:hover .metric-icon-indicator {
+  transform: scale(1.1);
 }
 
-/* 4. Active Milestone Tracker */
-.milestone-tracker-card {
+/* 4. Fluid Connected Timeline Stepper (NO boxes inside boxes!) */
+.fluid-timeline-card {
   padding: 1.75rem 2rem;
   margin-bottom: 2.5rem;
   border-radius: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="dark"] .fluid-timeline-card {
+  background: rgba(12, 26, 46, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.timeline-stepper-track {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
   position: relative;
-  transition: all 0.2s ease;
+  margin-top: 1.5rem;
+  padding: 0 0.5rem;
 }
 
-[data-theme="light"] .milestone-tracker-card {
-  background: #FFFFFF !important;
-  border: 1px solid #E2E8F0 !important;
-  box-shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.06) !important;
+/* The continuous connecting line */
+.timeline-stepper-track::before {
+  content: '';
+  position: absolute;
+  top: 16px;
+  left: 2rem;
+  right: 2rem;
+  height: 2px;
+  background: var(--border-subtle);
+  z-index: 1;
 }
 
-[data-theme="dark"] .milestone-tracker-card {
-  background: rgba(12, 26, 46, 0.75) !important;
-  border: 1px solid rgba(148, 163, 184, 0.15) !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+.timeline-stepper-node {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
 }
 
-.milestone-stage-pill {
-  padding: 0.75rem 0.85rem;
-  border-radius: 10px;
+.timeline-stepper-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 0.75rem;
-  transition: all 0.2s ease;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  background: var(--bg-card);
+  border: 2px solid var(--border-subtle);
+  color: var(--text-muted);
+  transition: all 0.25s ease;
 }
 
-[data-theme="light"] .milestone-stage-pill.done {
-  background: #ECFDF5 !important;
-  border: 1px solid #A7F3D0 !important;
+[data-theme="dark"] .timeline-stepper-dot {
+  background: #0B192C;
 }
 
-[data-theme="light"] .milestone-stage-pill.current {
-  background: #EFF6FF !important;
-  border: 1.5px solid #3B82F6 !important;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+.timeline-stepper-dot.done {
+  background: #10B981 !important;
+  border-color: #10B981 !important;
+  color: #FFFFFF !important;
 }
 
-[data-theme="light"] .milestone-stage-pill.pending {
-  background: #F8FAFC !important;
-  border: 1px solid #E2E8F0 !important;
-}
-
-[data-theme="dark"] .milestone-stage-pill.done {
-  background: rgba(16, 185, 129, 0.12) !important;
-  border: 1px solid rgba(16, 185, 129, 0.35) !important;
-}
-
-[data-theme="dark"] .milestone-stage-pill.current {
-  background: rgba(37, 99, 235, 0.2) !important;
-  border: 1.5px solid #3B82F6 !important;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25) !important;
-}
-
-[data-theme="dark"] .milestone-stage-pill.pending {
-  background: rgba(255, 255, 255, 0.03) !important;
-  border: 1px solid rgba(148, 163, 184, 0.12) !important;
+.timeline-stepper-dot.current {
+  background: #2563EB !important;
+  border-color: #2563EB !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.25) !important;
 }
 
 /* 5. Modern Dashboard Table Container */
 .modern-dashboard-table-wrap {
   border-radius: 16px;
   overflow: hidden;
-  transition: all 0.2s ease;
-}
-
-[data-theme="light"] .modern-dashboard-table-wrap {
-  background: #FFFFFF !important;
-  border: 1px solid #E2E8F0 !important;
-  box-shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.06) !important;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 }
 
 [data-theme="dark"] .modern-dashboard-table-wrap {
-  background: rgba(12, 26, 46, 0.75) !important;
-  border: 1px solid rgba(148, 163, 184, 0.15) !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+  background: rgba(12, 26, 46, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
-[data-theme="light"] .modern-dashboard-table-wrap thead tr {
-  background: #F8FAFC !important;
-  border-bottom: 1px solid #E2E8F0 !important;
+/* 6. Sleek Quick Action Chips (Horizontal pills, not big square boxes) */
+.quick-action-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 2.5rem;
 }
 
-[data-theme="light"] .modern-dashboard-table-wrap thead th {
-  color: #475569 !important;
-  font-weight: 700 !important;
-}
-
-/* 6. Quick Action Cards */
-.quick-action-card {
-  padding: 1.35rem;
-  border-radius: 14px;
+.quick-action-chip {
+  padding: 0.9rem 1.15rem;
+  border-radius: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
   text-decoration: none;
   display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  align-items: center;
+  gap: 0.85rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-[data-theme="light"] .quick-action-card {
-  background: #FFFFFF !important;
-  border: 1px solid #E2E8F0 !important;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+[data-theme="dark"] .quick-action-chip {
+  background: rgba(12, 26, 46, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.15);
 }
 
-[data-theme="light"] .quick-action-card:hover {
-  transform: translateY(-3px);
-  border-color: #CBD5E1 !important;
-  box-shadow: 0 10px 22px -3px rgba(15, 23, 42, 0.08) !important;
+.quick-action-chip:hover {
+  background: var(--bg-secondary);
+  border-color: var(--border-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-[data-theme="dark"] .quick-action-card {
-  background: rgba(12, 26, 46, 0.75) !important;
-  border: 1px solid rgba(148, 163, 184, 0.15) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
-}
-
-[data-theme="dark"] .quick-action-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(59, 130, 246, 0.35) !important;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4) !important;
+.quick-action-chip-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 /* ===== Citizen Global Header & Navigation Controls ===== */

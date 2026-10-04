@@ -196,9 +196,9 @@ export const CitizenDashboardPage: React.FC = () => {
     <DashboardLayout>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         {/* ==================================================
-            1. Welcome Section (Section 4)
+            1. Welcome Section (Open Canvas Header - No Box Enclosure)
         ================================================== */}
-        <section className="citizen-workspace-hero">
+        <header className="citizen-canvas-header">
           <div style={{ maxWidth: '640px' }}>
             <div className="citizen-hero-eyebrow">
               <Sparkles size={13} />
@@ -207,11 +207,11 @@ export const CitizenDashboardPage: React.FC = () => {
             <h1
               id="citizen-greeting"
               style={{
-                fontSize: 'clamp(1.5rem, 3vw, 2.1rem)',
-                fontWeight: 700,
+                fontSize: 'clamp(1.6rem, 3vw, 2.25rem)',
+                fontWeight: 800,
                 color: 'var(--text-primary)',
-                marginBottom: '0.45rem',
-                letterSpacing: '-0.025em'
+                marginBottom: '0.4rem',
+                letterSpacing: '-0.03em'
               }}
             >
               {loading ? 'Loading profile...' : currentUser ? `${getGreeting()}, ${getCitizenDisplayName()}` : 'Unable to load profile.'}
@@ -232,12 +232,12 @@ export const CitizenDashboardPage: React.FC = () => {
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
             {draftApp ? (
               <Link
                 to={applicationService.getApplicationResumeRoute(draftApp)}
                 className="btn btn-primary hover-lift"
-                style={{ padding: '0.75rem 1.35rem', fontSize: '0.88rem', display: 'inline-flex', alignItems: 'center', gap: '0.45rem' }}
+                style={{ padding: '0.7rem 1.25rem', fontSize: '0.88rem', display: 'inline-flex', alignItems: 'center', gap: '0.45rem' }}
               >
                 <PlayCircle size={16} /> Continue Application
               </Link>
@@ -245,33 +245,32 @@ export const CitizenDashboardPage: React.FC = () => {
             <Link
               to="/services"
               className={draftApp ? "btn btn-secondary hover-lift" : "btn btn-primary hover-lift"}
-              style={{ padding: '0.75rem 1.35rem', fontSize: '0.88rem' }}
+              style={{ padding: '0.7rem 1.25rem', fontSize: '0.88rem' }}
             >
               <Plus size={16} /> New Application
             </Link>
             <Link
               to="/applications"
               className="btn btn-secondary hover-lift"
-              style={{ padding: '0.75rem 1.25rem', fontSize: '0.88rem' }}
+              style={{ padding: '0.7rem 1.25rem', fontSize: '0.88rem' }}
             >
               View My Applications
             </Link>
           </div>
-        </section>
+        </header>
 
         {/* ==================================================
-            2. Priority Attention: Correction Required Banner (Section 17)
+            2. Priority Attention: Correction Required Banner (Sleek Inline Ribbon)
         ================================================== */}
         {correctionApp && (
-          <section className="attention-banner-warning">
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', maxWidth: '720px' }}>
+          <div className="citizen-alert-ribbon warning">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
               <div
                 style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '12px',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
                   background: 'rgba(217, 119, 6, 0.15)',
-                  border: '1px solid rgba(217, 119, 6, 0.3)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -279,20 +278,18 @@ export const CitizenDashboardPage: React.FC = () => {
                   flexShrink: 0
                 }}
               >
-                <AlertTriangle size={22} />
+                <AlertTriangle size={18} />
               </div>
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
-                  <strong style={{ fontSize: '1rem', color: 'var(--text-primary)', fontWeight: 700 }}>
-                    Action Required: Your {correctionApp.serviceName} application requires correction
-                  </strong>
-                  <span className="badge badge-warning" style={{ fontSize: '0.72rem', letterSpacing: '0.04em' }}>
-                    {correctionApp.id}
-                  </span>
-                </div>
-                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.45 }}>
-                  Reason: {correctionApp.remarks || 'Address proof does not match the application premises address.'}
-                </p>
+                <span style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-primary)', marginRight: '0.5rem' }}>
+                  Action Required: Your {correctionApp.serviceName} application requires correction
+                </span>
+                <span className="badge badge-warning" style={{ fontSize: '0.7rem', padding: '0.15rem 0.45rem' }}>
+                  {correctionApp.id}
+                </span>
+                <span style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', marginLeft: '0.5rem' }}>
+                  — {correctionApp.remarks || 'Premises proof does not match address.'}
+                </span>
               </div>
             </div>
 
@@ -300,30 +297,29 @@ export const CitizenDashboardPage: React.FC = () => {
               to={`/applications/${correctionApp.id}`}
               className="btn btn-primary hover-lift"
               style={{
-                padding: '0.65rem 1.25rem',
-                fontSize: '0.85rem',
+                padding: '0.45rem 1rem',
+                fontSize: '0.8rem',
                 background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
-                borderColor: 'rgba(217, 119, 6, 0.5)'
+                borderColor: 'rgba(217, 119, 6, 0.4)'
               }}
             >
-              Fix Application <ArrowRight size={15} />
+              Fix Application <ArrowRight size={14} />
             </Link>
-          </section>
+          </div>
         )}
 
         {/* ==================================================
-            3. Priority Attention: Digital Approval Banner (Section 18)
+            3. Priority Attention: Digital Approval Banner (Sleek Inline Ribbon)
         ================================================== */}
         {approvedApp && (
-          <section className="attention-banner-success">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div className="citizen-alert-ribbon success">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
               <div
                 style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '12px',
-                  background: 'rgba(5, 150, 105, 0.15)',
-                  border: '1px solid rgba(5, 150, 105, 0.3)',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
+                  background: 'rgba(16, 185, 129, 0.15)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -331,25 +327,18 @@ export const CitizenDashboardPage: React.FC = () => {
                   flexShrink: 0
                 }}
               >
-                <Award size={22} />
+                <Award size={18} />
               </div>
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
-                  <strong style={{ fontSize: '1rem', color: 'var(--text-primary)', fontWeight: 700 }}>
-                    Application Approved: {approvedApp.serviceName}
-                  </strong>
-                  <span className="badge badge-success" style={{ fontSize: '0.72rem', letterSpacing: '0.04em' }}>
-                    {approvedApp.id}
-                  </span>
-                  {approvedApp.approvalReference && (
-                    <span style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
-                      Ref: {approvedApp.approvalReference}
-                    </span>
-                  )}
-                </div>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>
-                  Sanctioned on {formatDate(approvedApp.updatedAt)}. Prototype digital approval certificate is ready.
-                </p>
+                <span style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-primary)', marginRight: '0.5rem' }}>
+                  Application Approved: {approvedApp.serviceName}
+                </span>
+                <span className="badge badge-success" style={{ fontSize: '0.7rem', padding: '0.15rem 0.45rem' }}>
+                  {approvedApp.id}
+                </span>
+                <span style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', marginLeft: '0.5rem' }}>
+                  — Sanctioned on {formatDate(approvedApp.updatedAt)}. Ready for download.
+                </span>
               </div>
             </div>
 
@@ -357,116 +346,101 @@ export const CitizenDashboardPage: React.FC = () => {
               to={`/applications/${approvedApp.id}/approval`}
               className="btn btn-primary hover-lift"
               style={{
-                padding: '0.65rem 1.25rem',
-                fontSize: '0.85rem',
+                padding: '0.45rem 1rem',
+                fontSize: '0.8rem',
                 background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                borderColor: 'rgba(5, 150, 105, 0.5)'
+                borderColor: 'rgba(5, 150, 105, 0.4)'
               }}
             >
-              View Digital Approval <ExternalLink size={15} />
+              View Digital Approval <ExternalLink size={14} />
             </Link>
-          </section>
+          </div>
         )}
 
         {/* ==================================================
-            4. Application Statistics (Section 5 - 4 Clickable Cards)
+            4. Unified Metrics Ribbon (1 Cohesive Bar - No Separate Box Cards)
         ================================================== */}
-        <section style={{ marginBottom: '2.25rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.015em' }}>
-              Application Overview
-            </h3>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              Click any card to filter applications
-            </span>
-          </div>
-
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-              gap: '1rem'
-            }}
-          >
+        <section style={{ marginBottom: '2.5rem' }}>
+          <div className="unified-metrics-ribbon">
             {/* Total Applications */}
-            <Link to="/applications" className="kpi-stat-card">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+            <Link to="/applications" className="metric-ribbon-col">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.65rem' }}>
+                <span style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
                   Total Applications
                 </span>
-                <div className="kpi-icon-pill" style={{ background: 'rgba(37, 99, 235, 0.12)', color: 'var(--accent-blue)' }}>
-                  <FileText size={18} />
+                <div className="metric-icon-indicator" style={{ background: 'rgba(37, 99, 235, 0.1)', color: 'var(--accent-blue)' }}>
+                  <FileText size={17} />
                 </div>
               </div>
-              <div style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1, letterSpacing: '-0.03em' }}>
+              <div style={{ fontSize: '2.4rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1, letterSpacing: '-0.03em' }}>
                 {stats.total}
               </div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                View all applications <ArrowRight size={12} />
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                View all applications <ArrowRight size={11} />
               </div>
             </Link>
 
             {/* Pending Review */}
-            <Link to="/applications?status=OFFICER_REVIEW" className="kpi-stat-card">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+            <Link to="/applications?status=OFFICER_REVIEW" className="metric-ribbon-col">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.65rem' }}>
+                <span style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
                   Pending Review
                 </span>
-                <div className="kpi-icon-pill" style={{ background: 'rgba(6, 182, 212, 0.12)', color: 'var(--accent-cyan)' }}>
-                  <Clock size={18} />
+                <div className="metric-icon-indicator" style={{ background: 'rgba(6, 182, 212, 0.1)', color: 'var(--accent-cyan)' }}>
+                  <Clock size={17} />
                 </div>
               </div>
-              <div style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--accent-blue)', lineHeight: 1, letterSpacing: '-0.03em' }}>
+              <div style={{ fontSize: '2.4rem', fontWeight: 800, color: 'var(--accent-blue)', lineHeight: 1, letterSpacing: '-0.03em' }}>
                 {stats.pendingReview}
               </div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                Under scrutiny or AI processing <ArrowRight size={12} />
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                Under scrutiny or AI processing <ArrowRight size={11} />
               </div>
             </Link>
 
             {/* Correction Required */}
-            <Link to="/applications?status=CORRECTION_REQUIRED" className="kpi-stat-card">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+            <Link to="/applications?status=CORRECTION_REQUIRED" className="metric-ribbon-col">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.65rem' }}>
+                <span style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
                   Correction Required
                 </span>
-                <div className="kpi-icon-pill" style={{ background: 'rgba(245, 158, 11, 0.12)', color: 'var(--status-warning)' }}>
-                  <AlertTriangle size={18} />
+                <div className="metric-icon-indicator" style={{ background: 'rgba(245, 158, 11, 0.1)', color: 'var(--status-warning)' }}>
+                  <AlertTriangle size={17} />
                 </div>
               </div>
-              <div style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--status-warning)', lineHeight: 1, letterSpacing: '-0.03em' }}>
+              <div style={{ fontSize: '2.4rem', fontWeight: 800, color: 'var(--status-warning)', lineHeight: 1, letterSpacing: '-0.03em' }}>
                 {stats.correctionRequired}
               </div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                Citizen update required <ArrowRight size={12} />
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                Citizen update required <ArrowRight size={11} />
               </div>
             </Link>
 
             {/* Approved */}
-            <Link to="/applications?status=APPROVED" className="kpi-stat-card">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+            <Link to="/applications?status=APPROVED" className="metric-ribbon-col">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.65rem' }}>
+                <span style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
                   Approved
                 </span>
-                <div className="kpi-icon-pill" style={{ background: 'rgba(16, 185, 129, 0.12)', color: 'var(--status-success)' }}>
-                  <CheckCircle2 size={18} />
+                <div className="metric-icon-indicator" style={{ background: 'rgba(16, 185, 129, 0.1)', color: 'var(--status-success)' }}>
+                  <CheckCircle2 size={17} />
                 </div>
               </div>
-              <div style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--status-success)', lineHeight: 1, letterSpacing: '-0.03em' }}>
+              <div style={{ fontSize: '2.4rem', fontWeight: 800, color: 'var(--status-success)', lineHeight: 1, letterSpacing: '-0.03em' }}>
                 {stats.approved}
               </div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                Sanctioned certificates <ArrowRight size={12} />
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                Sanctioned certificates <ArrowRight size={11} />
               </div>
             </Link>
           </div>
         </section>
 
         {/* ==================================================
-            5. Active Application Progress Tracker (Section 8)
+            5. Active Application Progress (Fluid Connected Timeline - NO boxes inside boxes!)
         ================================================== */}
         {activeApp && (
-          <section className="milestone-tracker-card">
+          <section className="fluid-timeline-card">
             <div
               style={{
                 display: 'flex',
@@ -475,29 +449,27 @@ export const CitizenDashboardPage: React.FC = () => {
                 flexWrap: 'wrap',
                 gap: '1rem',
                 borderBottom: '1px solid var(--border-subtle)',
-                paddingBottom: '1.25rem',
-                marginBottom: '1.5rem'
+                paddingBottom: '1.25rem'
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <div
                   style={{
-                    width: '46px',
-                    height: '46px',
-                    borderRadius: '12px',
+                    width: '42px',
+                    height: '42px',
+                    borderRadius: '10px',
                     background: 'var(--bg-accent-subtle)',
                     border: '1px solid var(--border-accent)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: 'var(--accent-blue)',
-                    boxShadow: '0 2px 6px rgba(37, 99, 235, 0.1)'
+                    color: 'var(--accent-blue)'
                   }}
                 >
-                  <Building size={22} />
+                  <Building size={20} />
                 </div>
                 <div>
-                  <h4 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 0.2rem 0' }}>
+                  <h4 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 0.15rem 0' }}>
                     {activeApp.serviceName}
                   </h4>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
@@ -543,9 +515,9 @@ export const CitizenDashboardPage: React.FC = () => {
               </div>
             </div>
 
-            {/* 6-Stage Progress Tracker */}
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+            {/* Fluid Connected Timeline Track (No square boxes around steps!) */}
+            <div style={{ marginTop: '1.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                 <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                   Current Milestone:{' '}
                   <strong style={{ color: 'var(--text-primary)' }}>
@@ -557,18 +529,10 @@ export const CitizenDashboardPage: React.FC = () => {
                 </span>
               </div>
 
-              {/* Progress Milestones */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
-                  gap: '0.65rem',
-                  marginTop: '1rem'
-                }}
-              >
+              <div className="timeline-stepper-track">
                 {[
                   { title: 'Submitted', done: true },
-                  { title: 'Documents Processed', done: activeApp.status !== 'DRAFT' },
+                  { title: 'Docs Processed', done: activeApp.status !== 'DRAFT' },
                   { title: 'AI Verification', done: !['DRAFT', 'SUBMITTED'].includes(activeApp.status) },
                   {
                     title: 'Officer Review',
@@ -585,42 +549,27 @@ export const CitizenDashboardPage: React.FC = () => {
                     done: activeApp.status === 'APPROVED' || activeApp.status === 'DIGITAL_APPROVAL'
                   }
                 ].map((stage, idx) => (
-                  <div
-                    key={stage.title}
-                    className={`milestone-stage-pill ${stage.done ? 'done' : stage.current ? 'current' : 'pending'}`}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.25rem' }}>
-                      <span
-                        style={{
-                          fontWeight: 700,
-                          color: stage.done
-                            ? 'var(--status-success)'
-                            : stage.current
-                            ? 'var(--accent-blue)'
-                            : 'var(--text-muted)'
-                        }}
-                      >
-                        {stage.done ? '✓' : stage.current ? '●' : '○'}
-                      </span>
-                      <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-                        Step {idx + 1}
-                      </span>
+                  <div key={stage.title} className="timeline-stepper-node">
+                    <div className={`timeline-stepper-dot ${stage.done ? 'done' : stage.current ? 'current' : ''}`}>
+                      {stage.done ? '✓' : idx + 1}
                     </div>
-                    <div
+                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginBottom: '0.15rem' }}>
+                      Step {idx + 1}
+                    </span>
+                    <span
                       style={{
-                        fontWeight: 600,
+                        fontSize: '0.75rem',
+                        fontWeight: stage.done || stage.current ? 700 : 500,
                         color: stage.done
                           ? 'var(--status-success)'
                           : stage.current
-                          ? 'var(--text-primary)'
+                          ? 'var(--accent-blue)'
                           : 'var(--text-muted)',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis'
+                        whiteSpace: 'nowrap'
                       }}
                     >
                       {stage.title}
-                    </div>
+                    </span>
                   </div>
                 ))}
               </div>
@@ -629,7 +578,7 @@ export const CitizenDashboardPage: React.FC = () => {
         )}
 
         {/* ==================================================
-            6. Recent Applications (Section 6 & 7)
+            6. Recent Applications Table
         ================================================== */}
         <section style={{ marginBottom: '2.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
@@ -653,7 +602,7 @@ export const CitizenDashboardPage: React.FC = () => {
           </div>
 
           {applications.length === 0 ? (
-            /* Empty State (Section 27) */
+            /* Empty State */
             <div
               className="glass-panel"
               style={{
@@ -694,7 +643,7 @@ export const CitizenDashboardPage: React.FC = () => {
             <div className="modern-dashboard-table-wrap">
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '680px' }}>
                 <thead>
-                  <tr>
+                  <tr style={{ background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border-subtle)' }}>
                     <th style={{ padding: '0.95rem 1.25rem', fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.04em' }}>
                       Application ID
                     </th>
@@ -809,158 +758,139 @@ export const CitizenDashboardPage: React.FC = () => {
         </section>
 
         {/* ==================================================
-            7. Quick Actions (Section 9 - 4 Working Cards)
+            7. Quick Actions (Sleek Horizontal Action Strip - No Chunky Square Boxes)
         ================================================== */}
         <section style={{ marginBottom: '2.5rem' }}>
           <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '1rem', letterSpacing: '-0.015em' }}>
             Quick Actions
           </h3>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-              gap: '1rem'
-            }}
-          >
+          <div className="quick-action-strip">
             {/* Active Draft Quick Action */}
             {draftApp && (
               <Link
                 to={applicationService.getApplicationResumeRoute(draftApp)}
-                className="quick-action-card hover-lift"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(6, 182, 212, 0.08) 100%)',
-                  border: '1px solid rgba(59, 130, 246, 0.35)'
-                }}
+                className="quick-action-chip hover-lift"
               >
                 <div
+                  className="quick-action-chip-icon"
                   style={{
-                    width: '42px',
-                    height: '42px',
-                    borderRadius: '11px',
-                    background: 'rgba(59, 130, 246, 0.2)',
-                    color: 'var(--accent-blue)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
+                    background: 'rgba(37, 99, 235, 0.12)',
+                    color: 'var(--accent-blue)'
                   }}
                 >
-                  <PlayCircle size={22} />
+                  <PlayCircle size={19} />
                 </div>
-                <div style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-primary)' }}>
-                  Continue Application
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    Continue Application
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                    Resume Step {draftApp.currentStep || 1}
+                  </div>
                 </div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                  Resume {draftApp.serviceName} draft ({draftApp.id}) at Step {draftApp.currentStep || 1} of 5.
-                </div>
+                <ArrowRight size={14} style={{ color: 'var(--text-muted)' }} />
               </Link>
             )}
+
             {/* Browse Government Services */}
             <Link
               to="/services"
-              className="quick-action-card hover-lift"
+              className="quick-action-chip hover-lift"
             >
               <div
+                className="quick-action-chip-icon"
                 style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '11px',
-                  background: 'rgba(37, 99, 235, 0.12)',
-                  color: 'var(--accent-blue)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                  background: 'rgba(37, 99, 235, 0.1)',
+                  color: 'var(--accent-blue)'
                 }}
               >
-                <Search size={20} />
+                <Search size={18} />
               </div>
-              <div style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-primary)' }}>
-                Browse Government Services
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  Browse Services
+                </div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                  6 State Services
+                </div>
               </div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                Discover 6 municipal and industrial state services.
-              </div>
+              <ArrowRight size={14} style={{ color: 'var(--text-muted)' }} />
             </Link>
 
             {/* My Applications */}
             <Link
               to="/applications"
-              className="quick-action-card hover-lift"
+              className="quick-action-chip hover-lift"
             >
               <div
+                className="quick-action-chip-icon"
                 style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '11px',
-                  background: 'rgba(6, 182, 212, 0.12)',
-                  color: 'var(--accent-cyan)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                  background: 'rgba(6, 182, 212, 0.1)',
+                  color: 'var(--accent-cyan)'
                 }}
               >
-                <FileText size={20} />
+                <FileText size={18} />
               </div>
-              <div style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-primary)' }}>
-                My Applications
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  My Applications
+                </div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                  {stats.total} Total Submissions
+                </div>
               </div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                Filter drafts, pending scrutiny, and approved sanctions.
-              </div>
+              <ArrowRight size={14} style={{ color: 'var(--text-muted)' }} />
             </Link>
 
             {/* AI Assistant */}
             <Link
               to="/assistant"
-              className="quick-action-card hover-lift"
+              className="quick-action-chip hover-lift"
             >
               <div
+                className="quick-action-chip-icon"
                 style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '11px',
-                  background: 'rgba(16, 185, 129, 0.12)',
-                  color: 'var(--status-success)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                  background: 'rgba(16, 185, 129, 0.1)',
+                  color: 'var(--status-success)'
                 }}
               >
-                <Bot size={20} />
+                <Bot size={18} />
               </div>
-              <div style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-primary)' }}>
-                AI Assistant
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  AI Assistant
+                </div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                  Automated Guidance
+                </div>
               </div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                Get automated guidance on eligibility, rules, and proofs.
-              </div>
+              <ArrowRight size={14} style={{ color: 'var(--text-muted)' }} />
             </Link>
 
             {/* Track Application */}
             <Link
               to="/applications"
-              className="quick-action-card hover-lift"
+              className="quick-action-chip hover-lift"
             >
               <div
+                className="quick-action-chip-icon"
                 style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '11px',
-                  background: 'rgba(245, 158, 11, 0.12)',
-                  color: 'var(--status-warning)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                  background: 'rgba(245, 158, 11, 0.1)',
+                  color: 'var(--status-warning)'
                 }}
               >
-                <Clock size={20} />
+                <Clock size={18} />
               </div>
-              <div style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-primary)' }}>
-                Track Application
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  Track Application
+                </div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                  Desk Scrutiny Timelines
+                </div>
               </div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                View desk review timelines, timestamps, and officer remarks.
-              </div>
+              <ArrowRight size={14} style={{ color: 'var(--text-muted)' }} />
             </Link>
           </div>
         </section>
