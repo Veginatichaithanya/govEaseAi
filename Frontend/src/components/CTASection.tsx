@@ -24,11 +24,11 @@ export const CTASection: React.FC = () => {
               GET STARTED TODAY
             </div>
 
-            <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.75rem)', color: '#FFFFFF', marginBottom: '1rem' }}>
+            <h2 className="cta-title">
               Ready to simplify your next application?
             </h2>
 
-            <p style={{ fontSize: '1.1rem', color: '#CBD5E1', lineHeight: 1.6, marginBottom: '2.25rem' }}>
+            <p className="cta-desc">
               Explore government services and see how GovEaseAI can guide you through the application process.
             </p>
 
@@ -65,6 +65,19 @@ export const CTASection: React.FC = () => {
           box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.65);
         }
 
+        .cta-title {
+          font-size: clamp(2rem, 4vw, 2.75rem);
+          color: #FFFFFF;
+          margin-bottom: 1rem;
+        }
+
+        .cta-desc {
+          font-size: 1.1rem;
+          color: #CBD5E1;
+          line-height: 1.6;
+          margin-bottom: 2.25rem;
+        }
+
         .cta-ambient-glow {
           position: absolute;
           top: 50%;
@@ -75,6 +88,25 @@ export const CTASection: React.FC = () => {
           background: radial-gradient(circle, rgba(6, 182, 212, 0.22) 0%, rgba(59, 130, 246, 0.1) 50%, transparent 75%);
           filter: blur(40px);
           pointer-events: none;
+        }
+
+        /* Light Mode Specific Overrides */
+        [data-theme="light"] .cta-banner {
+          background: linear-gradient(135deg, #FFFFFF 0%, #EFF6FF 100%) !important;
+          border-color: rgba(37, 99, 235, 0.35) !important;
+          box-shadow: 0 20px 45px -10px rgba(37, 99, 235, 0.12) !important;
+        }
+
+        [data-theme="light"] .cta-title {
+          color: #0F172A !important;
+        }
+
+        [data-theme="light"] .cta-desc {
+          color: #475569 !important;
+        }
+
+        [data-theme="light"] .cta-ambient-glow {
+          background: radial-gradient(circle, rgba(37, 99, 235, 0.12) 0%, rgba(6, 182, 212, 0.06) 50%, transparent 75%) !important;
         }
       `}</style>
     </section>

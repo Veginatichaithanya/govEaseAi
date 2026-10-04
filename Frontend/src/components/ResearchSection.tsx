@@ -79,38 +79,17 @@ export const ResearchSection: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="glass-panel hover-lift glow-border-accent"
-                style={{
-                  padding: '1.85rem',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  background: 'rgba(10, 23, 41, 0.65)',
-                  border: '1px solid rgba(148, 163, 184, 0.12)',
-                  borderRadius: 'var(--radius-lg)'
-                }}
+                className="glass-panel academic-research-card hover-lift glow-border-accent"
               >
-                <div
-                  style={{
-                    width: '42px',
-                    height: '42px',
-                    borderRadius: '10px',
-                    background: 'rgba(59, 130, 246, 0.1)',
-                    border: '1px solid rgba(59, 130, 246, 0.22)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#60A5FA',
-                    marginBottom: '1.15rem'
-                  }}
-                >
+                <div className="academic-icon-wrap">
                   <Icon size={20} />
                 </div>
 
-                <h3 style={{ fontSize: '1.1rem', color: '#FFFFFF', marginBottom: '0.65rem' }}>
+                <h3 className="academic-title">
                   {topic.title}
                 </h3>
 
-                <p style={{ fontSize: '0.88rem', color: '#94A3B8', lineHeight: 1.55, margin: 0 }}>
+                <p className="academic-desc">
                   {topic.description}
                 </p>
               </div>
@@ -119,29 +98,96 @@ export const ResearchSection: React.FC = () => {
         </div>
 
         {/* Scientific Integrity Notice */}
-        <div
-          style={{
-            textAlign: 'center',
-            padding: '1.25rem 2rem',
-            background: 'rgba(15, 31, 53, 0.4)',
-            border: '1px solid rgba(148, 163, 184, 0.1)',
-            borderRadius: 'var(--radius-md)',
-            maxWidth: '850px',
-            margin: '0 auto'
-          }}
-        >
-          <span
-            style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.78rem',
-              color: '#94A3B8',
-              lineHeight: 1.6
-            }}
-          >
+        <div className="academic-notice-box">
+          <span className="academic-notice-text">
             <strong>Research Methodology Note:</strong> This platform is designed strictly for academic demonstration and system evaluation. It makes no claims of unverified empirical accuracy or comparative superiority over existing e-governance infrastructures.
           </span>
         </div>
       </div>
+
+      <style>{`
+        .academic-research-card {
+          padding: 1.85rem;
+          display: flex;
+          flex-direction: column;
+          background: rgba(10, 23, 41, 0.65);
+          border: 1px solid rgba(148, 163, 184, 0.12);
+          border-radius: var(--radius-lg);
+        }
+
+        .academic-icon-wrap {
+          width: 42px;
+          height: 42px;
+          border-radius: 10px;
+          background: rgba(59, 130, 246, 0.1);
+          border: 1px solid rgba(59, 130, 246, 0.22);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #60A5FA;
+          margin-bottom: 1.15rem;
+        }
+
+        .academic-title {
+          font-size: 1.1rem;
+          color: #FFFFFF;
+          margin-bottom: 0.65rem;
+        }
+
+        .academic-desc {
+          font-size: 0.88rem;
+          color: #94A3B8;
+          line-height: 1.55;
+          margin: 0;
+        }
+
+        .academic-notice-box {
+          text-align: center;
+          padding: 1.25rem 2rem;
+          background: rgba(15, 31, 53, 0.4);
+          border: 1px solid rgba(148, 163, 184, 0.1);
+          border-radius: var(--radius-md);
+          maxWidth: 850px;
+          margin: 0 auto;
+        }
+
+        .academic-notice-text {
+          font-family: var(--font-mono);
+          font-size: 0.78rem;
+          color: #94A3B8;
+          line-height: 1.6;
+        }
+
+        /* Light Mode Specific Overrides */
+        [data-theme="light"] .academic-research-card {
+          background: #FFFFFF !important;
+          border-color: #E2E8F0 !important;
+          box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+        }
+
+        [data-theme="light"] .academic-title {
+          color: #0F172A !important;
+        }
+
+        [data-theme="light"] .academic-desc {
+          color: #475569 !important;
+        }
+
+        [data-theme="light"] .academic-icon-wrap {
+          background: #EFF6FF !important;
+          border-color: #BFDBFE !important;
+          color: #2563EB !important;
+        }
+
+        [data-theme="light"] .academic-notice-box {
+          background: #F8FAFC !important;
+          border-color: #E2E8F0 !important;
+        }
+
+        [data-theme="light"] .academic-notice-text {
+          color: #475569 !important;
+        }
+      `}</style>
     </section>
   );
 };

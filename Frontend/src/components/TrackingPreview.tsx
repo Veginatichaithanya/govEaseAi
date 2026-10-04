@@ -308,6 +308,68 @@ export const TrackingPreview: React.FC = () => {
             grid-template-columns: 1fr;
           }
         }
+
+        /* Light Mode Specific Overrides */
+        [data-theme="light"] .tracking-card-container {
+          background: #FFFFFF !important;
+          border-color: #E2E8F0 !important;
+          box-shadow: 0 16px 40px -10px rgba(15, 23, 42, 0.08) !important;
+        }
+
+        [data-theme="light"] .tracking-header {
+          background: #F8FAFC !important;
+          border-bottom-color: #E2E8F0 !important;
+        }
+
+        [data-theme="light"] .tracking-title-block h3 {
+          color: #0F172A !important;
+        }
+
+        [data-theme="light"] .token-code {
+          color: #0284C7 !important;
+        }
+
+        [data-theme="light"] .token-label {
+          color: #64748B !important;
+        }
+
+        [data-theme="light"] .node-title {
+          color: #0F172A !important;
+        }
+
+        [data-theme="light"] .node-desc {
+          color: #475569 !important;
+        }
+
+        [data-theme="light"] .stepper-node.pending .node-title {
+          color: #94A3B8 !important;
+        }
+
+        [data-theme="light"] .tracking-audit-sidebar {
+          background: #F8FAFC !important;
+          border-color: #E2E8F0 !important;
+        }
+
+        [data-theme="light"] .sidebar-header strong {
+          color: #0F172A !important;
+        }
+
+        [data-theme="light"] .meta-key {
+          color: #64748B !important;
+        }
+
+        [data-theme="light"] .meta-val {
+          color: #0F172A !important;
+        }
+
+        [data-theme="light"] .audit-disclaimer {
+          background: #EFF6FF !important;
+          border-color: #BFDBFE !important;
+        }
+
+        [data-theme="light"] .audit-disclaimer span {
+          color: #1E3A8A !important;
+        }
       `}</style>
     </section>
   );

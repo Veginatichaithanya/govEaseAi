@@ -411,6 +411,89 @@ export const OfficerExperience: React.FC = () => {
             display: none;
           }
         }
+
+        /* Light Mode Specific Overrides */
+        [data-theme="light"] .officer-stage-card {
+          background: #FFFFFF !important;
+          border-color: #E2E8F0 !important;
+          box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+        }
+
+        [data-theme="light"] .officer-stage-card.key-stage {
+          background: #F0FDF4 !important;
+          border-color: #10B981 !important;
+          box-shadow: 0 4px 16px rgba(16, 185, 129, 0.15) !important;
+        }
+
+        [data-theme="light"] .stage-name {
+          color: #0F172A !important;
+        }
+
+        [data-theme="light"] .stage-note {
+          color: #475569 !important;
+        }
+
+        [data-theme="light"] .stage-idx {
+          background: #EFF6FF !important;
+          color: #2563EB !important;
+        }
+
+        [data-theme="light"] .officer-workbench-preview {
+          background: #FFFFFF !important;
+          border-color: #E2E8F0 !important;
+          box-shadow: 0 16px 40px -10px rgba(15, 23, 42, 0.08) !important;
+        }
+
+        [data-theme="light"] .workbench-header {
+          background: #F8FAFC !important;
+          border-bottom-color: #E2E8F0 !important;
+        }
+
+        [data-theme="light"] .workbench-header h3 {
+          color: #0F172A !important;
+        }
+
+        [data-theme="light"] .workbench-header p {
+          color: #475569 !important;
+        }
+
+        [data-theme="light"] .col-header {
+          color: #475569 !important;
+        }
+
+        [data-theme="light"] .ai-finding-card {
+          background: #F8FAFC !important;
+          border-color: #E2E8F0 !important;
+        }
+
+        [data-theme="light"] .ai-finding-card span {
+          color: #0F172A !important;
+        }
+
+        [data-theme="light"] .finding-list li {
+          color: #334155 !important;
+        }
+
+        [data-theme="light"] .finding-notice {
+          background: #EFF6FF !important;
+          border-color: rgba(37, 99, 235, 0.3) !important;
+          color: #1D4ED8 !important;
+        }
+
+        [data-theme="light"] .officer-actions-wrapper {
+          background: #F8FAFC !important;
+          border-color: #E2E8F0 !important;
+        }
+
+        [data-theme="light"] .officer-actions-wrapper p {
+          color: #475569 !important;
+        }
+
+        [data-theme="light"] .officer-governance-strip {
+          background: #EFF6FF !important;
+          border-color: #BFDBFE !important;
+          color: #1E3A8A !important;
+        }
       `}</style>
     </section>
   );

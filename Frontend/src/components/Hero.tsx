@@ -517,6 +517,22 @@ export const Hero: React.FC = () => {
         }
 
         /* Light Mode Specific Overrides for Hero Product Preview */
+        [data-theme="light"] .hero-title {
+          color: #0F172A !important;
+        }
+
+        [data-theme="light"] .hero-description {
+          color: #334155 !important;
+        }
+
+        [data-theme="light"] .trust-pill {
+          color: #1E293B !important;
+        }
+
+        [data-theme="light"] .trust-divider {
+          color: #94A3B8 !important;
+        }
+
         [data-theme="light"] .hero-title-highlight {
           background: linear-gradient(135deg, #0284C7 0%, #2563EB 50%, #0D9488 100%);
           -webkit-background-clip: text;

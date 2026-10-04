@@ -1010,9 +1010,51 @@ export const ScrollExpandSection: React.FC = () => {
           color: #0F172A;
         }
 
+        [data-theme="light"] .matrix-table th {
+          color: #475569 !important;
+          border-bottom-color: #E2E8F0 !important;
+        }
+
         [data-theme="light"] .matrix-table td {
-          color: #1E293B;
-          border-bottom-color: #E2E8F0;
+          color: #1E293B !important;
+          border-bottom-color: #E2E8F0 !important;
+        }
+
+        [data-theme="light"] .matrix-table tr.row-flagged {
+          background: #FEF3C7 !important;
+        }
+
+        [data-theme="light"] .doc-type-tag {
+          color: #0284C7 !important;
+        }
+
+        [data-theme="light"] .extracted-field .k {
+          color: #475569 !important;
+        }
+
+        [data-theme="light"] .digital-sanction-card {
+          background: #F0FDF4 !important;
+          border-color: #86EFAC !important;
+        }
+
+        [data-theme="light"] .sanction-banner {
+          border-bottom-color: #BBF7D0 !important;
+        }
+
+        [data-theme="light"] .sanction-banner strong {
+          color: #0F172A !important;
+        }
+
+        [data-theme="light"] .sanction-banner span {
+          color: #475569 !important;
+        }
+
+        [data-theme="light"] .s-label {
+          color: #64748B !important;
+        }
+
+        [data-theme="light"] .s-val {
+          color: #0F172A !important;
         }
 
         [data-theme="light"] .officer-review-actions-panel {

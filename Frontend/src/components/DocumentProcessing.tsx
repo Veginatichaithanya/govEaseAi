@@ -586,6 +586,105 @@ export const DocumentProcessing: React.FC = () => {
             gap: 0.5rem;
           }
         }
+
+        /* Light Mode Specific Overrides */
+        [data-theme="light"] .flow-step {
+          background: #FFFFFF !important;
+          border-color: #CBD5E1 !important;
+        }
+
+        [data-theme="light"] .flow-text {
+          color: #334155 !important;
+        }
+
+        [data-theme="light"] .flow-step.active-flow {
+          background: #EFF6FF !important;
+          border-color: #3B82F6 !important;
+        }
+
+        [data-theme="light"] .doc-demo-workspace {
+          background: #FFFFFF !important;
+          border-color: #E2E8F0 !important;
+          box-shadow: 0 16px 40px -10px rgba(15, 23, 42, 0.08) !important;
+        }
+
+        [data-theme="light"] .demo-header-bar {
+          background: #F8FAFC !important;
+          border-bottom-color: #E2E8F0 !important;
+        }
+
+        [data-theme="light"] .demo-header-bar span {
+          color: #0F172A !important;
+        }
+
+        [data-theme="light"] .switcher-btn {
+          background: #FFFFFF !important;
+          border-color: #CBD5E1 !important;
+          color: #475569 !important;
+        }
+
+        [data-theme="light"] .switcher-btn.active {
+          background: #EFF6FF !important;
+          border-color: #3B82F6 !important;
+          color: #1D4ED8 !important;
+        }
+
+        [data-theme="light"] .mock-document-sheet {
+          background: #F8FAFC !important;
+          border-color: #E2E8F0 !important;
+        }
+
+        [data-theme="light"] .doc-stamp {
+          color: #0284C7 !important;
+          border-color: rgba(2, 132, 199, 0.5) !important;
+        }
+
+        [data-theme="light"] .field-value-box {
+          background: #FFFFFF !important;
+          border-color: #CBD5E1 !important;
+          color: #0F172A !important;
+        }
+
+        [data-theme="light"] .field-value-box.highlight-field {
+          background: #F0FDF4 !important;
+          border-color: #86EFAC !important;
+        }
+
+        [data-theme="light"] .field-value-box.warning-field {
+          background: #FFFBEB !important;
+          border-color: #FDE68A !important;
+        }
+
+        [data-theme="light"] .table-row {
+          background: #F8FAFC !important;
+          border-color: #E2E8F0 !important;
+        }
+
+        [data-theme="light"] .table-row.warning-highlight {
+          background: #FFFBEB !important;
+          border-color: #FDE68A !important;
+        }
+
+        [data-theme="light"] .table-label {
+          color: #0F172A !important;
+        }
+
+        [data-theme="light"] .form-val {
+          color: #475569 !important;
+        }
+
+        [data-theme="light"] .extracted-val {
+          color: #0284C7 !important;
+        }
+
+        [data-theme="light"] .demo-disclaimer-box {
+          background: #FFFBEB !important;
+          border-color: #FDE68A !important;
+        }
+
+        [data-theme="light"] .demo-disclaimer-box div {
+          color: #78350F !important;
+        }
       `}</style>
     </section>
   );

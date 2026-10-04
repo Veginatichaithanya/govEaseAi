@@ -195,6 +195,35 @@ export const HowItWorks: React.FC = () => {
             gap: 1.25rem;
           }
         }
+
+        /* Light Mode Specific Overrides */
+        [data-theme="light"] .timeline-step-card {
+          background: #FFFFFF !important;
+          border-color: #E2E8F0 !important;
+          box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+        }
+
+        [data-theme="light"] .timeline-step-card.ai-highlighted {
+          background: #F0FDFA !important;
+          border-color: #06B6D4 !important;
+          box-shadow: 0 4px 20px rgba(6, 182, 212, 0.15) !important;
+        }
+
+        [data-theme="light"] .step-title {
+          color: #0F172A !important;
+        }
+
+        [data-theme="light"] .step-desc {
+          color: #475569 !important;
+        }
+
+        [data-theme="light"] .step-number {
+          color: #CBD5E1 !important;
+        }
+
+        [data-theme="light"] .ai-highlighted .step-number {
+          color: #0891B2 !important;
+        }
       `}</style>
     </section>
   );
