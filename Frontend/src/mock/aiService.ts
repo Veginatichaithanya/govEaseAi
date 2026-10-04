@@ -81,8 +81,8 @@ export const mockAIService = {
   getOpenRouterStatus() {
     return {
       connected: true,
-      model: 'openrouter/auto',
-      provider: 'OpenRouter (Backend Proxy)',
+      model: 'gemini-3.6-flash',
+      provider: 'Gemini Direct API / OpenRouter',
       keyMasked: 'Protected Server-Side Secret'
     };
   },

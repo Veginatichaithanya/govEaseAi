@@ -33,13 +33,12 @@ class Settings(BaseSettings):
 
     # ── Gemini Direct API ────────────────────────────────────────────────────────
     GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-3.6-flash"                     # native Gemini model name
+    GEMINI_MODEL: str = "gemini-flash-latest"                  # native Gemini model name
 
-    # ── AI Provider Selection ────────────────────────────────────────────────────
-    # "agentrouter" = use AgentRouter (with OpenRouter/Gemini fallback)
-    # "openrouter"  = use OpenRouter (with AgentRouter/Gemini fallback)
-    # "gemini"      = use Gemini directly (with AgentRouter/OpenRouter fallback)
-    AI_PROVIDER: str = "agentrouter"
+    # "gemini"      = use Gemini directly (with OpenRouter/AgentRouter fallback)
+    # "openrouter"  = use OpenRouter (with Gemini/AgentRouter fallback)
+    # "agentrouter" = use AgentRouter (with Gemini/OpenRouter fallback)
+    AI_PROVIDER: str = "gemini"
 
     # ── AI Analysis Limits ───────────────────────────────────────────────────────
     AI_MAX_FILE_SIZE_BYTES: int = 10 * 1024 * 1024   # 10 MB

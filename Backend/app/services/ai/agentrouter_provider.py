@@ -147,6 +147,9 @@ class AgentRouterProvider(BaseAIProvider):
                     messages.append({"role": role, "content": text})
         messages.append({"role": "user", "content": user_message.strip()[:2000]})
 
+        if not settings.AGENTROUTER_API_KEY:
+            return
+
         effective_tokens = max(max_tokens, 1500)
         payload = {
             "model": settings.AGENTROUTER_MODEL,
@@ -157,7 +160,8 @@ class AgentRouterProvider(BaseAIProvider):
         }
 
         try:
-            async with httpx.AsyncClient(timeout=45.0) as client:
+            timeout = httpx.Timeout(connect=10.0, read=60.0, write=10.0, pool=10.0)
+            async with httpx.AsyncClient(timeout=timeout) as client:
                 async with client.stream(
                     "POST",
                     f"{settings.AGENTROUTER_BASE_URL}/chat/completions",
@@ -165,7 +169,7 @@ class AgentRouterProvider(BaseAIProvider):
                     headers=self._auth_headers(),
                 ) as response:
                     if response.status_code != 200:
-                        yield f"AI service temporarily unavailable (HTTP {response.status_code})."
+                        logger.warning(f"[AgentRouter] stream_text HTTP {response.status_code}")
                         return
 
                     streamed_content = False
@@ -195,9 +199,9 @@ class AgentRouterProvider(BaseAIProvider):
                     if not streamed_content and reasoning_buffer:
                         yield "".join(reasoning_buffer)
 
-        except Exception:
-            logger.exception("[AgentRouter] stream_text error")
-            yield "AI service temporarily unavailable. Please retry."
+        except Exception as e:
+            logger.warning(f"[AgentRouter] stream_text error: {e}")
+            return
 
     async def analyze_image(
         self,

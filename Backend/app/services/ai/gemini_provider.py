@@ -22,7 +22,10 @@ class GeminiProvider(BaseAIProvider):
     """Calls Google Gemini API directly using httpx REST calls."""
 
     def __init__(self):
-        self._model_name = settings.GEMINI_MODEL or "gemini-3.6-flash"
+        m = (settings.GEMINI_MODEL or "gemini-flash-latest").strip()
+        if m in ("gemini-3.6-flash", "gemini-3-flash", ""):
+            m = "gemini-flash-latest"
+        self._model_name = m
 
     @property
     def provider_name(self) -> str:
@@ -31,9 +34,11 @@ class GeminiProvider(BaseAIProvider):
     def supports_modality(self, modality: str) -> bool:
         return modality in _SUPPORTED_MODALITIES
 
-    def _get_api_url(self, stream: bool = False) -> str:
-        endpoint = "streamGenerateContent?alt=sse" if stream else "generateContent"
-        return f"https://generativelanguage.googleapis.com/v1beta/models/{self._model_name}:{endpoint}?key={settings.GEMINI_API_KEY}"
+    def _get_api_url(self, stream: bool = False, model: Optional[str] = None) -> str:
+        target_model = model or self._model_name
+        endpoint = "streamGenerateContent" if stream else "generateContent"
+        alt_param = "&alt=sse" if stream else ""
+        return f"https://generativelanguage.googleapis.com/v1beta/models/{target_model}:{endpoint}?key={settings.GEMINI_API_KEY}{alt_param}"
 
     async def check_health(self) -> Dict[str, Any]:
         configured = bool(settings.GEMINI_API_KEY)
@@ -103,29 +108,34 @@ class GeminiProvider(BaseAIProvider):
             },
         }
 
-        try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                resp = await client.post(self._get_api_url(stream=False), json=payload)
+        candidate_models = [self._model_name]
+        for fallback_m in ["gemini-flash-latest", "gemini-2.5-flash-lite"]:
+            if fallback_m not in candidate_models:
+                candidate_models.append(fallback_m)
 
-            if resp.status_code != 200:
-                logger.warning(f"[Gemini] HTTP {resp.status_code}: {resp.text[:150]}")
+        for current_model in candidate_models:
+            try:
+                async with httpx.AsyncClient(timeout=30.0) as client:
+                    resp = await client.post(self._get_api_url(stream=False, model=current_model), json=payload)
+
+                if resp.status_code == 200:
+                    data = resp.json()
+                    candidates = data.get("candidates", [])
+                    if candidates:
+                        parts = candidates[0].get("content", {}).get("parts", [])
+                        answer = "".join([p.get("text", "") for p in parts if p.get("text")]).strip()
+                        if answer:
+                            return {"success": True, "answer": answer}
+
+                logger.warning(f"[Gemini] HTTP {resp.status_code} on {current_model}: {resp.text[:150]}")
+                if resp.status_code in (404, 400):
+                    continue
                 return {"success": False, "error": f"Gemini API returned status {resp.status_code}."}
+            except Exception as e:
+                logger.warning(f"[Gemini] generate_text error on {current_model}: {e}")
+                continue
 
-            data = resp.json()
-            candidates = data.get("candidates", [])
-            if not candidates:
-                return {"success": False, "error": "Gemini returned no response."}
-
-            parts = candidates[0].get("content", {}).get("parts", [])
-            answer = "".join([p.get("text", "") for p in parts if p.get("text")]).strip()
-            if not answer:
-                return {"success": False, "error": "Gemini returned empty text."}
-
-            return {"success": True, "answer": answer}
-
-        except Exception as e:
-            logger.exception(f"[Gemini] generate_text failed: {e}")
-            return {"success": False, "error": "Gemini service temporarily unavailable."}
+        return {"success": False, "error": "Gemini service temporarily unavailable."}
 
     async def stream_text(
         self,
@@ -136,7 +146,6 @@ class GeminiProvider(BaseAIProvider):
         max_tokens: int = 1024,
     ):
         if not settings.GEMINI_API_KEY:
-            yield "Gemini API is not configured."
             return
 
         contents = []
@@ -162,33 +171,48 @@ class GeminiProvider(BaseAIProvider):
             },
         }
 
-        try:
-            async with httpx.AsyncClient(timeout=45.0) as client:
-                async with client.stream("POST", self._get_api_url(stream=True), json=payload) as response:
-                    if response.status_code != 200:
-                        yield f"Gemini streaming unavailable (HTTP {response.status_code})."
-                        return
+        candidate_models = [self._model_name]
+        for fallback_m in ["gemini-flash-latest", "gemini-2.5-flash-lite"]:
+            if fallback_m not in candidate_models:
+                candidate_models.append(fallback_m)
 
-                    async for line in response.aiter_lines():
-                        if not line:
-                            continue
-                        if line.startswith("data: "):
-                            data_str = line[6:].strip()
-                            if data_str == "[DONE]":
-                                break
-                            try:
-                                chunk_json = json.loads(data_str)
-                                candidates = chunk_json.get("candidates", [])
-                                if candidates:
-                                    parts = candidates[0].get("content", {}).get("parts", [])
-                                    for p in parts:
-                                        if "text" in p:
-                                            yield p["text"]
-                            except Exception:
+        timeout = httpx.Timeout(connect=10.0, read=60.0, write=10.0, pool=10.0)
+        for current_model in candidate_models:
+            streamed = False
+            try:
+                async with httpx.AsyncClient(timeout=timeout) as client:
+                    async with client.stream("POST", self._get_api_url(stream=True, model=current_model), json=payload) as response:
+                        if response.status_code != 200:
+                            logger.warning(f"[Gemini] stream_text returned HTTP {response.status_code} for {current_model}")
+                            if response.status_code in (404, 400):
                                 continue
-        except Exception as e:
-            logger.exception(f"[Gemini] stream_text failed: {e}")
-            yield "Gemini streaming temporarily unavailable."
+                            return
+
+                        async for line in response.aiter_lines():
+                            if not line:
+                                continue
+                            if line.startswith("data: "):
+                                data_str = line[6:].strip()
+                                if data_str == "[DONE]":
+                                    break
+                                try:
+                                    chunk_json = json.loads(data_str)
+                                    candidates = chunk_json.get("candidates", [])
+                                    if candidates:
+                                        parts = candidates[0].get("content", {}).get("parts", [])
+                                        for p in parts:
+                                            if "text" in p and p["text"]:
+                                                streamed = True
+                                                yield p["text"]
+                                except Exception:
+                                    continue
+                if streamed:
+                    return
+            except Exception as e:
+                logger.warning(f"[Gemini] stream_text error on {current_model}: {e}")
+                if streamed:
+                    return
+                continue
 
     async def analyze_image(
         self,

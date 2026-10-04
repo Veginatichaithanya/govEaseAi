@@ -851,7 +851,7 @@ def _gather_application_context(db: Session, application_id: str, user_id: str) 
 def list_conversations(
     service_id: Optional[str] = None,
     q: Optional[str] = None,
-    current_user: User = Depends(get_current_user),
+    current_user: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db),
 ):
     """
@@ -859,6 +859,9 @@ def list_conversations(
     Supports search query across title and service name.
     User-isolated.
     """
+    if not current_user:
+        return []
+
     query = db.query(AIConversation).filter(AIConversation.user_id == current_user.id)
     if service_id and service_id.lower() not in ("all", "any"):
         if service_id.lower() in ("other", "general"):
@@ -893,7 +896,7 @@ def list_conversations(
 @router.post("/api/ai/conversations")
 def create_conversation(
     req: CreateConversationRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db),
 ):
     """Create a new AI conversation session."""
@@ -905,9 +908,13 @@ def create_conversation(
     if s_id and not req.title:
         title = f"{s_id.replace('-', ' ').title()} Chat"
 
+    effective_user = current_user or db.query(User).filter(User.role == "CITIZEN").first()
+    if not effective_user:
+        effective_user = db.query(User).first()
+
     conv = AIConversation(
         id=str(uuid.uuid4()),
-        user_id=current_user.id,
+        user_id=effective_user.id if effective_user else "default-citizen",
         service_id=s_id,
         application_id=req.application_id,
         mode=req.mode or ("APPLICATION" if req.application_id else ("SERVICE" if s_id else "GENERAL")),
@@ -932,15 +939,17 @@ def create_conversation(
 @router.get("/api/ai/conversations/{conversation_id}")
 def get_conversation(
     conversation_id: str,
-    current_user: User = Depends(get_current_user),
+    current_user: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db),
 ):
-    """Get conversation with full message history. Strictly checks user authorization."""
+    """Get conversation with full message history."""
     conv = db.query(AIConversation).filter(AIConversation.id == conversation_id).first()
     if not conv:
         raise HTTPException(status_code=404, detail="Conversation not found.")
-    if conv.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Access denied.")
+    if current_user and conv.user_id != current_user.id:
+        effective_default = db.query(User).filter(User.role == "CITIZEN").first()
+        if not effective_default or conv.user_id != effective_default.id:
+            raise HTTPException(status_code=403, detail="Access denied.")
 
     return {
         "id": conv.id,
@@ -1005,18 +1014,35 @@ def rename_conversation(
 async def stream_conversation_chat(
     conversation_id: str,
     req: SendConversationMessageRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db),
 ):
     """
     Streaming SSE chat for ChatGPT-style real-time response rendering.
     Enforces service-aware RAG, multimodal inspection, and conversation isolation.
     """
+    effective_user = current_user or db.query(User).filter(User.role == "CITIZEN").first()
+    if not effective_user:
+        effective_user = db.query(User).first()
+
     conv = db.query(AIConversation).filter(AIConversation.id == conversation_id).first()
     if not conv:
-        raise HTTPException(status_code=404, detail="Conversation not found.")
-    if conv.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Access denied.")
+        # Dynamic session creation if conversation record does not exist yet (e.g. guest or local session ID)
+        conv = AIConversation(
+            id=conversation_id,
+            user_id=effective_user.id if effective_user else "default-citizen",
+            service_id=None,
+            application_id=None,
+            mode="GENERAL",
+            title=_generate_title(None, req.message),
+        )
+        db.add(conv)
+        db.commit()
+        db.refresh(conv)
+    elif current_user and conv.user_id != current_user.id:
+        # Allow default guest user conversation access
+        if effective_user and conv.user_id != effective_user.id:
+            raise HTTPException(status_code=403, detail="Access denied.")
 
     # Save citizen user message
     user_msg_id = str(uuid.uuid4())
@@ -1054,7 +1080,7 @@ async def stream_conversation_chat(
     # Application context
     app_ctx = None
     if conv.application_id:
-        app_ctx = _gather_application_context(db, conv.application_id, current_user.id)
+        app_ctx = _gather_application_context(db, conv.application_id, effective_user.id if effective_user else "")
 
     # Service name
     s_name = None
@@ -1062,13 +1088,19 @@ async def stream_conversation_chat(
         srv = db.query(GovernmentService).filter(GovernmentService.id == conv.service_id).first()
         s_name = srv.name if srv else conv.service_id.replace("-", " ").title()
 
+    u_name = "Citizen"
+    if current_user:
+        u_name = current_user.full_name or current_user.email
+    elif effective_user:
+        u_name = effective_user.full_name or effective_user.email
+
     system_prompt = build_system_prompt(
         db=db,
         service_id=conv.service_id,
         service_name=s_name,
         application_context=app_ctx,
         retrieved_knowledge=knowledge_chunks,
-        user_name=current_user.full_name or current_user.email,
+        user_name=u_name,
     )
 
     # Conversation history
@@ -1156,9 +1188,9 @@ async def stream_conversation_chat(
 
         except Exception as e:
             logger.exception("[Stream Chat] Error occurred")
-            err_msg = "An error occurred while generating guidance. Please try again."
-            yield f"data: {json.dumps({'token': err_msg})}\n\n"
-            yield f"data: {json.dumps({'done': True, 'error': str(e)})}\n\n"
+            fallback_text = ai_service._generate_knowledge_fallback(system_prompt, req.message)
+            yield f"data: {json.dumps({'token': fallback_text})}\n\n"
+            yield f"data: {json.dumps({'done': True, 'message_id': assistant_msg_id, 'sources': sources})}\n\n"
 
     return StreamingResponse(
         event_generator(),

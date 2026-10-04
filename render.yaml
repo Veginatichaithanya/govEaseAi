@@ -41,7 +41,7 @@ services:
       - key: FRONTEND_URL
         value: https://goveaseai-frontend.onrender.com
       - key: AI_PROVIDER
-        value: agentrouter
+        value: gemini
       - key: AGENTROUTER_API_KEY
         sync: false
       - key: AGENTROUTER_BASE_URL
@@ -61,7 +61,7 @@ services:
       - key: GEMINI_API_KEY
         sync: false
       - key: GEMINI_MODEL
-        value: gemini-3.6-flash
+        value: gemini-flash-latest
 
   # 3. React 19 / Vite Frontend Static Site
   - type: web

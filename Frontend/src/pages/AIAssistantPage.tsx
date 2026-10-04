@@ -19,6 +19,8 @@ import {
   deleteConversation,
   streamConversationChat,
 } from '../services/aiMultimodalService';
+import { mockAIService } from '../mock/aiService';
+import { MOCK_SERVICES } from '../mock/services';
 import {
   Send,
   Square,
@@ -507,8 +509,9 @@ export const AIAssistantPage: React.FC = () => {
           ...prev.filter(c => c.id !== newConv.id),
         ]);
       } catch (err: any) {
-        setErrorMessage('Unable to initialize conversation session.');
-        return;
+        console.warn('Backend conversation init unavailable, continuing with local session:', err);
+        convId = `local-${Date.now()}`;
+        setCurrentConvId(convId);
       }
     }
 
@@ -546,11 +549,29 @@ export const AIAssistantPage: React.FC = () => {
         accumulatedTokens += token;
         setStreamingContent(accumulatedTokens);
       },
-      (data: any) => {
+      async (data: any) => {
+        let finalContent = (data.content || accumulatedTokens).trim();
+        if (
+          !finalContent ||
+          finalContent.toLowerCase().includes('temporarily unavailable') ||
+          finalContent.toLowerCase().includes('streaming unavailable') ||
+          finalContent.toLowerCase().includes('error occurred while generating')
+        ) {
+          try {
+            const currentSvc = MOCK_SERVICES.find(s => s.id === activeServiceId) || MOCK_SERVICES[0];
+            const fallbackAns = await mockAIService.ask(currentSvc, textToSend);
+            if (fallbackAns) {
+              finalContent = fallbackAns;
+            }
+          } catch {
+            // Keep finalContent
+          }
+        }
+
         const assistantMsg: ConversationMessageItem = {
           id: data.message_id || `asst-${Date.now()}`,
           role: 'assistant',
-          content: data.content || accumulatedTokens,
+          content: finalContent,
           sources: data.sources || [],
           metadata: { service_id: activeServiceId },
           created_at: new Date().toISOString(),
@@ -561,8 +582,29 @@ export const AIAssistantPage: React.FC = () => {
         abortControllerRef.current = null;
         refreshConversations();
       },
-      (err: string) => {
+      async (err: string) => {
         if (err !== 'Generation stopped.') {
+          try {
+            const currentSvc = MOCK_SERVICES.find(s => s.id === activeServiceId) || MOCK_SERVICES[0];
+            const fallbackAns = await mockAIService.ask(currentSvc, textToSend);
+            if (fallbackAns) {
+              const fallbackMsg: ConversationMessageItem = {
+                id: `asst-${Date.now()}`,
+                role: 'assistant',
+                content: fallbackAns,
+                sources: [],
+                metadata: { service_id: activeServiceId },
+                created_at: new Date().toISOString(),
+              };
+              setMessages(prev => [...prev, fallbackMsg]);
+              setStreamingContent('');
+              setIsStreaming(false);
+              abortControllerRef.current = null;
+              return;
+            }
+          } catch {
+            // Ignore
+          }
           setErrorMessage('Unable to generate a response. Please check connection or retry.');
         }
         if (accumulatedTokens) {

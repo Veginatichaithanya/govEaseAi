@@ -25,7 +25,14 @@ def mask_secret(key: str) -> str:
     return f"{key[:8]}...{key[-4:]}"
 
 def get_ai_status() -> Dict[str, Any]:
-    prov = settings.AI_PROVIDER.lower()
+    prov = (settings.AI_PROVIDER or "gemini").lower().strip()
+    if prov == "gemini" and settings.GEMINI_API_KEY:
+        return {
+            "success": True,
+            "configured": True,
+            "provider": "Gemini",
+            "model": settings.GEMINI_MODEL or "gemini-3.6-flash"
+        }
     if prov == "agentrouter" and settings.AGENTROUTER_API_KEY:
         return {
             "success": True,
@@ -49,14 +56,14 @@ async def generate_guidance(
     conversation_history: Optional[List[Dict[str, Any]]] = None
 ) -> Dict[str, Any]:
     """
-    Generate AI guidance using AgentRouter (or OpenRouter fallback) API with statutory guardrails.
-    Preserves exact prompts and guardrails from GovEaseAI architecture.
+    Generate AI guidance using unified capability-aware AI service with statutory guardrails.
+    Supports Gemini Direct, OpenRouter, and AgentRouter providers.
     """
-    prov = settings.AI_PROVIDER.lower()
-    has_agentrouter = bool(prov == "agentrouter" and settings.AGENTROUTER_API_KEY)
+    has_gemini = bool(settings.GEMINI_API_KEY)
+    has_agentrouter = bool(settings.AGENTROUTER_API_KEY)
     has_openrouter = bool(settings.OPENROUTER_API_KEY and settings.OPENROUTER_MODEL)
 
-    if not has_agentrouter and not has_openrouter:
+    if not has_gemini and not has_agentrouter and not has_openrouter:
         return {
             "success": False,
             "error": "AI service is not configured."
@@ -144,111 +151,27 @@ Strict Guardrails:
     messages.extend(windowed_history)
     messages.append({"role": "user", "content": message.strip()[:1000]})
 
-    # ── Attempt AgentRouter first if configured ──
-    if has_agentrouter:
-        ar_payload = {
-            "model": settings.AGENTROUTER_MODEL or "deepseek-v4-flash",
-            "messages": messages,
-            "temperature": 0.2,
-            "max_tokens": 1500,
-        }
-        ar_headers = {
-            "Authorization": f"Bearer {settings.AGENTROUTER_API_KEY}",
-            "Content-Type": "application/json",
-            "User-Agent": "claude-cli/2.1.158 (external, sdk-cli)",
-            "x-app": "cli",
-            "HTTP-Referer": "https://goveaseai.local",
-            "X-Title": "GovEaseAI Portal",
-        }
-        try:
-            async with httpx.AsyncClient(timeout=25.0) as client:
-                ar_resp = await client.post(
-                    f"{settings.AGENTROUTER_BASE_URL}/chat/completions",
-                    json=ar_payload,
-                    headers=ar_headers,
-                )
-            if ar_resp.status_code == 200:
-                data = ar_resp.json()
-                msg = data.get("choices", [{}])[0].get("message", {})
-                content = msg.get("content", "")
-                reasoning = msg.get("reasoning_content", "")
-                raw_answer = content.strip() if content and content.strip() else (reasoning.strip() if reasoning else "")
-                if raw_answer:
-                    return {
-                        "success": True,
-                        "answer": raw_answer,
-                        "serviceId": service_id,
-                    }
-            else:
-                logger.warning(f"[AgentRouter] guidance HTTP {ar_resp.status_code}: {ar_resp.text[:150]}. Falling back to OpenRouter.")
-        except Exception as e:
-            logger.warning(f"[AgentRouter] guidance call failed: {e}. Falling back to OpenRouter.")
+    # ── Execute via unified capability-aware AI service (Gemini -> OpenRouter -> AgentRouter) ──
+    from app.services.ai.ai_service import get_ai_service
+    ai_service = get_ai_service()
 
-    # ── OpenRouter Fallback ──
-    if not has_openrouter:
-        return {
-            "success": False,
-            "error": "AI guidance is temporarily unavailable."
-        }
+    res = await ai_service.ai_chat(
+        system_prompt=system_prompt,
+        user_message=message.strip()[:1000],
+        conversation_history=windowed_history,
+        temperature=0.2,
+        max_tokens=600,
+    )
 
-    payload = {
-        "model": settings.OPENROUTER_MODEL,
-        "messages": messages,
-        "temperature": 0.2,
-        "max_tokens": 450
-    }
-
-    headers = {
-        "Authorization": f"Bearer {settings.OPENROUTER_API_KEY}",
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://goveaseai.local",
-        "X-Title": "GovEaseAI Portal"
-    }
-
-    try:
-        async with httpx.AsyncClient(timeout=12.0) as client:
-            resp = await client.post(
-                f"{settings.OPENROUTER_BASE_URL}/chat/completions",
-                json=payload,
-                headers=headers
-            )
-
-        if resp.status_code == 429:
-            logger.warning("[OpenRouter] Rate limit reached (429)")
-            return {
-                "success": False,
-                "error": "AI service is temporarily busy. Please try again later."
-            }
-
-        if resp.status_code != 200:
-            logger.warning(f"[OpenRouter] Status code {resp.status_code}: {resp.text}")
-            return {
-                "success": False,
-                "error": "AI guidance is temporarily unavailable. Please try again."
-            }
-
-        data = resp.json()
-        raw_answer = data.get("choices", [{}])[0].get("message", {}).get("content", "")
-        if not raw_answer:
-            return {
-                "success": False,
-                "error": "AI guidance is temporarily unavailable."
-            }
-
+    if res.get("success") and res.get("answer"):
         return {
             "success": True,
-            "answer": raw_answer.strip(),
-            "serviceId": service_id
+            "answer": res["answer"].strip(),
+            "serviceId": service_id,
         }
-    except httpx.TimeoutException:
-        logger.warning("[OpenRouter] Request timed out")
-        return {
-            "success": False,
-            "error": "AI guidance request timed out. Please try again."
-        }
-    except Exception as e:
-        logger.exception("[OpenRouter] Unexpected error")
-        return {
-            "success": False,
-            "error": "AI guidance is temporarily unavailable. Please try again."
-        }
+
+    return {
+        "success": False,
+        "error": res.get("error") or "AI guidance is temporarily unavailable. Please try again.",
+        "serviceId": service_id,
+    }

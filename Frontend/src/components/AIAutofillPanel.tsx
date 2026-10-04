@@ -58,7 +58,7 @@ export const AIAutofillPanel: React.FC<AIAutofillPanelProps> = ({
           aiValue,
           confidence,
           currentValue: currentFormValues[mapping.formKey],
-          accepted: false,
+          accepted: true,
           editing: false,
           editValue: aiValue ?? '',
         });

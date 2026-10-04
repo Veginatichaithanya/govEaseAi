@@ -132,6 +132,9 @@ class OpenRouterProvider(BaseAIProvider):
                     messages.append({"role": role, "content": text})
         messages.append({"role": "user", "content": user_message.strip()[:2000]})
 
+        if not settings.OPENROUTER_API_KEY:
+            return
+
         payload = {
             "model": settings.OPENROUTER_MODEL,
             "messages": messages,
@@ -140,7 +143,8 @@ class OpenRouterProvider(BaseAIProvider):
             "stream": True,
         }
         try:
-            async with httpx.AsyncClient(timeout=45.0) as client:
+            timeout = httpx.Timeout(connect=10.0, read=60.0, write=10.0, pool=10.0)
+            async with httpx.AsyncClient(timeout=timeout) as client:
                 async with client.stream(
                     "POST",
                     f"{settings.OPENROUTER_BASE_URL}/chat/completions",
@@ -148,7 +152,7 @@ class OpenRouterProvider(BaseAIProvider):
                     headers=self._auth_headers(),
                 ) as response:
                     if response.status_code != 200:
-                        yield f"AI service temporarily unavailable (HTTP {response.status_code})."
+                        logger.warning(f"[OpenRouter] stream_text HTTP {response.status_code}")
                         return
                     async for line in response.aiter_lines():
                         if not line:
@@ -166,8 +170,8 @@ class OpenRouterProvider(BaseAIProvider):
                             except Exception:
                                 continue
         except Exception as e:
-            logger.exception("[OpenRouter] stream_text error")
-            yield "AI service temporarily unavailable. Please retry."
+            logger.warning(f"[OpenRouter] stream_text error: {e}")
+            return
 
 
     async def analyze_image(

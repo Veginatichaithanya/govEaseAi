@@ -4,7 +4,7 @@
  * API keys are 100% server-side only.
  */
 
-import { getAuthToken } from './apiClient';
+import { getAuthToken, getApiBaseUrl } from './apiClient';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -162,18 +162,25 @@ export async function fileToAttachment(file: File): Promise<FileAttachment> {
 
 // ── URL & API Helpers ─────────────────────────────────────────────────────────
 
-let RAW_API_BASE = (import.meta.env.VITE_API_BASE_URL || '/api').trim().replace(/\/+$/, '');
-if (RAW_API_BASE && !RAW_API_BASE.startsWith('/') && !RAW_API_BASE.startsWith('http://') && !RAW_API_BASE.startsWith('https://')) {
-  RAW_API_BASE = `https://${RAW_API_BASE}`;
-}
-const API_BASE = RAW_API_BASE.endsWith('/api') ? RAW_API_BASE : `${RAW_API_BASE}/api`;
-
 export function resolveUrl(endpoint: string): string {
+  const base = getApiBaseUrl().replace(/\/+$/, '');
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  if (cleanEndpoint.startsWith('/api')) {
-    return `${API_BASE}${cleanEndpoint.slice(4)}`;
+
+  if (base.startsWith('http://') || base.startsWith('https://')) {
+    if (base.endsWith('/api') && cleanEndpoint.startsWith('/api')) {
+      return `${base}${cleanEndpoint.slice(4)}`;
+    }
+    if (!base.endsWith('/api') && cleanEndpoint.startsWith('/api')) {
+      return `${base}${cleanEndpoint}`;
+    }
+    return `${base}${cleanEndpoint}`;
   }
-  return `${API_BASE}${cleanEndpoint}`;
+
+  const apiBase = base.endsWith('/api') ? base : `${base}/api`;
+  if (cleanEndpoint.startsWith('/api')) {
+    return `${apiBase}${cleanEndpoint.slice(4)}`;
+  }
+  return `${apiBase}${cleanEndpoint}`;
 }
 
 function authHeaders(): Record<string, string> {

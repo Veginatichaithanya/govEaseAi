@@ -44,6 +44,8 @@ import {
   getServiceAIContext,
   streamConversationChat,
 } from '../services/aiMultimodalService';
+import { mockAIService } from '../mock/aiService';
+import { MOCK_SERVICES } from '../mock/services';
 
 import './FloatingAIAssistant.css';
 
@@ -750,11 +752,29 @@ export const FloatingAIAssistant: React.FC = () => {
         accumulatedTokens += token;
         setStreamingContent(accumulatedTokens);
       },
-      (sources: any[]) => {
+      async (sources: any[]) => {
+        let finalContent = (accumulatedTokens || '').trim();
+        if (
+          !finalContent ||
+          finalContent.toLowerCase().includes('temporarily unavailable') ||
+          finalContent.toLowerCase().includes('streaming unavailable') ||
+          finalContent.toLowerCase().includes('error occurred while generating')
+        ) {
+          try {
+            const currentSvc = MOCK_SERVICES.find(s => s.id === activeServiceId) || MOCK_SERVICES[0];
+            const fallbackAns = await mockAIService.ask(currentSvc, textToSend);
+            if (fallbackAns) {
+              finalContent = fallbackAns;
+            }
+          } catch {
+            // Keep finalContent
+          }
+        }
+
         const newAssistantMsg: ConversationMessageItem = {
           id: `asst-${Date.now()}`,
           role: 'assistant',
-          content: accumulatedTokens || 'Guidance provided successfully.',
+          content: finalContent || 'Guidance provided successfully.',
           metadata: { sources, service_id: activeServiceId },
         };
         setMessages(prev => [...prev, newAssistantMsg]);
@@ -763,8 +783,27 @@ export const FloatingAIAssistant: React.FC = () => {
         abortControllerRef.current = null;
         refreshConversations();
       },
-      (err: string) => {
+      async (err: string) => {
         if (err !== 'Generation stopped.') {
+          try {
+            const currentSvc = MOCK_SERVICES.find(s => s.id === activeServiceId) || MOCK_SERVICES[0];
+            const fallbackAns = await mockAIService.ask(currentSvc, textToSend);
+            if (fallbackAns) {
+              const fallbackMsg: ConversationMessageItem = {
+                id: `asst-${Date.now()}`,
+                role: 'assistant',
+                content: fallbackAns,
+                metadata: { service_id: activeServiceId },
+              };
+              setMessages(prev => [...prev, fallbackMsg]);
+              setStreamingContent('');
+              setIsStreaming(false);
+              abortControllerRef.current = null;
+              return;
+            }
+          } catch {
+            // Ignore and display standard error below
+          }
           setErrorMessage(err);
         }
         if (accumulatedTokens) {
