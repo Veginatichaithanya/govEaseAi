@@ -30,16 +30,6 @@ import {
 /* ─────────────────────────────────────────────────
    Inline helper styles
 ───────────────────────────────────────────────── */
-const fieldWrap: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '0.4rem'
-};
-
-const passwordWrap: React.CSSProperties = {
-  position: 'relative'
-};
-
 const eyeBtn: React.CSSProperties = {
   position: 'absolute',
   right: '0.85rem',
@@ -177,7 +167,7 @@ export const LoginPage: React.FC = () => {
     setErrorMsg(null);
 
     if (!identifier.trim()) {
-      setIdentifierError('Email or Mobile Number is required.');
+      setIdentifierError('Email is required.');
       valid = false;
     }
     if (!password.trim()) {
@@ -219,7 +209,7 @@ export const LoginPage: React.FC = () => {
           msg.toLowerCase().includes('credentials') ||
           msg.toLowerCase().includes('password')
         ) {
-          setErrorMsg('Invalid phone number/email or password.');
+          setErrorMsg('Invalid email or password.');
         } else if (
           msg.toLowerCase().includes('deactivated') ||
           msg.toLowerCase().includes('inactive')
@@ -534,11 +524,8 @@ export const LoginPage: React.FC = () => {
               </div>
             )}
 
-            {/* Email / Mobile */}
-            <div style={fieldWrap}>
-              <label htmlFor="login-identifier" className="form-label">
-                Email or Mobile Number
-              </label>
+            {/* Email Field with Outlined Floating Label */}
+            <div className={`floating-field-group ${identifier ? 'is-floating' : ''}`}>
               <input
                 id="login-identifier"
                 type="text"
@@ -549,54 +536,29 @@ export const LoginPage: React.FC = () => {
                   setErrorMsg(null);
                   setSuccessNotice(null);
                 }}
-                placeholder="Enter email or mobile number"
-                className="login-input"
-                autoComplete="username"
+                placeholder=" "
+                className={`floating-input ${identifierError ? 'input-error' : ''}`}
+                autoComplete="email"
                 disabled={isLoading}
                 aria-invalid={!!identifierError}
                 aria-describedby={identifierError ? 'identifier-error' : undefined}
               />
+              <label htmlFor="login-identifier" className="floating-label">
+                Email
+              </label>
               {identifierError && (
                 <span
                   id="identifier-error"
-                  style={{ fontSize: '0.78rem', color: '#F87171', marginTop: '0.15rem' }}
+                  style={{ fontSize: '0.78rem', color: '#F87171', marginTop: '0.25rem', paddingLeft: '0.25rem' }}
                 >
                   {identifierError}
                 </span>
               )}
             </div>
 
-            {/* Password */}
-            <div style={fieldWrap}>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginBottom: '0.1rem'
-                }}
-              >
-                <label htmlFor="login-password" className="form-label" style={{ marginBottom: 0 }}>
-                  Password
-                </label>
-                <Link
-                  to="/forgot-password"
-                  id="forgot-password-link"
-                  style={{
-                    fontSize: '0.78rem',
-                    color: 'var(--accent-blue-light)',
-                    fontWeight: 600,
-                    textDecoration: 'none',
-                    cursor: 'pointer'
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
-                  onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
-                >
-                  Forgot Password?
-                </Link>
-              </div>
-
-              <div style={passwordWrap}>
+            {/* Password Field with Outlined Floating Label */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div className={`floating-field-group ${password ? 'is-floating' : ''}`} style={{ position: 'relative' }}>
                 <input
                   ref={passwordInputRef}
                   id="login-password"
@@ -608,9 +570,9 @@ export const LoginPage: React.FC = () => {
                     setErrorMsg(null);
                     setSuccessNotice(null);
                   }}
-                  placeholder="Enter your password"
-                  className="login-input"
-                  style={{ paddingRight: '3rem' }}
+                  placeholder=" "
+                  className={`floating-input ${passwordError ? 'input-error' : ''}`}
+                  style={{ paddingRight: '2.85rem' }}
                   autoComplete="current-password"
                   autoCapitalize="none"
                   autoCorrect="off"
@@ -619,6 +581,9 @@ export const LoginPage: React.FC = () => {
                   aria-invalid={!!passwordError}
                   aria-describedby={passwordError ? 'password-error' : undefined}
                 />
+                <label htmlFor="login-password" className="floating-label">
+                  Password
+                </label>
                 <button
                   type="button"
                   style={eyeBtn}
@@ -629,14 +594,32 @@ export const LoginPage: React.FC = () => {
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
-              {passwordError && (
-                <span
-                  id="password-error"
-                  style={{ fontSize: '0.78rem', color: '#F87171', marginTop: '0.15rem' }}
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.35rem' }}>
+                {passwordError ? (
+                  <span
+                    id="password-error"
+                    style={{ fontSize: '0.78rem', color: '#F87171', paddingLeft: '0.25rem' }}
+                  >
+                    {passwordError}
+                  </span>
+                ) : <span />}
+                <Link
+                  to="/forgot-password"
+                  id="forgot-password-link"
+                  style={{
+                    fontSize: '0.8rem',
+                    color: 'var(--accent-blue)',
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
+                  onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
                 >
-                  {passwordError}
-                </span>
-              )}
+                  Forgot Password?
+                </Link>
+              </div>
             </div>
 
             {/* API error banner */}
