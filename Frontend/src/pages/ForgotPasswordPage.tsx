@@ -210,14 +210,7 @@ export const ForgotPasswordPage: React.FC = () => {
   };
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        backgroundColor: 'var(--bg-primary)',
-        display: 'flex',
-        flexDirection: 'column'
-      }}
-    >
+    <div className="auth-page-wrapper">
       {/* ── Top Header Strip ── */}
       <header
         style={{
@@ -259,32 +252,10 @@ export const ForgotPasswordPage: React.FC = () => {
           padding: '2rem 1.5rem'
         }}
       >
-        <div
-          className="glass-panel"
-          style={{
-            width: '100%',
-            maxWidth: '460px',
-            padding: '2.5rem',
-            border: '1px solid var(--border-accent)',
-            background: 'var(--bg-card)',
-            boxShadow: 'var(--shadow-card)'
-          }}
-        >
+        <div className="glass-panel auth-card hover-lift">
           {/* Brand header */}
           <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <div
-              style={{
-                width: '52px',
-                height: '52px',
-                borderRadius: '14px',
-                background: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '1rem',
-                boxShadow: '0 6px 20px rgba(37, 99, 235, 0.38)'
-              }}
-            >
+            <div className="auth-brand-badge">
               {step === 3 ? (
                 <CheckCircle2 size={28} color="#FFFFFF" />
               ) : (

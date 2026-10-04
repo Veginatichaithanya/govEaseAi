@@ -250,11 +250,13 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div
+      className="auth-page-wrapper"
       style={{
         minHeight: '100vh',
         backgroundColor: 'var(--bg-primary)',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        position: 'relative'
       }}
     >
       {/* ── Top Header Strip ── */}
@@ -295,53 +297,35 @@ export const LoginPage: React.FC = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '2rem 1.5rem'
+          padding: '2rem 1.5rem',
+          position: 'relative',
+          zIndex: 2
         }}
       >
         <div
-          className="glass-panel"
-          style={{
-            width: '100%',
-            maxWidth: '460px',
-            padding: '2.5rem',
-            border: '1px solid var(--border-accent)',
-            background: 'var(--bg-card)',
-            boxShadow: 'var(--shadow-card)'
-          }}
+          className="glass-panel auth-card hover-lift"
         >
           {/* Brand header */}
           <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
-            <div
-              style={{
-                width: '50px',
-                height: '50px',
-                borderRadius: '14px',
-                background: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '1rem',
-                boxShadow: '0 6px 20px rgba(37, 99, 235, 0.38)'
-              }}
-            >
-              <ShieldCheck size={26} color="#FFFFFF" />
+            <div className="auth-brand-badge">
+              <ShieldCheck size={28} color="#FFFFFF" strokeWidth={2.2} />
             </div>
 
             <h1
               style={{
-                fontSize: '1.7rem',
-                fontWeight: 700,
+                fontSize: '1.75rem',
+                fontWeight: 800,
                 color: 'var(--text-primary)',
                 marginBottom: '0.25rem',
-                letterSpacing: '-0.02em'
+                letterSpacing: '-0.025em'
               }}
             >
               GovEaseAI
             </h1>
             <p
               style={{
-                fontSize: '0.84rem',
-                color: 'var(--text-muted)',
+                fontSize: '0.86rem',
+                color: 'var(--text-secondary)',
                 margin: 0
               }}
             >
@@ -350,20 +334,8 @@ export const LoginPage: React.FC = () => {
           </div>
 
           {/* Backend Status Diagnostic Pill */}
-          <div
-            style={{
-              marginBottom: '1.25rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '0.45rem 0.75rem',
-              borderRadius: 'var(--radius-sm)',
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid var(--border-subtle)',
-              fontSize: '0.78rem'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', overflow: 'hidden' }}>
+          <div className="backend-status-pill">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', overflow: 'hidden' }}>
               <div
                 style={{
                   width: '8px',
@@ -378,11 +350,11 @@ export const LoginPage: React.FC = () => {
                   boxShadow: apiHealth?.ok ? '0 0 8px rgba(16, 185, 129, 0.6)' : undefined
                 }}
               />
-              <span style={{ color: 'var(--text-muted)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+              <span style={{ fontWeight: 500, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
                 {isCheckingHealth ? (
                   'Checking API status...'
                 ) : apiHealth?.ok ? (
-                  <>Backend Online ({apiHealth.latencyMs}ms)</>
+                  <>Backend Online <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, opacity: 0.85 }}>({apiHealth.latencyMs}ms)</span></>
                 ) : (
                   'Backend Offline / Waking up'
                 )}
@@ -395,15 +367,7 @@ export const LoginPage: React.FC = () => {
                 onClick={probeBackendHealth}
                 disabled={isCheckingHealth}
                 title="Ping backend server"
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: 'var(--text-muted)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '2px'
-                }}
+                className="backend-status-btn"
               >
                 <RefreshCw size={13} style={{ animation: isCheckingHealth ? 'spin 1s linear infinite' : 'none' }} />
               </button>
@@ -411,15 +375,7 @@ export const LoginPage: React.FC = () => {
                 type="button"
                 onClick={() => setShowApiConfig(!showApiConfig)}
                 title="Configure Backend URL"
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: 'var(--text-muted)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '2px'
-                }}
+                className="backend-status-btn"
               >
                 <Sliders size={13} />
               </button>
@@ -512,40 +468,24 @@ export const LoginPage: React.FC = () => {
           </div>
 
           {/* Quick Demo Credentials Bar */}
-          <div style={{ marginBottom: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.5rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              <Zap size={13} color="var(--accent-blue-light)" /> Quick Demo Credentials:
+          <div style={{ marginBottom: '1.35rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.5rem', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)' }}>
+              <Zap size={13} color="var(--accent-blue)" /> Quick Demo Credentials:
             </div>
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               <button
                 type="button"
                 onClick={() => handleApplyDemoAccount('citizen@govease.ai', 'Citizen@123')}
-                style={{
-                  background: 'rgba(59, 130, 246, 0.08)',
-                  border: '1px solid rgba(59, 130, 246, 0.25)',
-                  color: 'var(--accent-blue-light)',
-                  borderRadius: '16px',
-                  padding: '0.25rem 0.65rem',
-                  fontSize: '0.74rem',
-                  cursor: 'pointer',
-                  fontWeight: 500
-                }}
+                className="demo-chip-btn citizen-chip"
+                title="Click to auto-fill Ravi Kumar credentials"
               >
                 Ravi Kumar (citizen@govease.ai)
               </button>
               <button
                 type="button"
                 onClick={() => handleApplyDemoAccount('naga@gmail.com', 'Password@123')}
-                style={{
-                  background: 'rgba(16, 185, 129, 0.08)',
-                  border: '1px solid rgba(16, 185, 129, 0.25)',
-                  color: '#34D399',
-                  borderRadius: '16px',
-                  padding: '0.25rem 0.65rem',
-                  fontSize: '0.74rem',
-                  cursor: 'pointer',
-                  fontWeight: 500
-                }}
+                className="demo-chip-btn naga-chip"
+                title="Click to auto-fill Naga credentials"
               >
                 Naga (naga@gmail.com)
               </button>
@@ -556,15 +496,16 @@ export const LoginPage: React.FC = () => {
           <div style={{ marginBottom: '1.25rem' }}>
             <h2
               style={{
-                fontSize: '1.25rem',
+                fontSize: '1.3rem',
                 fontWeight: 700,
                 color: 'var(--text-primary)',
-                marginBottom: '0.25rem'
+                marginBottom: '0.2rem',
+                letterSpacing: '-0.015em'
               }}
             >
               Welcome Back
             </h2>
-            <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', margin: 0 }}>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>
               Sign in to your citizen account
             </p>
           </div>
@@ -711,13 +652,9 @@ export const LoginPage: React.FC = () => {
               id="citizen-signin-btn"
               type="submit"
               disabled={isLoading}
-              className="btn btn-primary"
+              className="auth-submit-btn hover-lift"
               style={{
-                width: '100%',
-                justifyContent: 'center',
-                padding: '0.85rem',
-                marginTop: '0.25rem',
-                fontSize: '0.95rem',
+                marginTop: '0.4rem',
                 opacity: isLoading ? 0.75 : 1,
                 cursor: isLoading ? 'not-allowed' : 'pointer'
               }}
@@ -736,26 +673,17 @@ export const LoginPage: React.FC = () => {
           </form>
 
           {/* Government Portal Link */}
-          <div
-            style={{
-              marginTop: '1.5rem',
-              padding: '0.75rem 0.85rem',
-              borderRadius: 'var(--radius-sm)',
-              background: 'rgba(59, 130, 246, 0.05)',
-              border: '1px solid var(--border-subtle)',
-              textAlign: 'center',
-              fontSize: '0.82rem',
-              color: 'var(--text-muted)'
-            }}
-          >
+          <div className="auth-switch-box">
             Government official?{' '}
             <Link
               to="/officer/login"
               style={{
                 color: 'var(--accent-blue)',
-                fontWeight: 600,
+                fontWeight: 700,
                 textDecoration: 'none'
               }}
+              onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
+              onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
             >
               Sign in to Government Officer Portal
             </Link>
@@ -764,9 +692,9 @@ export const LoginPage: React.FC = () => {
           {/* Footer link to signup */}
           <div
             style={{
-              marginTop: '1.5rem',
+              marginTop: '1.25rem',
               textAlign: 'center',
-              fontSize: '0.84rem',
+              fontSize: '0.85rem',
               color: 'var(--text-secondary)'
             }}
           >
@@ -774,8 +702,8 @@ export const LoginPage: React.FC = () => {
             <Link
               to="/signup"
               style={{
-                color: 'var(--accent-blue-light)',
-                fontWeight: 600,
+                color: 'var(--accent-blue)',
+                fontWeight: 700,
                 textDecoration: 'none'
               }}
               onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}

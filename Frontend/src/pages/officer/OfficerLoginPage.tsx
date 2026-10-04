@@ -212,14 +212,7 @@ export const OfficerLoginPage: React.FC = () => {
   const activeDept = GOVERNMENT_DEPARTMENTS[selectedDeptId] || DEPARTMENT_OPTIONS[0];
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        backgroundColor: 'var(--bg-primary)',
-        display: 'flex',
-        flexDirection: 'column'
-      }}
-    >
+    <div className="auth-page-wrapper">
       {/* ── Header ── */}
       <header
         style={{
@@ -253,14 +246,13 @@ export const OfficerLoginPage: React.FC = () => {
           </Link>
           <span style={{ color: 'var(--border-subtle)' }}>|</span>
           <span
+            className="officer-badge-tag"
             style={{
               fontSize: '0.78rem',
               fontFamily: 'var(--font-mono)',
-              color: 'var(--accent-blue-light)',
-              backgroundColor: 'rgba(37, 99, 235, 0.12)',
-              padding: '0.2rem 0.55rem',
+              padding: '0.25rem 0.65rem',
               borderRadius: 'var(--radius-sm)',
-              border: '1px solid rgba(37, 99, 235, 0.25)'
+              fontWeight: 600
             }}
           >
             Statutory Administration Interface
@@ -289,44 +281,20 @@ export const OfficerLoginPage: React.FC = () => {
           flex: 1
         }}
       >
-        <div
-          className="glass-panel"
-          style={{
-            width: '100%',
-            maxWidth: '480px',
-            padding: '2.5rem',
-            border: '1px solid var(--border-accent)',
-            background: 'var(--bg-card)',
-            boxShadow: 'var(--shadow-card)',
-            borderRadius: 'var(--radius-lg)'
-          }}
-        >
+        <div className="glass-panel auth-card hover-lift">
           {/* Brand header */}
           <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
-            <div
-              style={{
-                width: '52px',
-                height: '52px',
-                borderRadius: '14px',
-                background: 'linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '1rem',
-                boxShadow: '0 8px 20px rgba(37, 99, 235, 0.35)',
-                border: '1px solid rgba(147, 197, 253, 0.3)'
-              }}
-            >
+            <div className="auth-brand-badge">
               <ShieldCheck size={28} color="#FFFFFF" strokeWidth={2.2} />
             </div>
 
             <h1
               style={{
-                fontSize: '1.6rem',
+                fontSize: '1.75rem',
                 color: 'var(--text-primary)',
-                marginBottom: '0.3rem',
-                fontWeight: 700,
-                letterSpacing: '-0.02em'
+                marginBottom: '0.25rem',
+                fontWeight: 800,
+                letterSpacing: '-0.025em'
               }}
             >
               GovEaseAI
@@ -343,20 +311,8 @@ export const OfficerLoginPage: React.FC = () => {
           </div>
 
           {/* Backend Status Diagnostic Pill */}
-          <div
-            style={{
-              marginBottom: '1.25rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '0.45rem 0.75rem',
-              borderRadius: 'var(--radius-sm)',
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid var(--border-subtle)',
-              fontSize: '0.78rem'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', overflow: 'hidden' }}>
+          <div className="backend-status-pill">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', overflow: 'hidden' }}>
               <div
                 style={{
                   width: '8px',
@@ -371,11 +327,11 @@ export const OfficerLoginPage: React.FC = () => {
                   boxShadow: apiHealth?.ok ? '0 0 8px rgba(16, 185, 129, 0.6)' : undefined
                 }}
               />
-              <span style={{ color: 'var(--text-muted)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+              <span style={{ fontWeight: 500, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
                 {isCheckingHealth ? (
                   'Checking API status...'
                 ) : apiHealth?.ok ? (
-                  <>Backend Online ({apiHealth.latencyMs}ms)</>
+                  <>Backend Online <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, opacity: 0.85 }}>({apiHealth.latencyMs}ms)</span></>
                 ) : (
                   'Backend Offline / Waking up'
                 )}
@@ -388,15 +344,7 @@ export const OfficerLoginPage: React.FC = () => {
                 onClick={probeBackendHealth}
                 disabled={isCheckingHealth}
                 title="Ping backend server"
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: 'var(--text-muted)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '2px'
-                }}
+                className="backend-status-btn"
               >
                 <RefreshCw size={13} style={{ animation: isCheckingHealth ? 'spin 1s linear infinite' : 'none' }} />
               </button>
@@ -404,15 +352,7 @@ export const OfficerLoginPage: React.FC = () => {
                 type="button"
                 onClick={() => setShowApiConfig(!showApiConfig)}
                 title="Configure Backend URL"
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: 'var(--text-muted)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '2px'
-                }}
+                className="backend-status-btn"
               >
                 <Sliders size={13} />
               </button>
@@ -484,25 +424,17 @@ export const OfficerLoginPage: React.FC = () => {
 
           {/* Quick Department Select Bar */}
           <div style={{ marginBottom: '1.25rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.4rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              <Zap size={13} color="var(--accent-blue-light)" /> Quick Department Accounts:
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.5rem', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)' }}>
+              <Zap size={13} color="var(--accent-blue)" /> Quick Department Accounts:
             </div>
-            <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
               {DEPARTMENT_OPTIONS.map((dept) => (
                 <button
                   key={dept.departmentId}
                   type="button"
                   onClick={() => handleDepartmentChange(dept.departmentId)}
-                  style={{
-                    background: selectedDeptId === dept.departmentId ? 'rgba(59, 130, 246, 0.25)' : 'rgba(255, 255, 255, 0.04)',
-                    border: `1px solid ${selectedDeptId === dept.departmentId ? 'var(--accent-blue)' : 'var(--border-subtle)'}`,
-                    color: selectedDeptId === dept.departmentId ? 'var(--accent-blue-light)' : 'var(--text-secondary)',
-                    borderRadius: '12px',
-                    padding: '0.2rem 0.5rem',
-                    fontSize: '0.72rem',
-                    cursor: 'pointer',
-                    fontWeight: 600
-                  }}
+                  className={`officer-dept-chip ${selectedDeptId === dept.departmentId ? 'active' : ''}`}
+                  title={`${dept.departmentName} (${dept.departmentCode})`}
                 >
                   {dept.departmentCode}
                 </button>
@@ -586,22 +518,10 @@ export const OfficerLoginPage: React.FC = () => {
               </div>
 
               {/* Department preview pill */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.55rem 0.85rem',
-                  borderRadius: 'var(--radius-sm)',
-                  backgroundColor: 'rgba(59, 130, 246, 0.06)',
-                  border: '1px solid rgba(59, 130, 246, 0.15)',
-                  fontSize: '0.78rem',
-                  color: 'var(--text-secondary)'
-                }}
-              >
-                <Building2 size={14} color="var(--accent-blue)" style={{ flexShrink: 0 }} />
+              <div className="officer-dept-infobox">
+                <Building2 size={16} color="var(--accent-blue)" style={{ flexShrink: 0 }} />
                 <span>
-                  Authorized for: <strong style={{ color: 'var(--text-primary)' }}>{activeDept.serviceName}</strong>
+                  Authorized for: <strong style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{activeDept.serviceName}</strong>
                 </span>
               </div>
             </div>
@@ -710,13 +630,9 @@ export const OfficerLoginPage: React.FC = () => {
               id="officer-signin-btn"
               type="submit"
               disabled={isLoading}
-              className="btn btn-primary"
+              className="auth-submit-btn hover-lift"
               style={{
-                width: '100%',
-                justifyContent: 'center',
-                padding: '0.85rem',
                 marginTop: '0.5rem',
-                fontSize: '0.95rem',
                 opacity: isLoading ? 0.75 : 1,
                 cursor: isLoading ? 'not-allowed' : 'pointer'
               }}
