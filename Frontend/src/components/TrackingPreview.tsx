@@ -146,8 +146,8 @@ export const TrackingPreview: React.FC = () => {
           align-items: center;
           justify-content: space-between;
           padding: 1.5rem 2rem;
-          background: rgba(7, 17, 31, 0.75);
-          border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+          background: var(--bg-card);
+          border-bottom: 1px solid var(--border-subtle);
           flex-wrap: wrap;
           gap: 1rem;
         }
@@ -205,7 +205,7 @@ export const TrackingPreview: React.FC = () => {
           width: 28px;
           height: 28px;
           border-radius: 50%;
-          background: #0A1728;
+          background: var(--bg-secondary);
           display: flex;
           align-items: center;
           justify-content: center;

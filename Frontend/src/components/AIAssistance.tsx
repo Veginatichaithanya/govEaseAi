@@ -252,8 +252,8 @@ export const AIAssistance: React.FC = () => {
           font-family: var(--font-mono);
           font-size: 0.72rem;
           color: #CBD5E1;
-          background: rgba(15, 34, 58, 0.7);
-          border: 1px solid rgba(148, 163, 184, 0.15);
+          background: var(--bg-card);
+          border: 1px solid var(--border-subtle);
           padding: 0.2rem 0.6rem;
           border-radius: 4px;
         }
@@ -261,7 +261,7 @@ export const AIAssistance: React.FC = () => {
         /* Guidance interactive box */
         .ai-guidance-interactive-box {
           padding: 1.75rem;
-          background: rgba(10, 22, 39, 0.88);
+          background: var(--bg-secondary);
           border: 1px solid rgba(6, 182, 212, 0.25);
           border-radius: var(--radius-lg);
         }
@@ -314,8 +314,8 @@ export const AIAssistance: React.FC = () => {
           align-items: center;
           gap: 0.5rem;
           padding: 0.55rem 0.95rem;
-          background: rgba(15, 34, 58, 0.65);
-          border: 1px solid rgba(148, 163, 184, 0.15);
+          background: var(--bg-card);
+          border: 1px solid var(--border-subtle);
           border-radius: var(--radius-pill);
           color: #CBD5E1;
           font-family: var(--font-body);
@@ -339,7 +339,7 @@ export const AIAssistance: React.FC = () => {
 
         .guidance-response-view {
           padding: 1.25rem;
-          background: rgba(7, 17, 31, 0.7);
+          background: var(--bg-card);
           border-left: 3px solid #06B6D4;
           border-radius: var(--radius-sm);
         }

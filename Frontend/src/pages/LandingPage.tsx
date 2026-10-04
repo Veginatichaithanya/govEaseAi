@@ -74,7 +74,7 @@ export const LandingPage: React.FC = () => {
       >
         <Lightfall
           colors={isLight ? ['#2563EB', '#0891B2', '#3B82F6'] : ['#3B82F6', '#06B6D4', '#60A5FA']}
-          backgroundColor={isLight ? '#F1F5F9' : '#07111F'}
+          backgroundColor={isLight ? '#F1F5F9' : '#09090b'}
           speed={0.35}
           streakCount={3}
           streakWidth={1}
@@ -98,7 +98,7 @@ export const LandingPage: React.FC = () => {
             inset: 0,
             background: isLight
               ? 'radial-gradient(circle at 50% 30%, rgba(241, 245, 249, 0.35) 0%, rgba(241, 245, 249, 0.88) 70%, #F1F5F9 100%)'
-              : 'radial-gradient(circle at 50% 30%, rgba(7, 17, 31, 0.25) 0%, rgba(7, 17, 31, 0.78) 70%, #07111F 100%)',
+              : 'radial-gradient(circle at 50% 30%, rgba(9, 9, 11, 0.25) 0%, rgba(9, 9, 11, 0.78) 70%, #09090b 100%)',
             pointerEvents: 'none'
           }}
         />

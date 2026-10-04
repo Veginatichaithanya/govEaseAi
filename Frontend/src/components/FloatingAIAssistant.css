@@ -516,8 +516,8 @@
 }
 
 [data-theme="dark"] .govease-service-dropdown {
-  background-color: #0F172A;
-  border-color: rgba(59, 130, 246, 0.35);
+  background-color: #111114;
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .govease-service-item {
@@ -569,7 +569,7 @@
 }
 
 [data-theme="dark"] .govease-history-drawer {
-  background-color: #0F172A;
+  background-color: #111114;
 }
 
 .govease-history-header {
@@ -792,8 +792,8 @@
 }
 
 [data-theme="dark"] .govease-msg-bubble.assistant {
-  background-color: #1E293B;
-  border-color: rgba(148, 163, 184, 0.15);
+  background-color: #16161a;
+  border-color: rgba(255, 255, 255, 0.08);
   color: #F8FAFC;
 }
 

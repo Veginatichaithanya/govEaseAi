@@ -76,8 +76,8 @@ export const SettingsPage: React.FC = () => {
               style={{
                 padding: '1.25rem',
                 borderRadius: 'var(--radius-md)',
-                background: '#07111F',
-                border: theme === 'dark' ? '2px solid var(--accent-blue)' : '1px solid rgba(148, 163, 184, 0.2)',
+                background: '#09090b',
+                border: theme === 'dark' ? '2px solid var(--accent-blue)' : '1px solid var(--border-subtle)',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
                 position: 'relative'
@@ -85,10 +85,10 @@ export const SettingsPage: React.FC = () => {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.5rem' }}>
                 <Moon size={18} color="#60A5FA" />
-                <strong style={{ color: '#FFFFFF', fontSize: '0.95rem' }}>Dark Theme</strong>
+                <strong style={{ color: '#FFFFFF', fontSize: '0.95rem' }}>Black Theme</strong>
               </div>
-              <p style={{ fontSize: '0.78rem', color: '#94A3B8', margin: 0 }}>
-                Deep GovTech navy palette with cyan and electric blue accents.
+              <p style={{ fontSize: '0.78rem', color: '#A1A1AA', margin: 0 }}>
+                Deep obsidian black palette with high-contrast neutral surfaces.
               </p>
               {theme === 'dark' && (
                 <span className="badge badge-info" style={{ position: 'absolute', top: '12px', right: '12px', fontSize: '0.68rem' }}>

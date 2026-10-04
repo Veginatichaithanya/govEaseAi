@@ -639,8 +639,8 @@ export const ScrollExpandSection: React.FC = () => {
           align-items: center;
           justify-content: space-between;
           padding: 0.85rem 1.25rem;
-          background: rgba(7, 17, 31, 0.65);
-          border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+          background: var(--bg-card);
+          border-bottom: 1px solid var(--border-subtle);
         }
 
         .window-dot {
@@ -729,8 +729,8 @@ export const ScrollExpandSection: React.FC = () => {
           font-family: var(--font-mono);
           font-size: 0.78rem;
           color: #CBD5E1;
-          background: rgba(15, 34, 58, 0.8);
-          border: 1px solid rgba(148, 163, 184, 0.18);
+          background: var(--bg-secondary);
+          border: 1px solid var(--border-subtle);
           padding: 0.4rem 0.8rem;
           border-radius: var(--radius-pill);
         }
@@ -773,8 +773,8 @@ export const ScrollExpandSection: React.FC = () => {
           align-items: center;
           justify-content: space-between;
           padding: 0.75rem 0.95rem;
-          background: rgba(7, 17, 31, 0.75);
-          border: 1px solid rgba(148, 163, 184, 0.18);
+          background: var(--bg-card);
+          border: 1px solid var(--border-subtle);
           border-radius: var(--radius-sm);
           font-family: var(--font-body);
           font-size: 0.9rem;
@@ -883,7 +883,7 @@ export const ScrollExpandSection: React.FC = () => {
 
         .review-notes-box {
           padding: 1rem;
-          background: rgba(7, 17, 31, 0.6);
+          background: var(--bg-card);
           border-left: 3px solid #06B6D4;
           border-radius: var(--radius-sm);
           margin-bottom: 1.5rem;
@@ -941,8 +941,8 @@ export const ScrollExpandSection: React.FC = () => {
           align-items: center;
           justify-content: space-between;
           padding: 0.95rem 1.25rem;
-          background: rgba(7, 17, 31, 0.55);
-          border: 1px solid rgba(148, 163, 184, 0.12);
+          background: var(--bg-card);
+          border: 1px solid var(--border-subtle);
           border-radius: var(--radius-md);
           gap: 1rem;
           flex-wrap: wrap;

@@ -252,8 +252,8 @@ export const OfficerExperience: React.FC = () => {
         }
 
         .officer-workbench-preview {
-          border: 1px solid rgba(59, 130, 246, 0.25);
-          background: rgba(10, 22, 39, 0.88);
+          border: 1px solid var(--border-subtle);
+          background: var(--bg-secondary);
           border-radius: var(--radius-lg);
           overflow: hidden;
         }
@@ -263,8 +263,8 @@ export const OfficerExperience: React.FC = () => {
           align-items: center;
           justify-content: space-between;
           padding: 1.25rem 1.75rem;
-          background: rgba(7, 17, 31, 0.75);
-          border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+          background: var(--bg-card);
+          border-bottom: 1px solid var(--border-subtle);
           flex-wrap: wrap;
           gap: 1rem;
         }

@@ -350,7 +350,7 @@ export const Hero: React.FC = () => {
           justify-content: space-between;
           padding: 0.85rem 1.25rem;
           border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-          background: rgba(7, 17, 31, 0.5);
+          background: var(--bg-card);
           border-top-left-radius: var(--radius-lg);
           border-top-right-radius: var(--radius-lg);
         }
@@ -476,7 +476,7 @@ export const Hero: React.FC = () => {
           align-items: center;
           justify-content: space-between;
           padding: 0.75rem 0.95rem;
-          background: rgba(7, 17, 31, 0.6);
+          background: var(--bg-secondary);
           border: 1px solid rgba(148, 163, 184, 0.1);
           border-radius: var(--radius-sm);
         }

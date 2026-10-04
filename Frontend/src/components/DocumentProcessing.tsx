@@ -312,8 +312,8 @@ export const DocumentProcessing: React.FC = () => {
           align-items: center;
           gap: 0.5rem;
           padding: 0.45rem 0.95rem;
-          background: rgba(15, 34, 58, 0.7);
-          border: 1px solid rgba(148, 163, 184, 0.15);
+          background: var(--bg-card);
+          border: 1px solid var(--border-subtle);
           border-radius: var(--radius-pill);
         }
 
@@ -338,7 +338,7 @@ export const DocumentProcessing: React.FC = () => {
 
         .active-flow .flow-num {
           background: #06B6D4;
-          color: #07111F;
+          color: #000000;
         }
 
         .flow-text {
@@ -353,8 +353,8 @@ export const DocumentProcessing: React.FC = () => {
         }
 
         .doc-demo-workspace {
-          background: rgba(10, 22, 39, 0.88);
-          border: 1px solid rgba(59, 130, 246, 0.25);
+          background: var(--bg-secondary);
+          border: 1px solid var(--border-subtle);
           border-radius: var(--radius-lg);
           overflow: hidden;
         }
@@ -364,8 +364,8 @@ export const DocumentProcessing: React.FC = () => {
           align-items: center;
           justify-content: space-between;
           padding: 1rem 1.75rem;
-          background: rgba(7, 17, 31, 0.7);
-          border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+          background: var(--bg-card);
+          border-bottom: 1px solid var(--border-subtle);
           flex-wrap: wrap;
           gap: 1rem;
         }

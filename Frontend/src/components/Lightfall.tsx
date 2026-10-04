@@ -208,7 +208,7 @@ export const Lightfall: React.FC<LightfallProps> = ({
   dpr,
   paused = false,
   colors = ['#3B82F6', '#06B6D4', '#60A5FA'],
-  backgroundColor = '#07111F',
+  backgroundColor = '#09090b',
   speed = 0.35,
   streakCount = 3,
   streakWidth = 1,

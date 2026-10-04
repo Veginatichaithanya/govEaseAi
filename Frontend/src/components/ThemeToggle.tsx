@@ -35,8 +35,8 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
         padding: showLabel ? '0 0.95rem' : '0',
         width: showLabel ? 'auto' : '38px',
         borderRadius: 'var(--radius-md)',
-        background: isDark ? 'rgba(15, 34, 58, 0.75)' : 'rgba(241, 245, 249, 0.9)',
-        border: isDark ? '1px solid rgba(148, 163, 184, 0.18)' : '1px solid #CBD5E1',
+        background: isDark ? 'var(--bg-secondary)' : 'rgba(241, 245, 249, 0.9)',
+        border: isDark ? '1px solid var(--border-subtle)' : '1px solid #CBD5E1',
         color: isDark ? '#F59E0B' : '#0284C7',
         cursor: 'pointer',
         transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -50,7 +50,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = 'none';
-        e.currentTarget.style.borderColor = isDark ? 'rgba(148, 163, 184, 0.18)' : '#CBD5E1';
+        e.currentTarget.style.borderColor = isDark ? 'var(--border-subtle)' : '#CBD5E1';
       }}
     >
       {isDark ? (

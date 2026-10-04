@@ -40,7 +40,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // Update meta theme-color tag if present
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', theme === 'light' ? '#F1F5F9' : '#07111F');
+      metaThemeColor.setAttribute('content', theme === 'light' ? '#F1F5F9' : '#09090b');
     }
 
     try {

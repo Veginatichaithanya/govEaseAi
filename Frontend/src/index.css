@@ -6,22 +6,22 @@
   --font-body: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* Color Palette - Deep GovTech Navy with Precision Electric & Cyan Accents */
-  --bg-primary: #07111F;
-  --bg-secondary: #0A1728;
-  --bg-card: rgba(12, 26, 46, 0.72);
-  --bg-card-hover: rgba(16, 35, 62, 0.88);
-  --bg-glass: rgba(10, 23, 40, 0.65);
+  /* Color Palette - True Obsidian Black with Precision Electric & Cyan Accents */
+  --bg-primary: #09090b;
+  --bg-secondary: #121215;
+  --bg-card: #111114;
+  --bg-card-hover: #18181c;
+  --bg-glass: rgba(14, 14, 18, 0.88);
   --bg-accent-subtle: rgba(59, 130, 246, 0.08);
 
-  --border-subtle: rgba(148, 163, 184, 0.12);
-  --border-accent: rgba(59, 130, 246, 0.32);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-accent: rgba(59, 130, 246, 0.35);
   --border-cyan: rgba(6, 182, 212, 0.35);
 
-  --text-primary: #F8FAFC;
-  --text-secondary: #94A3B8;
-  --text-muted: #64748B;
-  --text-inverse: #07111F;
+  --text-primary: #F4F4F6;
+  --text-secondary: #A1A1AA;
+  --text-muted: #71717A;
+  --text-inverse: #09090b;
   --heading-color: #FFFFFF;
 
   --accent-blue: #3B82F6;
@@ -33,39 +33,39 @@
   --status-success: #10B981;
   --status-success-bg: rgba(16, 185, 129, 0.12);
   --status-warning: #F59E0B;
-  --status-warning-bg: rgba(245, 158, 11, 0.14);
+  --status-warning-bg: rgba(245, 158, 11, 0.12);
   --status-info: #3B82F6;
-  --status-info-bg: rgba(59, 130, 246, 0.14);
-  --status-neutral: #64748B;
+  --status-info-bg: rgba(59, 130, 246, 0.12);
+  --status-neutral: #71717A;
 
   /* Glows & Shadows */
-  --glow-blue: 0 0 35px -5px rgba(59, 130, 246, 0.22);
-  --glow-cyan: 0 0 35px -5px rgba(6, 182, 212, 0.25);
-  --shadow-card: 0 16px 36px -8px rgba(0, 0, 0, 0.45);
-  --shadow-dropdown: 0 20px 40px -10px rgba(0, 0, 0, 0.65);
+  --glow-blue: 0 0 35px -5px rgba(59, 130, 246, 0.18);
+  --glow-cyan: 0 0 35px -5px rgba(6, 182, 212, 0.2);
+  --shadow-card: 0 16px 36px -8px rgba(0, 0, 0, 0.65);
+  --shadow-dropdown: 0 20px 40px -10px rgba(0, 0, 0, 0.85);
 
-  --nav-bg: rgba(7, 17, 31, 0.88);
-  --nav-border: rgba(59, 130, 246, 0.18);
-  --input-bg: rgba(7, 17, 31, 0.75);
-  --input-border: rgba(148, 163, 184, 0.2);
+  --nav-bg: rgba(9, 9, 11, 0.92);
+  --nav-border: rgba(255, 255, 255, 0.08);
+  --input-bg: #141418;
+  --input-border: rgba(255, 255, 255, 0.1);
   --input-text: #FFFFFF;
 
   /* Role Selector & Form Tokens */
-  --role-selector-bg: rgba(7, 17, 31, 0.65);
-  --role-selector-border: rgba(148, 163, 184, 0.16);
-  --role-tab-inactive-color: #94A3B8;
-  --role-tab-inactive-hover-color: #F8FAFC;
+  --role-selector-bg: #121215;
+  --role-selector-border: rgba(255, 255, 255, 0.1);
+  --role-tab-inactive-color: #A1A1AA;
+  --role-tab-inactive-hover-color: #F4F4F6;
   --role-tab-inactive-hover-bg: rgba(255, 255, 255, 0.06);
   --role-tab-active-color: #FFFFFF;
   --role-tab-active-bg: rgba(59, 130, 246, 0.35);
   --role-tab-active-border: rgba(59, 130, 246, 0.55);
   --role-tab-active-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
 
-  --form-label-color: #94A3B8;
-  --info-box-bg: rgba(15, 34, 58, 0.5);
-  --info-box-border: rgba(148, 163, 184, 0.15);
+  --form-label-color: #A1A1AA;
+  --info-box-bg: #141418;
+  --info-box-border: rgba(255, 255, 255, 0.08);
   --info-box-icon: #38BDF8;
-  --info-box-text: #94A3B8;
+  --info-box-text: #A1A1AA;
 
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -306,15 +306,15 @@ button {
 }
 
 .btn-secondary {
-  background: rgba(15, 34, 58, 0.7);
+  background: #141418;
   color: var(--text-primary);
   border: 1px solid var(--border-subtle);
   backdrop-filter: blur(12px);
 }
 
 .btn-secondary:hover {
-  background: rgba(30, 58, 95, 0.75);
-  border-color: var(--accent-blue-light);
+  background: #1e1e24;
+  border-color: rgba(255, 255, 255, 0.2);
   color: #FFFFFF;
   transform: translateY(-1px);
 }
@@ -730,8 +730,8 @@ html.theme-transition *::after {
 }
 
 [data-theme="dark"] .floating-input {
-  background: #0A1728 !important;
-  border: 1.5px solid rgba(148, 163, 184, 0.28) !important;
+  background: #141418 !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
   color: #FFFFFF !important;
 }
 
@@ -741,13 +741,13 @@ html.theme-transition *::after {
 }
 
 [data-theme="dark"] .floating-label {
-  color: #94A3B8;
+  color: #A1A1AA;
 }
 
 [data-theme="dark"] .floating-input:focus ~ .floating-label,
 [data-theme="dark"] .floating-input:not(:placeholder-shown) ~ .floating-label,
 [data-theme="dark"] .floating-field-group.is-floating .floating-label {
-  background: #0A1728 !important;
+  background: #141418 !important;
   color: #60A5FA !important;
 }
 
@@ -783,10 +783,10 @@ html.theme-transition *::after {
 }
 
 [data-theme="dark"] .auth-page-wrapper {
-  background-color: #07111F !important;
+  background-color: #09090b !important;
   background-image: 
-    radial-gradient(ellipse 100% 600px at 50% 0px, rgba(59, 130, 246, 0.14) 0%, transparent 100%),
-    radial-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px) !important;
+    radial-gradient(ellipse 100% 600px at 50% 0px, rgba(59, 130, 246, 0.1) 0%, transparent 100%),
+    radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px) !important;
   background-size: 100% 600px, 24px 24px !important;
   background-repeat: no-repeat, repeat !important;
   background-position: top center, top left !important;
@@ -808,11 +808,11 @@ html.theme-transition *::after {
 }
 
 [data-theme="dark"] .auth-card {
-  background: rgba(12, 26, 46, 0.88) !important;
+  background: #111114 !important;
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(59, 130, 246, 0.28) !important;
-  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.6), 0 0 35px -5px rgba(59, 130, 246, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.8), 0 0 35px -5px rgba(59, 130, 246, 0.1) !important;
 }
 
 /* Auth Brand Badge */
@@ -1206,8 +1206,8 @@ html.theme-transition *::after {
 }
 
 [data-theme="dark"] .citizen-alert-ribbon.warning {
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.35);
+  background: rgba(245, 158, 11, 0.05);
+  border: 1px solid rgba(245, 158, 11, 0.22);
 }
 
 .citizen-alert-ribbon.success {
@@ -1216,8 +1216,8 @@ html.theme-transition *::after {
 }
 
 [data-theme="dark"] .citizen-alert-ribbon.success {
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.35);
+  background: rgba(16, 185, 129, 0.05);
+  border: 1px solid rgba(16, 185, 129, 0.22);
 }
 
 /* 3. Unified Metrics Ribbon (1 cohesive continuous bar, NO separate box cards) */
@@ -1233,9 +1233,9 @@ html.theme-transition *::after {
 }
 
 [data-theme="dark"] .unified-metrics-ribbon {
-  background: rgba(12, 26, 46, 0.75);
-  border: 1px solid rgba(148, 163, 184, 0.15);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  background: #111114;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
 }
 
 @media (max-width: 860px) {
@@ -1308,9 +1308,9 @@ html.theme-transition *::after {
 }
 
 [data-theme="dark"] .fluid-timeline-card {
-  background: rgba(12, 26, 46, 0.75);
-  border: 1px solid rgba(148, 163, 184, 0.15);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  background: #111114;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
 }
 
 .timeline-stepper-track {
@@ -1361,7 +1361,8 @@ html.theme-transition *::after {
 }
 
 [data-theme="dark"] .timeline-stepper-dot {
-  background: #0B192C;
+  background: #18181c;
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .timeline-stepper-dot.done {
@@ -1387,9 +1388,9 @@ html.theme-transition *::after {
 }
 
 [data-theme="dark"] .modern-dashboard-table-wrap {
-  background: rgba(12, 26, 46, 0.75);
-  border: 1px solid rgba(148, 163, 184, 0.15);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  background: #111114;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
 }
 
 /* 6. Sleek Quick Action Chips (Horizontal pills, not big square boxes) */
@@ -1413,8 +1414,8 @@ html.theme-transition *::after {
 }
 
 [data-theme="dark"] .quick-action-chip {
-  background: rgba(12, 26, 46, 0.75);
-  border: 1px solid rgba(148, 163, 184, 0.15);
+  background: #111114;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .quick-action-chip:hover {

@@ -55,7 +55,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(circle at center, rgba(7, 17, 31, 0.72) 0%, rgba(7, 17, 31, 0.92) 80%);
+  background: radial-gradient(circle at center, rgba(9, 9, 11, 0.72) 0%, rgba(9, 9, 11, 0.95) 80%);
   opacity: 0;
   transition: opacity 0.1s ease;
 }

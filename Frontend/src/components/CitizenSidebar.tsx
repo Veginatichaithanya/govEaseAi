@@ -447,7 +447,7 @@ export const CitizenSidebar: React.FC<CitizenSidebarProps> = ({
           style={{
             position: 'absolute',
             inset: 0,
-            backgroundColor: 'rgba(7, 17, 31, 0.65)',
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
             backdropFilter: 'blur(4px)',
             opacity: isOpen ? 1 : 0,
             transition: 'opacity 0.25s ease'
