@@ -67,14 +67,7 @@ export const AIAssistance: React.FC = () => {
       <div className="container">
         {/* Section Header */}
         <div className="section-header">
-          <div
-            className="section-eyebrow shimmer-badge"
-            style={{
-              background: 'rgba(16, 185, 129, 0.1)',
-              borderColor: 'rgba(16, 185, 129, 0.3)',
-              color: '#34D399'
-            }}
-          >
+          <div className="section-eyebrow shimmer-badge human-badge">
             <UserCheck size={13} />
             HUMAN-IN-THE-LOOP ARCHITECTURE
           </div>
@@ -92,91 +85,33 @@ export const AIAssistance: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="glass-panel hover-lift glow-border-accent"
-                style={{
-                  padding: '2.25rem',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  border: '1px solid rgba(59, 130, 246, 0.2)',
-                  background: 'rgba(11, 25, 44, 0.75)',
-                  borderRadius: 'var(--radius-lg)'
-                }}
+                className="glass-panel ai-pillar-card hover-lift glow-border-accent"
               >
                 <div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      marginBottom: '1.5rem'
-                    }}
-                  >
+                  <div className="ai-pillar-top-row">
                     <div
-                      style={{
-                        width: '48px',
-                        height: '48px',
-                        borderRadius: '12px',
-                        background: 'rgba(6, 182, 212, 0.12)',
-                        border: '1px solid rgba(6, 182, 212, 0.3)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: card.accent
-                      }}
+                      className="ai-pillar-icon"
+                      style={{ color: card.accent }}
                     >
                       <Icon size={24} />
                     </div>
-                    <span
-                      style={{
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: '1.25rem',
-                        fontWeight: 800,
-                        color: 'rgba(148, 163, 184, 0.3)'
-                      }}
-                    >
+                    <span className="ai-pillar-num">
                       {card.num}
                     </span>
                   </div>
 
-                  <h3 style={{ fontSize: '1.25rem', color: '#FFFFFF', marginBottom: '0.85rem' }}>
+                  <h3 className="ai-pillar-title">
                     {card.title}
                   </h3>
 
-                  <p
-                    style={{
-                      fontSize: '0.95rem',
-                      color: '#94A3B8',
-                      lineHeight: 1.6,
-                      marginBottom: '1.75rem'
-                    }}
-                  >
+                  <p className="ai-pillar-desc">
                     {card.description}
                   </p>
                 </div>
 
-                <div
-                  style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '0.45rem',
-                    borderTop: '1px solid rgba(148, 163, 184, 0.08)',
-                    paddingTop: '1.25rem'
-                  }}
-                >
+                <div className="ai-pillar-tags-row">
                   {card.tags.map((tag, tIdx) => (
-                    <span
-                      key={tIdx}
-                      style={{
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: '0.72rem',
-                        color: '#CBD5E1',
-                        background: 'rgba(15, 34, 58, 0.7)',
-                        border: '1px solid rgba(148, 163, 184, 0.15)',
-                        padding: '0.2rem 0.6rem',
-                        borderRadius: '4px'
-                      }}
-                    >
+                    <span key={tIdx} className="ai-pillar-tag">
                       {tag}
                     </span>
                   ))}
@@ -227,41 +162,16 @@ export const AIAssistance: React.FC = () => {
         </div>
 
         {/* Governance & Human-in-the-Loop Callout Banner */}
-        <div
-          className="glass-panel"
-          style={{
-            padding: '1.75rem 2.25rem',
-            background: 'linear-gradient(135deg, rgba(8, 28, 52, 0.9) 0%, rgba(12, 38, 70, 0.85) 100%)',
-            border: '1px solid rgba(6, 182, 212, 0.3)',
-            borderRadius: 'var(--radius-lg)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '1.5rem'
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', maxWidth: '800px' }}>
-            <div
-              style={{
-                width: '46px',
-                height: '46px',
-                borderRadius: '50%',
-                background: 'rgba(16, 185, 129, 0.15)',
-                border: '1px solid rgba(16, 185, 129, 0.35)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0
-              }}
-            >
+        <div className="glass-panel governance-callout-banner hover-lift glow-border-accent">
+          <div className="gov-banner-content">
+            <div className="gov-banner-icon-box">
               <ShieldCheck size={24} color="#10B981" />
             </div>
             <div>
-              <h4 style={{ color: '#FFFFFF', marginBottom: '0.25rem' }}>
+              <h4 className="gov-banner-title">
                 Ethical AI Governance Principle
               </h4>
-              <p style={{ fontSize: '0.88rem', color: '#94A3B8', margin: 0 }}>
+              <p className="gov-banner-desc">
                 GovEaseAI functions as an intelligence layer to reduce clerical overhead. The software
                 never overrides, bypasses, or replaces the statutory discretion of designated government
                 licensing officers.
@@ -269,27 +179,86 @@ export const AIAssistance: React.FC = () => {
             </div>
           </div>
 
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.78rem',
-              color: '#34D399',
-              background: 'rgba(16, 185, 129, 0.1)',
-              border: '1px solid rgba(16, 185, 129, 0.25)',
-              padding: '0.45rem 0.95rem',
-              borderRadius: 'var(--radius-pill)',
-              whiteSpace: 'nowrap'
-            }}
-          >
+          <div className="gov-banner-badge">
             Zero Automated Approvals
           </div>
         </div>
       </div>
 
       <style>{`
+        .human-badge {
+          background: rgba(16, 185, 129, 0.1);
+          border-color: rgba(16, 185, 129, 0.3);
+          color: #34D399;
+        }
+
+        .ai-pillar-card {
+          padding: 2.25rem;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          border: 1px solid rgba(59, 130, 246, 0.2);
+          background: rgba(11, 25, 44, 0.75);
+          border-radius: var(--radius-lg);
+        }
+
+        .ai-pillar-top-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 1.5rem;
+        }
+
+        .ai-pillar-icon {
+          width: 48px;
+          height: 48px;
+          border-radius: 12px;
+          background: rgba(6, 182, 212, 0.12);
+          border: 1px solid rgba(6, 182, 212, 0.3);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .ai-pillar-num {
+          font-family: var(--font-mono);
+          font-size: 1.25rem;
+          font-weight: 800;
+          color: rgba(148, 163, 184, 0.3);
+        }
+
+        .ai-pillar-title {
+          font-size: 1.25rem;
+          color: #FFFFFF;
+          margin-bottom: 0.85rem;
+        }
+
+        .ai-pillar-desc {
+          font-size: 0.95rem;
+          color: #94A3B8;
+          line-height: 1.6;
+          margin-bottom: 1.75rem;
+        }
+
+        .ai-pillar-tags-row {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.45rem;
+          border-top: 1px solid rgba(148, 163, 184, 0.08);
+          padding-top: 1.25rem;
+        }
+
+        .ai-pillar-tag {
+          font-family: var(--font-mono);
+          font-size: 0.72rem;
+          color: #CBD5E1;
+          background: rgba(15, 34, 58, 0.7);
+          border: 1px solid rgba(148, 163, 184, 0.15);
+          padding: 0.2rem 0.6rem;
+          border-radius: 4px;
+        }
+
+        /* Guidance interactive box */
         .ai-guidance-interactive-box {
           padding: 1.75rem;
           background: rgba(10, 22, 39, 0.88);
@@ -405,39 +374,184 @@ export const AIAssistance: React.FC = () => {
           margin: 0;
         }
 
-        /* Light Theme Overrides */
+        /* Governance callout banner */
+        .governance-callout-banner {
+          padding: 1.75rem 2.25rem;
+          background: linear-gradient(135deg, rgba(8, 28, 52, 0.9) 0%, rgba(12, 38, 70, 0.85) 100%);
+          border: 1px solid rgba(6, 182, 212, 0.3);
+          border-radius: var(--radius-lg);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 1.5rem;
+        }
+
+        .gov-banner-content {
+          display: flex;
+          align-items: center;
+          gap: 1.25rem;
+          max-width: 800px;
+        }
+
+        .gov-banner-icon-box {
+          width: 46px;
+          height: 46px;
+          border-radius: 50%;
+          background: rgba(16, 185, 129, 0.15);
+          border: 1px solid rgba(16, 185, 129, 0.35);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .gov-banner-title {
+          color: #FFFFFF;
+          margin-bottom: 0.25rem;
+          font-size: 1.05rem;
+          font-weight: 700;
+        }
+
+        .gov-banner-desc {
+          font-size: 0.88rem;
+          color: #94A3B8;
+          margin: 0;
+          line-height: 1.55;
+        }
+
+        .gov-banner-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-family: var(--font-mono);
+          font-size: 0.78rem;
+          color: #34D399;
+          background: rgba(16, 185, 129, 0.1);
+          border: 1px solid rgba(16, 185, 129, 0.25);
+          padding: 0.45rem 0.95rem;
+          border-radius: var(--radius-pill);
+          white-space: nowrap;
+        }
+
+        /* =======================================================
+           LIGHT THEME OVERRIDES (CRITICAL FIX FOR USER SCREENSHOTS)
+           ======================================================= */
+        [data-theme="light"] .ai-pillar-card {
+          background: #FFFFFF !important;
+          border: 1px solid #E2E8F0 !important;
+          box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06) !important;
+        }
+
+        [data-theme="light"] .ai-pillar-icon {
+          background: #EFF6FF !important;
+          border-color: #BFDBFE !important;
+        }
+
+        [data-theme="light"] .ai-pillar-num {
+          color: #CBD5E1 !important;
+        }
+
+        [data-theme="light"] .ai-pillar-title {
+          color: #0F172A !important;
+        }
+
+        [data-theme="light"] .ai-pillar-desc {
+          color: #475569 !important;
+        }
+
+        [data-theme="light"] .ai-pillar-tags-row {
+          border-top-color: #E2E8F0 !important;
+        }
+
+        [data-theme="light"] .ai-pillar-tag {
+          background: #F1F5F9 !important;
+          border-color: #CBD5E1 !important;
+          color: #334155 !important;
+        }
+
         [data-theme="light"] .ai-guidance-interactive-box {
-          background: #FFFFFF;
-          border-color: #E2E8F0;
+          background: #FFFFFF !important;
+          border-color: #E2E8F0 !important;
+          box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06) !important;
         }
 
         [data-theme="light"] .box-title {
-          color: #0F172A;
+          color: #0F172A !important;
         }
 
         [data-theme="light"] .box-sub {
-          color: #64748B;
+          color: #64748B !important;
+        }
+
+        [data-theme="light"] .bot-avatar {
+          background: #EFF6FF !important;
+          border-color: #BFDBFE !important;
         }
 
         [data-theme="light"] .query-chip {
-          background: #F8FAFC;
-          border-color: #CBD5E1;
-          color: #334155;
+          background: #F8FAFC !important;
+          border-color: #CBD5E1 !important;
+          color: #334155 !important;
+        }
+
+        [data-theme="light"] .query-chip:hover {
+          background: #F1F5F9 !important;
+          border-color: #94A3B8 !important;
+          color: #0F172A !important;
         }
 
         [data-theme="light"] .query-chip.active {
-          background: #EFF6FF;
-          border-color: #3B82F6;
-          color: #1D4ED8;
+          background: #EFF6FF !important;
+          border-color: #3B82F6 !important;
+          color: #1D4ED8 !important;
+          box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15) !important;
         }
 
         [data-theme="light"] .guidance-response-view {
-          background: #F8FAFC;
-          border-left-color: #0284C7;
+          background: #F8FAFC !important;
+          border-left-color: #0284C7 !important;
+          border: 1px solid #E2E8F0 !important;
+          border-left: 3px solid #0284C7 !important;
+        }
+
+        [data-theme="light"] .response-tag {
+          color: #0284C7 !important;
+        }
+
+        [data-theme="light"] .response-badge {
+          background: #E2E8F0 !important;
+          color: #334155 !important;
         }
 
         [data-theme="light"] .response-text {
-          color: #1E293B;
+          color: #1E293B !important;
+        }
+
+        [data-theme="light"] .governance-callout-banner {
+          background: linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%) !important;
+          border-color: #86EFAC !important;
+          box-shadow: 0 10px 30px rgba(16, 185, 129, 0.08) !important;
+        }
+
+        [data-theme="light"] .gov-banner-icon-box {
+          background: #DCFCE7 !important;
+          border-color: #86EFAC !important;
+        }
+
+        [data-theme="light"] .gov-banner-title {
+          color: #0F172A !important;
+        }
+
+        [data-theme="light"] .gov-banner-desc {
+          color: #475569 !important;
+        }
+
+        [data-theme="light"] .gov-banner-badge {
+          background: #DCFCE7 !important;
+          border-color: #86EFAC !important;
+          color: #15803D !important;
+          font-weight: 700 !important;
         }
       `}</style>
     </section>

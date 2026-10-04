@@ -310,8 +310,18 @@ export const ServicePreview: React.FC = () => {
           box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
         }
 
+        [data-theme="light"] .service-card {
+          background: #FFFFFF !important;
+          border: 1px solid #E2E8F0 !important;
+          box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06) !important;
+        }
+
         [data-theme="light"] .service-card h3 {
           color: #0F172A !important;
+        }
+
+        [data-theme="light"] .service-card p {
+          color: #475569 !important;
         }
 
         [data-theme="light"] .meta-chip {
