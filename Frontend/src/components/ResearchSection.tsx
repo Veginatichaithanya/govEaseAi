@@ -50,12 +50,12 @@ export const ResearchSection: React.FC = () => {
   ];
 
   return (
-    <section id="about" className="section-wrapper" style={{ position: 'relative', zIndex: 10 }}>
+    <section id="about" className="section-wrapper reveal-on-scroll" style={{ position: 'relative', zIndex: 10 }}>
       <div className="container">
         {/* Section Header */}
         <div className="section-header">
           <div
-            className="section-eyebrow"
+            className="section-eyebrow shimmer-badge"
             style={{
               background: 'rgba(96, 165, 250, 0.1)',
               borderColor: 'rgba(96, 165, 250, 0.28)',
@@ -79,13 +79,14 @@ export const ResearchSection: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="glass-panel"
+                className="glass-panel hover-lift glow-border-accent"
                 style={{
                   padding: '1.85rem',
                   display: 'flex',
                   flexDirection: 'column',
                   background: 'rgba(10, 23, 41, 0.65)',
-                  border: '1px solid rgba(148, 163, 184, 0.12)'
+                  border: '1px solid rgba(148, 163, 184, 0.12)',
+                  borderRadius: 'var(--radius-lg)'
                 }}
               >
                 <div

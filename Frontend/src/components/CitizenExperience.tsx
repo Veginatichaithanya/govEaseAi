@@ -52,11 +52,11 @@ export const CitizenExperience: React.FC = () => {
   ];
 
   return (
-    <section className="section-wrapper" style={{ position: 'relative', zIndex: 10 }}>
+    <section className="section-wrapper reveal-on-scroll" style={{ position: 'relative', zIndex: 10 }}>
       <div className="container">
         {/* Section Header */}
         <div className="section-header">
-          <div className="section-eyebrow">
+          <div className="section-eyebrow shimmer-badge">
             <User size={13} />
             CITIZEN-FIRST ARCHITECTURE
           </div>
@@ -72,7 +72,7 @@ export const CitizenExperience: React.FC = () => {
           {steps.map((step, idx) => {
             const Icon = step.icon;
             return (
-              <div key={idx} className="glass-panel citizen-card">
+              <div key={idx} className="glass-panel citizen-card hover-lift glow-border-accent">
                 <div className="citizen-step-indicator">
                   <span className="step-circle">{step.num}</span>
                   <div className="citizen-icon-box">

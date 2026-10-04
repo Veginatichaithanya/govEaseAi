@@ -57,11 +57,11 @@ export const HowItWorks: React.FC = () => {
   ];
 
   return (
-    <section id="how-it-works" className="section-wrapper" style={{ position: 'relative', zIndex: 10 }}>
+    <section id="how-it-works" className="section-wrapper reveal-on-scroll" style={{ position: 'relative', zIndex: 10 }}>
       <div className="container">
         {/* Section Header */}
         <div className="section-header">
-          <div className="section-eyebrow">
+          <div className="section-eyebrow shimmer-badge">
             <Sparkles size={13} />
             END-TO-END WORKFLOW
           </div>
@@ -78,7 +78,7 @@ export const HowItWorks: React.FC = () => {
             return (
               <div
                 key={idx}
-                className={`glass-panel timeline-step-card ${step.isAi ? 'ai-highlighted' : ''}`}
+                className={`glass-panel timeline-step-card hover-lift glow-border-accent ${step.isAi ? 'ai-highlighted' : ''}`}
               >
                 {/* Step Number & Badge */}
                 <div className="step-card-header">

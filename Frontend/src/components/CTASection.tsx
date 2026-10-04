@@ -4,15 +4,15 @@ import { ArrowRight, Sparkles } from 'lucide-react';
 
 export const CTASection: React.FC = () => {
   return (
-    <section className="section-wrapper" style={{ position: 'relative', zIndex: 10, paddingBottom: '7rem' }}>
+    <section className="section-wrapper reveal-on-scroll" style={{ position: 'relative', zIndex: 10, paddingBottom: '7rem' }}>
       <div className="container">
-        <div className="cta-banner">
+        <div className="cta-banner hover-lift glow-border-accent">
           {/* Subtle Ambient Radial Glow */}
           <div className="cta-ambient-glow" />
 
           <div style={{ position: 'relative', zIndex: 1, maxWidth: '680px', margin: '0 auto' }}>
             <div
-              className="section-eyebrow"
+              className="section-eyebrow shimmer-badge"
               style={{
                 background: 'rgba(6, 182, 212, 0.12)',
                 borderColor: 'rgba(6, 182, 212, 0.35)',
@@ -35,7 +35,7 @@ export const CTASection: React.FC = () => {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
               <Link
                 to="/services"
-                className="btn btn-primary"
+                className="btn btn-primary hover-lift"
                 style={{ padding: '0.85rem 1.85rem', fontSize: '1rem' }}
               >
                 Explore Services <ArrowRight size={17} />
@@ -43,7 +43,7 @@ export const CTASection: React.FC = () => {
 
               <Link
                 to="/login"
-                className="btn btn-secondary"
+                className="btn btn-secondary hover-lift"
                 style={{ padding: '0.85rem 1.65rem', fontSize: '1rem' }}
               >
                 Get Started <ArrowRight size={17} />

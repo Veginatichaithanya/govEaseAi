@@ -14,11 +14,11 @@ export const TrackingPreview: React.FC = () => {
   const tracking = MOCK_TRACKING_SAMPLE;
 
   return (
-    <section className="section-wrapper" style={{ position: 'relative', zIndex: 10 }}>
+    <section className="section-wrapper reveal-on-scroll" style={{ position: 'relative', zIndex: 10 }}>
       <div className="container">
         {/* Section Header */}
         <div className="section-header">
-          <div className="section-eyebrow">
+          <div className="section-eyebrow shimmer-badge">
             <Search size={13} />
             TRANSPARENT APPLICATION AUDIT
           </div>
@@ -30,7 +30,7 @@ export const TrackingPreview: React.FC = () => {
         </div>
 
         {/* Tracking Card */}
-        <div className="glass-panel tracking-card-container">
+        <div className="glass-panel tracking-card-container hover-lift glow-border-accent">
           {/* Card Header */}
           <div className="tracking-header">
             <div className="tracking-title-block">

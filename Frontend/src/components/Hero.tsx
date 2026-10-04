@@ -44,7 +44,7 @@ export const Hero: React.FC = () => {
         <div className="hero-grid">
           {/* Left Column: Headline, Copy & CTAs */}
           <div className="hero-content">
-            <div className="section-eyebrow" style={{ alignSelf: 'flex-start' }}>
+            <div className="section-eyebrow shimmer-badge" style={{ alignSelf: 'flex-start' }}>
               <Sparkles size={13} />
               AI-POWERED GOVERNMENT SERVICES
             </div>
@@ -61,14 +61,14 @@ export const Hero: React.FC = () => {
 
             {/* CTAs */}
             <div className="hero-cta-group">
-              <Link to="/services" className="btn btn-primary" style={{ padding: '0.85rem 1.65rem' }}>
+              <Link to="/services" className="btn btn-primary hover-lift" style={{ padding: '0.85rem 1.65rem' }}>
                 Explore Government Services <ArrowRight size={17} />
               </Link>
 
               <a
                 href="#how-it-works"
                 onClick={scrollToHowItWorks}
-                className="btn btn-secondary"
+                className="btn btn-secondary hover-lift"
                 style={{ padding: '0.85rem 1.45rem' }}
               >
                 How It Works

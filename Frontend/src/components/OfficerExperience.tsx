@@ -23,12 +23,12 @@ export const OfficerExperience: React.FC = () => {
   ];
 
   return (
-    <section className="section-wrapper" style={{ position: 'relative', zIndex: 10 }}>
+    <section className="section-wrapper reveal-on-scroll" style={{ position: 'relative', zIndex: 10 }}>
       <div className="container">
         {/* Section Header */}
         <div className="section-header">
           <div
-            className="section-eyebrow"
+            className="section-eyebrow shimmer-badge"
             style={{
               background: 'rgba(59, 130, 246, 0.1)',
               borderColor: 'rgba(59, 130, 246, 0.3)',

@@ -13,11 +13,11 @@ export const DocumentProcessing: React.FC = () => {
   const [selectedDoc, setSelectedDoc] = useState<'aadhaar' | 'lease'>('aadhaar');
 
   return (
-    <section className="section-wrapper" style={{ position: 'relative', zIndex: 10 }}>
+    <section className="section-wrapper reveal-on-scroll" style={{ position: 'relative', zIndex: 10 }}>
       <div className="container">
         {/* Section Header */}
         <div className="section-header">
-          <div className="section-eyebrow">
+          <div className="section-eyebrow shimmer-badge">
             <Cpu size={13} />
             DOCUMENT PROCESSING PIPELINE
           </div>
@@ -57,7 +57,7 @@ export const DocumentProcessing: React.FC = () => {
         </div>
 
         {/* Visual Product Demonstration Workspace */}
-        <div className="glass-panel doc-demo-workspace">
+        <div className="glass-panel doc-demo-workspace hover-lift glow-border-accent">
           {/* Header Bar */}
           <div className="demo-header-bar">
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
