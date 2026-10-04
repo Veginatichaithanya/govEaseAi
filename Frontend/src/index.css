@@ -1155,6 +1155,285 @@ html.theme-transition *::after {
   color: var(--accent-blue) !important;
 }
 
+/* ==================================================
+   Elevated Citizen Dashboard Master Tokens & Components
+================================================== */
+/* 1. Citizen Workspace Hero Banner */
+.citizen-workspace-hero {
+  padding: 2.25rem 2.5rem;
+  margin-bottom: 2rem;
+  border-radius: 18px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+[data-theme="light"] .citizen-workspace-hero {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F0F7FF 50%, #E0F2FE 100%) !important;
+  border: 1px solid #BFDBFE !important;
+  box-shadow: 0 4px 20px -2px rgba(37, 99, 235, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04) !important;
+}
+
+[data-theme="dark"] .citizen-workspace-hero {
+  background: linear-gradient(135deg, rgba(15, 34, 58, 0.9) 0%, rgba(10, 23, 40, 0.95) 100%) !important;
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.5), 0 0 35px -5px rgba(59, 130, 246, 0.15) !important;
+}
+
+.citizen-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.75rem;
+}
+
+[data-theme="light"] .citizen-hero-eyebrow {
+  background: #EFF6FF !important;
+  border: 1px solid #BFDBFE !important;
+  color: #1D4ED8 !important;
+}
+
+[data-theme="dark"] .citizen-hero-eyebrow {
+  background: rgba(37, 99, 235, 0.16) !important;
+  border: 1px solid rgba(59, 130, 246, 0.35) !important;
+  color: #93C5FD !important;
+}
+
+/* 2. Priority Attention Banners */
+.attention-banner-warning {
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.75rem;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  transition: all 0.2s ease;
+}
+
+[data-theme="light"] .attention-banner-warning {
+  background: #FFFBEB !important;
+  border: 1.5px solid #FDE68A !important;
+  border-left: 5px solid #D97706 !important;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.08) !important;
+}
+
+[data-theme="dark"] .attention-banner-warning {
+  background: rgba(245, 158, 11, 0.12) !important;
+  border: 1px solid rgba(245, 158, 11, 0.35) !important;
+  border-left: 5px solid #F59E0B !important;
+}
+
+.attention-banner-success {
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.75rem;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  transition: all 0.2s ease;
+}
+
+[data-theme="light"] .attention-banner-success {
+  background: #F0FDF4 !important;
+  border: 1.5px solid #BBF7D0 !important;
+  border-left: 5px solid #059669 !important;
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.08) !important;
+}
+
+[data-theme="dark"] .attention-banner-success {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border: 1px solid rgba(16, 185, 129, 0.35) !important;
+  border-left: 5px solid #10B981 !important;
+}
+
+/* 3. Application Overview KPI Stat Cards */
+.kpi-stat-card {
+  padding: 1.5rem;
+  border-radius: 16px;
+  position: relative;
+  text-decoration: none;
+  display: block;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+[data-theme="light"] .kpi-stat-card {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03), 0 6px 16px -2px rgba(15, 23, 42, 0.05) !important;
+}
+
+[data-theme="light"] .kpi-stat-card:hover {
+  transform: translateY(-3px);
+  border-color: #CBD5E1 !important;
+  box-shadow: 0 12px 24px -4px rgba(15, 23, 42, 0.09) !important;
+}
+
+[data-theme="dark"] .kpi-stat-card {
+  background: rgba(12, 26, 46, 0.75) !important;
+  border: 1px solid rgba(148, 163, 184, 0.15) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme="dark"] .kpi-stat-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(59, 130, 246, 0.4) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45), 0 0 20px -3px rgba(59, 130, 246, 0.2) !important;
+}
+
+.kpi-icon-pill {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.kpi-stat-card:hover .kpi-icon-pill {
+  transform: scale(1.08);
+}
+
+/* 4. Active Milestone Tracker */
+.milestone-tracker-card {
+  padding: 1.75rem 2rem;
+  margin-bottom: 2.5rem;
+  border-radius: 16px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+[data-theme="light"] .milestone-tracker-card {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.06) !important;
+}
+
+[data-theme="dark"] .milestone-tracker-card {
+  background: rgba(12, 26, 46, 0.75) !important;
+  border: 1px solid rgba(148, 163, 184, 0.15) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+}
+
+.milestone-stage-pill {
+  padding: 0.75rem 0.85rem;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+[data-theme="light"] .milestone-stage-pill.done {
+  background: #ECFDF5 !important;
+  border: 1px solid #A7F3D0 !important;
+}
+
+[data-theme="light"] .milestone-stage-pill.current {
+  background: #EFF6FF !important;
+  border: 1.5px solid #3B82F6 !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+}
+
+[data-theme="light"] .milestone-stage-pill.pending {
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+[data-theme="dark"] .milestone-stage-pill.done {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border: 1px solid rgba(16, 185, 129, 0.35) !important;
+}
+
+[data-theme="dark"] .milestone-stage-pill.current {
+  background: rgba(37, 99, 235, 0.2) !important;
+  border: 1.5px solid #3B82F6 !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25) !important;
+}
+
+[data-theme="dark"] .milestone-stage-pill.pending {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(148, 163, 184, 0.12) !important;
+}
+
+/* 5. Modern Dashboard Table Container */
+.modern-dashboard-table-wrap {
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+[data-theme="light"] .modern-dashboard-table-wrap {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.06) !important;
+}
+
+[data-theme="dark"] .modern-dashboard-table-wrap {
+  background: rgba(12, 26, 46, 0.75) !important;
+  border: 1px solid rgba(148, 163, 184, 0.15) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+}
+
+[data-theme="light"] .modern-dashboard-table-wrap thead tr {
+  background: #F8FAFC !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+}
+
+[data-theme="light"] .modern-dashboard-table-wrap thead th {
+  color: #475569 !important;
+  font-weight: 700 !important;
+}
+
+/* 6. Quick Action Cards */
+.quick-action-card {
+  padding: 1.35rem;
+  border-radius: 14px;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="light"] .quick-action-card {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+}
+
+[data-theme="light"] .quick-action-card:hover {
+  transform: translateY(-3px);
+  border-color: #CBD5E1 !important;
+  box-shadow: 0 10px 22px -3px rgba(15, 23, 42, 0.08) !important;
+}
+
+[data-theme="dark"] .quick-action-card {
+  background: rgba(12, 26, 46, 0.75) !important;
+  border: 1px solid rgba(148, 163, 184, 0.15) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
+[data-theme="dark"] .quick-action-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(59, 130, 246, 0.35) !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4) !important;
+}
+
 /* ===== Citizen Global Header & Navigation Controls ===== */
 .dashboard-top-header {
   height: 70px;

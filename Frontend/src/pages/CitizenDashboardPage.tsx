@@ -198,41 +198,20 @@ export const CitizenDashboardPage: React.FC = () => {
         {/* ==================================================
             1. Welcome Section (Section 4)
         ================================================== */}
-        <section
-          className="glass-panel"
-          style={{
-            padding: '2rem 2.25rem',
-            marginBottom: '2rem',
-            background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(6, 182, 212, 0.08) 100%)',
-            border: '1px solid var(--border-accent)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '1.5rem'
-          }}
-        >
+        <section className="citizen-workspace-hero">
           <div style={{ maxWidth: '640px' }}>
-            <div
-              className="section-eyebrow"
-              style={{
-                background: 'rgba(37, 99, 235, 0.12)',
-                borderColor: 'var(--border-accent)',
-                color: 'var(--accent-blue)',
-                marginBottom: '0.65rem'
-              }}
-            >
+            <div className="citizen-hero-eyebrow">
               <Sparkles size={13} />
               CITIZEN WORKSPACE
             </div>
             <h1
               id="citizen-greeting"
               style={{
-                fontSize: 'clamp(1.5rem, 3vw, 2rem)',
+                fontSize: 'clamp(1.5rem, 3vw, 2.1rem)',
                 fontWeight: 700,
                 color: 'var(--text-primary)',
-                marginBottom: '0.4rem',
-                letterSpacing: '-0.02em'
+                marginBottom: '0.45rem',
+                letterSpacing: '-0.025em'
               }}
             >
               {loading ? 'Loading profile...' : currentUser ? `${getGreeting()}, ${getCitizenDisplayName()}` : 'Unable to load profile.'}
@@ -257,7 +236,7 @@ export const CitizenDashboardPage: React.FC = () => {
             {draftApp ? (
               <Link
                 to={applicationService.getApplicationResumeRoute(draftApp)}
-                className="btn btn-primary"
+                className="btn btn-primary hover-lift"
                 style={{ padding: '0.75rem 1.35rem', fontSize: '0.88rem', display: 'inline-flex', alignItems: 'center', gap: '0.45rem' }}
               >
                 <PlayCircle size={16} /> Continue Application
@@ -265,14 +244,14 @@ export const CitizenDashboardPage: React.FC = () => {
             ) : null}
             <Link
               to="/services"
-              className={draftApp ? "btn btn-secondary" : "btn btn-primary"}
+              className={draftApp ? "btn btn-secondary hover-lift" : "btn btn-primary hover-lift"}
               style={{ padding: '0.75rem 1.35rem', fontSize: '0.88rem' }}
             >
               <Plus size={16} /> New Application
             </Link>
             <Link
               to="/applications"
-              className="btn btn-secondary"
+              className="btn btn-secondary hover-lift"
               style={{ padding: '0.75rem 1.25rem', fontSize: '0.88rem' }}
             >
               View My Applications
@@ -284,46 +263,34 @@ export const CitizenDashboardPage: React.FC = () => {
             2. Priority Attention: Correction Required Banner (Section 17)
         ================================================== */}
         {correctionApp && (
-          <section
-            className="glass-panel"
-            style={{
-              padding: '1.25rem 1.5rem',
-              marginBottom: '1.75rem',
-              background: 'var(--status-warning-bg)',
-              border: '1px solid rgba(245, 158, 11, 0.4)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: '1rem'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem', maxWidth: '720px' }}>
+          <section className="attention-banner-warning">
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', maxWidth: '720px' }}>
               <div
                 style={{
-                  width: '38px',
-                  height: '38px',
-                  borderRadius: '10px',
-                  background: 'rgba(245, 158, 11, 0.25)',
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '12px',
+                  background: 'rgba(217, 119, 6, 0.15)',
+                  border: '1px solid rgba(217, 119, 6, 0.3)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'var(--status-warning)',
+                  color: '#D97706',
                   flexShrink: 0
                 }}
               >
                 <AlertTriangle size={22} />
               </div>
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem', flexWrap: 'wrap' }}>
-                  <strong style={{ fontSize: '0.98rem', color: 'var(--text-primary)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
+                  <strong style={{ fontSize: '1rem', color: 'var(--text-primary)', fontWeight: 700 }}>
                     Action Required: Your {correctionApp.serviceName} application requires correction
                   </strong>
-                  <span className="badge badge-warning" style={{ fontSize: '0.7rem' }}>
+                  <span className="badge badge-warning" style={{ fontSize: '0.72rem', letterSpacing: '0.04em' }}>
                     {correctionApp.id}
                   </span>
                 </div>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.45 }}>
                   Reason: {correctionApp.remarks || 'Address proof does not match the application premises address.'}
                 </p>
               </div>
@@ -331,7 +298,7 @@ export const CitizenDashboardPage: React.FC = () => {
 
             <Link
               to={`/applications/${correctionApp.id}`}
-              className="btn btn-primary"
+              className="btn btn-primary hover-lift"
               style={{
                 padding: '0.65rem 1.25rem',
                 fontSize: '0.85rem',
@@ -348,42 +315,30 @@ export const CitizenDashboardPage: React.FC = () => {
             3. Priority Attention: Digital Approval Banner (Section 18)
         ================================================== */}
         {approvedApp && (
-          <section
-            className="glass-panel"
-            style={{
-              padding: '1.25rem 1.5rem',
-              marginBottom: '1.75rem',
-              background: 'var(--status-success-bg)',
-              border: '1px solid rgba(16, 185, 129, 0.4)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: '1rem'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+          <section className="attention-banner-success">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <div
                 style={{
-                  width: '38px',
-                  height: '38px',
-                  borderRadius: '10px',
-                  background: 'rgba(16, 185, 129, 0.25)',
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '12px',
+                  background: 'rgba(5, 150, 105, 0.15)',
+                  border: '1px solid rgba(5, 150, 105, 0.3)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'var(--status-success)',
+                  color: '#059669',
                   flexShrink: 0
                 }}
               >
                 <Award size={22} />
               </div>
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem', flexWrap: 'wrap' }}>
-                  <strong style={{ fontSize: '0.98rem', color: 'var(--text-primary)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
+                  <strong style={{ fontSize: '1rem', color: 'var(--text-primary)', fontWeight: 700 }}>
                     Application Approved: {approvedApp.serviceName}
                   </strong>
-                  <span className="badge badge-success" style={{ fontSize: '0.7rem' }}>
+                  <span className="badge badge-success" style={{ fontSize: '0.72rem', letterSpacing: '0.04em' }}>
                     {approvedApp.id}
                   </span>
                   {approvedApp.approvalReference && (
@@ -392,7 +347,7 @@ export const CitizenDashboardPage: React.FC = () => {
                     </span>
                   )}
                 </div>
-                <p style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', margin: 0 }}>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>
                   Sanctioned on {formatDate(approvedApp.updatedAt)}. Prototype digital approval certificate is ready.
                 </p>
               </div>
@@ -400,7 +355,7 @@ export const CitizenDashboardPage: React.FC = () => {
 
             <Link
               to={`/applications/${approvedApp.id}/approval`}
-              className="btn btn-primary"
+              className="btn btn-primary hover-lift"
               style={{
                 padding: '0.65rem 1.25rem',
                 fontSize: '0.85rem',
@@ -418,10 +373,10 @@ export const CitizenDashboardPage: React.FC = () => {
         ================================================== */}
         <section style={{ marginBottom: '2.25rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-            <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)', margin: 0 }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.015em' }}>
               Application Overview
             </h3>
-            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               Click any card to filter applications
             </span>
           </div>
@@ -434,117 +389,73 @@ export const CitizenDashboardPage: React.FC = () => {
             }}
           >
             {/* Total Applications */}
-            <Link
-              to="/applications"
-              className="glass-panel"
-              style={{
-                padding: '1.35rem',
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border-subtle)',
-                textDecoration: 'none',
-                display: 'block',
-                transition: 'all 0.18s ease'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.65rem' }}>
-                <span style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+            <Link to="/applications" className="kpi-stat-card">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
                   Total Applications
                 </span>
-                <div style={{ color: 'var(--accent-blue)' }}>
+                <div className="kpi-icon-pill" style={{ background: 'rgba(37, 99, 235, 0.12)', color: 'var(--accent-blue)' }}>
                   <FileText size={18} />
                 </div>
               </div>
-              <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1 }}>
+              <div style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1, letterSpacing: '-0.03em' }}>
                 {stats.total}
               </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.45rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                 View all applications <ArrowRight size={12} />
               </div>
             </Link>
 
             {/* Pending Review */}
-            <Link
-              to="/applications?status=OFFICER_REVIEW"
-              className="glass-panel"
-              style={{
-                padding: '1.35rem',
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border-subtle)',
-                textDecoration: 'none',
-                display: 'block',
-                transition: 'all 0.18s ease'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.65rem' }}>
-                <span style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+            <Link to="/applications?status=OFFICER_REVIEW" className="kpi-stat-card">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
                   Pending Review
                 </span>
-                <div style={{ color: 'var(--accent-cyan)' }}>
+                <div className="kpi-icon-pill" style={{ background: 'rgba(6, 182, 212, 0.12)', color: 'var(--accent-cyan)' }}>
                   <Clock size={18} />
                 </div>
               </div>
-              <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--accent-blue)', lineHeight: 1 }}>
+              <div style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--accent-blue)', lineHeight: 1, letterSpacing: '-0.03em' }}>
                 {stats.pendingReview}
               </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.45rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                 Under scrutiny or AI processing <ArrowRight size={12} />
               </div>
             </Link>
 
             {/* Correction Required */}
-            <Link
-              to="/applications?status=CORRECTION_REQUIRED"
-              className="glass-panel"
-              style={{
-                padding: '1.35rem',
-                background: 'var(--bg-card)',
-                border: stats.correctionRequired > 0 ? '1px solid rgba(245, 158, 11, 0.45)' : '1px solid var(--border-subtle)',
-                textDecoration: 'none',
-                display: 'block',
-                transition: 'all 0.18s ease'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.65rem' }}>
-                <span style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+            <Link to="/applications?status=CORRECTION_REQUIRED" className="kpi-stat-card">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
                   Correction Required
                 </span>
-                <div style={{ color: 'var(--status-warning)' }}>
+                <div className="kpi-icon-pill" style={{ background: 'rgba(245, 158, 11, 0.12)', color: 'var(--status-warning)' }}>
                   <AlertTriangle size={18} />
                 </div>
               </div>
-              <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--status-warning)', lineHeight: 1 }}>
+              <div style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--status-warning)', lineHeight: 1, letterSpacing: '-0.03em' }}>
                 {stats.correctionRequired}
               </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.45rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                 Citizen update required <ArrowRight size={12} />
               </div>
             </Link>
 
             {/* Approved */}
-            <Link
-              to="/applications?status=APPROVED"
-              className="glass-panel"
-              style={{
-                padding: '1.35rem',
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border-subtle)',
-                textDecoration: 'none',
-                display: 'block',
-                transition: 'all 0.18s ease'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.65rem' }}>
-                <span style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+            <Link to="/applications?status=APPROVED" className="kpi-stat-card">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
                   Approved
                 </span>
-                <div style={{ color: 'var(--status-success)' }}>
+                <div className="kpi-icon-pill" style={{ background: 'rgba(16, 185, 129, 0.12)', color: 'var(--status-success)' }}>
                   <CheckCircle2 size={18} />
                 </div>
               </div>
-              <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--status-success)', lineHeight: 1 }}>
+              <div style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--status-success)', lineHeight: 1, letterSpacing: '-0.03em' }}>
                 {stats.approved}
               </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.45rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                 Sanctioned certificates <ArrowRight size={12} />
               </div>
             </Link>
@@ -555,15 +466,7 @@ export const CitizenDashboardPage: React.FC = () => {
             5. Active Application Progress Tracker (Section 8)
         ================================================== */}
         {activeApp && (
-          <section
-            className="glass-panel"
-            style={{
-              padding: '1.75rem 2rem',
-              marginBottom: '2.5rem',
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-subtle)'
-            }}
-          >
+          <section className="milestone-tracker-card">
             <div
               style={{
                 display: 'flex',
@@ -579,21 +482,22 @@ export const CitizenDashboardPage: React.FC = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <div
                   style={{
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '10px',
+                    width: '46px',
+                    height: '46px',
+                    borderRadius: '12px',
                     background: 'var(--bg-accent-subtle)',
                     border: '1px solid var(--border-accent)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: 'var(--accent-blue)'
+                    color: 'var(--accent-blue)',
+                    boxShadow: '0 2px 6px rgba(37, 99, 235, 0.1)'
                   }}
                 >
                   <Building size={22} />
                 </div>
                 <div>
-                  <h4 style={{ fontSize: '1.15rem', color: 'var(--text-primary)', margin: '0 0 0.2rem 0' }}>
+                  <h4 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 0.2rem 0' }}>
                     {activeApp.serviceName}
                   </h4>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
@@ -609,7 +513,7 @@ export const CitizenDashboardPage: React.FC = () => {
                 {activeApp.status === 'DRAFT' ? (
                   <Link
                     to={applicationService.getApplicationResumeRoute(activeApp)}
-                    className="btn btn-primary"
+                    className="btn btn-primary hover-lift"
                     style={{ fontSize: '0.85rem', padding: '0.5rem 1rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
                   >
                     <PlayCircle size={15} /> Continue Application
@@ -617,7 +521,7 @@ export const CitizenDashboardPage: React.FC = () => {
                 ) : activeApp.status === 'CORRECTION_REQUIRED' ? (
                   <Link
                     to={`/applications/${activeApp.id}`}
-                    className="btn btn-primary"
+                    className="btn btn-primary hover-lift"
                     style={{
                       fontSize: '0.85rem',
                       padding: '0.5rem 1rem',
@@ -630,7 +534,7 @@ export const CitizenDashboardPage: React.FC = () => {
                 ) : (
                   <Link
                     to={`/applications/${activeApp.id}`}
-                    className="btn btn-secondary"
+                    className="btn btn-secondary hover-lift"
                     style={{ fontSize: '0.85rem', padding: '0.5rem 1rem' }}
                   >
                     Track Application
@@ -648,7 +552,7 @@ export const CitizenDashboardPage: React.FC = () => {
                     {applicationService.getStatusLabel(activeApp.status)}
                   </strong>
                 </span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--accent-blue)' }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--accent-blue)', fontWeight: 600 }}>
                   Stage {activeApp.status === 'APPROVED' || activeApp.status === 'DIGITAL_APPROVAL' ? 6 : activeApp.status === 'OFFICER_REVIEW' ? 4 : 3} of 6
                 </span>
               </div>
@@ -658,7 +562,7 @@ export const CitizenDashboardPage: React.FC = () => {
                 style={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
-                  gap: '0.5rem',
+                  gap: '0.65rem',
                   marginTop: '1rem'
                 }}
               >
@@ -683,23 +587,9 @@ export const CitizenDashboardPage: React.FC = () => {
                 ].map((stage, idx) => (
                   <div
                     key={stage.title}
-                    style={{
-                      padding: '0.65rem 0.75rem',
-                      borderRadius: 'var(--radius-sm)',
-                      background: stage.done
-                        ? 'var(--status-success-bg)'
-                        : stage.current
-                        ? 'var(--bg-accent-subtle)'
-                        : 'var(--bg-secondary)',
-                      border: stage.done
-                        ? '1px solid rgba(16, 185, 129, 0.3)'
-                        : stage.current
-                        ? '1px solid var(--border-accent)'
-                        : '1px solid var(--border-subtle)',
-                      fontSize: '0.75rem'
-                    }}
+                    className={`milestone-stage-pill ${stage.done ? 'done' : stage.current ? 'current' : 'pending'}`}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.2rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.25rem' }}>
                       <span
                         style={{
                           fontWeight: 700,
@@ -743,7 +633,7 @@ export const CitizenDashboardPage: React.FC = () => {
         ================================================== */}
         <section style={{ marginBottom: '2.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-            <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)', margin: 0 }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.015em' }}>
               Recent Applications
             </h3>
             <Link
@@ -770,7 +660,8 @@ export const CitizenDashboardPage: React.FC = () => {
                 padding: '3rem 2rem',
                 textAlign: 'center',
                 background: 'var(--bg-card)',
-                border: '1px solid var(--border-subtle)'
+                border: '1px solid var(--border-subtle)',
+                borderRadius: '16px'
               }}
             >
               <div
@@ -794,40 +685,32 @@ export const CitizenDashboardPage: React.FC = () => {
               <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', marginBottom: '1.25rem' }}>
                 You haven't started any government service applications.
               </p>
-              <Link to="/services" className="btn btn-primary">
+              <Link to="/services" className="btn btn-primary hover-lift">
                 Browse Services <ArrowRight size={16} />
               </Link>
             </div>
           ) : (
             /* Table of Applications */
-            <div
-              className="glass-panel"
-              style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border-subtle)',
-                overflowX: 'auto',
-                borderRadius: 'var(--radius-md)'
-              }}
-            >
+            <div className="modern-dashboard-table-wrap">
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '680px' }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid var(--border-subtle)', background: 'var(--bg-secondary)' }}>
-                    <th style={{ padding: '0.85rem 1.25rem', fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
+                  <tr>
+                    <th style={{ padding: '0.95rem 1.25rem', fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.04em' }}>
                       Application ID
                     </th>
-                    <th style={{ padding: '0.85rem 1rem', fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
+                    <th style={{ padding: '0.95rem 1rem', fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.04em' }}>
                       Service
                     </th>
-                    <th style={{ padding: '0.85rem 1rem', fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
+                    <th style={{ padding: '0.95rem 1rem', fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.04em' }}>
                       Submitted Date
                     </th>
-                    <th style={{ padding: '0.85rem 1rem', fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
+                    <th style={{ padding: '0.95rem 1rem', fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.04em' }}>
                       Status
                     </th>
-                    <th style={{ padding: '0.85rem 1rem', fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
+                    <th style={{ padding: '0.95rem 1rem', fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.04em' }}>
                       Last Updated
                     </th>
-                    <th style={{ padding: '0.85rem 1.25rem', fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', textAlign: 'right' }}>
+                    <th style={{ padding: '0.95rem 1.25rem', fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.04em', textAlign: 'right' }}>
                       Action
                     </th>
                   </tr>
@@ -870,10 +753,10 @@ export const CitizenDashboardPage: React.FC = () => {
                         {app.status === 'DRAFT' ? (
                           <Link
                             to={applicationService.getApplicationResumeRoute(app)}
-                            className="btn btn-primary"
+                            className="btn btn-primary hover-lift"
                             style={{
                               fontSize: '0.78rem',
-                              padding: '0.4rem 0.85rem',
+                              padding: '0.45rem 0.95rem',
                               display: 'inline-flex',
                               alignItems: 'center',
                               gap: '0.35rem'
@@ -884,10 +767,10 @@ export const CitizenDashboardPage: React.FC = () => {
                         ) : app.status === 'CORRECTION_REQUIRED' ? (
                           <Link
                             to={`/applications/${app.id}`}
-                            className="btn btn-primary"
+                            className="btn btn-primary hover-lift"
                             style={{
                               fontSize: '0.78rem',
-                              padding: '0.4rem 0.85rem',
+                              padding: '0.45rem 0.95rem',
                               background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
                               borderColor: 'rgba(217, 119, 6, 0.4)'
                             }}
@@ -897,10 +780,10 @@ export const CitizenDashboardPage: React.FC = () => {
                         ) : app.status === 'APPROVED' || app.status === 'DIGITAL_APPROVAL' ? (
                           <Link
                             to={`/applications/${app.id}/approval`}
-                            className="btn btn-primary"
+                            className="btn btn-primary hover-lift"
                             style={{
                               fontSize: '0.78rem',
-                              padding: '0.4rem 0.85rem',
+                              padding: '0.45rem 0.95rem',
                               background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
                               borderColor: 'rgba(5, 150, 105, 0.4)'
                             }}
@@ -910,8 +793,8 @@ export const CitizenDashboardPage: React.FC = () => {
                         ) : (
                           <Link
                             to={`/applications/${app.id}`}
-                            className="btn btn-secondary"
-                            style={{ fontSize: '0.78rem', padding: '0.4rem 0.85rem' }}
+                            className="btn btn-secondary hover-lift"
+                            style={{ fontSize: '0.78rem', padding: '0.45rem 0.95rem' }}
                           >
                             View Application
                           </Link>
@@ -929,7 +812,7 @@ export const CitizenDashboardPage: React.FC = () => {
             7. Quick Actions (Section 9 - 4 Working Cards)
         ================================================== */}
         <section style={{ marginBottom: '2.5rem' }}>
-          <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)', marginBottom: '1rem' }}>
+          <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '1rem', letterSpacing: '-0.015em' }}>
             Quick Actions
           </h3>
 
@@ -944,25 +827,19 @@ export const CitizenDashboardPage: React.FC = () => {
             {draftApp && (
               <Link
                 to={applicationService.getApplicationResumeRoute(draftApp)}
-                className="glass-panel"
+                className="quick-action-card hover-lift"
                 style={{
-                  padding: '1.25rem',
-                  background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.15) 0%, rgba(6, 182, 212, 0.1) 100%)',
-                  border: '1px solid rgba(59, 130, 246, 0.4)',
-                  textDecoration: 'none',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.5rem',
-                  transition: 'all 0.18s ease'
+                  background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(6, 182, 212, 0.08) 100%)',
+                  border: '1px solid rgba(59, 130, 246, 0.35)'
                 }}
               >
                 <div
                   style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '10px',
+                    width: '42px',
+                    height: '42px',
+                    borderRadius: '11px',
                     background: 'rgba(59, 130, 246, 0.2)',
-                    color: '#60A5FA',
+                    color: 'var(--accent-blue)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
@@ -981,24 +858,14 @@ export const CitizenDashboardPage: React.FC = () => {
             {/* Browse Government Services */}
             <Link
               to="/services"
-              className="glass-panel"
-              style={{
-                padding: '1.25rem',
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border-subtle)',
-                textDecoration: 'none',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.5rem',
-                transition: 'all 0.18s ease'
-              }}
+              className="quick-action-card hover-lift"
             >
               <div
                 style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '10px',
-                  background: 'rgba(37, 99, 235, 0.1)',
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '11px',
+                  background: 'rgba(37, 99, 235, 0.12)',
                   color: 'var(--accent-blue)',
                   display: 'flex',
                   alignItems: 'center',
@@ -1018,24 +885,14 @@ export const CitizenDashboardPage: React.FC = () => {
             {/* My Applications */}
             <Link
               to="/applications"
-              className="glass-panel"
-              style={{
-                padding: '1.25rem',
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border-subtle)',
-                textDecoration: 'none',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.5rem',
-                transition: 'all 0.18s ease'
-              }}
+              className="quick-action-card hover-lift"
             >
               <div
                 style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '10px',
-                  background: 'rgba(6, 182, 212, 0.1)',
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '11px',
+                  background: 'rgba(6, 182, 212, 0.12)',
                   color: 'var(--accent-cyan)',
                   display: 'flex',
                   alignItems: 'center',
@@ -1055,24 +912,14 @@ export const CitizenDashboardPage: React.FC = () => {
             {/* AI Assistant */}
             <Link
               to="/assistant"
-              className="glass-panel"
-              style={{
-                padding: '1.25rem',
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border-subtle)',
-                textDecoration: 'none',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.5rem',
-                transition: 'all 0.18s ease'
-              }}
+              className="quick-action-card hover-lift"
             >
               <div
                 style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '10px',
-                  background: 'rgba(16, 185, 129, 0.1)',
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '11px',
+                  background: 'rgba(16, 185, 129, 0.12)',
                   color: 'var(--status-success)',
                   display: 'flex',
                   alignItems: 'center',
@@ -1092,24 +939,14 @@ export const CitizenDashboardPage: React.FC = () => {
             {/* Track Application */}
             <Link
               to="/applications"
-              className="glass-panel"
-              style={{
-                padding: '1.25rem',
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border-subtle)',
-                textDecoration: 'none',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.5rem',
-                transition: 'all 0.18s ease'
-              }}
+              className="quick-action-card hover-lift"
             >
               <div
                 style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '10px',
-                  background: 'rgba(245, 158, 11, 0.1)',
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '11px',
+                  background: 'rgba(245, 158, 11, 0.12)',
                   color: 'var(--status-warning)',
                   display: 'flex',
                   alignItems: 'center',
