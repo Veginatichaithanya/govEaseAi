@@ -239,20 +239,19 @@ export const CitizenSidebar: React.FC<CitizenSidebarProps> = ({
       {/* User Info Strip in Sidebar */}
       <div
         style={{
-          padding: collapsed ? '0.85rem 0.5rem' : '0.85rem 1.25rem',
-          background: 'var(--bg-accent-subtle)',
+          padding: collapsed ? '0.85rem 0.5rem' : '1rem 1.15rem',
           borderBottom: '1px solid var(--border-subtle)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: collapsed ? 'center' : 'flex-start',
-          gap: '0.75rem'
+          gap: '0.85rem'
         }}
         title={currentUser?.fullName || currentUser?.name || 'Citizen'}
       >
         <div
           style={{
-            width: '34px',
-            height: '34px',
+            width: '38px',
+            height: '38px',
             borderRadius: '50%',
             background: 'linear-gradient(135deg, #2563EB 0%, #06B6D4 100%)',
             display: 'flex',
@@ -260,34 +259,57 @@ export const CitizenSidebar: React.FC<CitizenSidebarProps> = ({
             justifyContent: 'center',
             color: '#FFFFFF',
             fontWeight: 700,
-            fontSize: '0.85rem',
+            fontSize: '0.95rem',
+            boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)',
             flexShrink: 0
           }}
         >
           {loading ? '…' : (currentUser?.fullName?.charAt(0) || currentUser?.name?.charAt(0) || 'C')}
         </div>
         {!collapsed && (
-          <div style={{ overflow: 'hidden' }}>
+          <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
             <div
               style={{
-                fontSize: '0.85rem',
+                fontSize: '0.9rem',
                 fontWeight: 600,
                 color: 'var(--text-primary)',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
-                textOverflow: 'ellipsis'
+                textOverflow: 'ellipsis',
+                lineHeight: 1.25
               }}
             >
-              {loading ? 'Loading citizen...' : currentUser ? (currentUser.fullName || currentUser.name || 'Citizen').split(' ').filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ') : 'Citizen'}
+              {loading
+                ? 'Loading citizen...'
+                : currentUser
+                ? (currentUser.fullName || currentUser.name || 'Citizen')
+                    .split(' ')
+                    .filter(Boolean)
+                    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+                    .join(' ')
+                : 'Citizen'}
             </div>
             <div
               style={{
-                fontSize: '0.72rem',
-                color: 'var(--text-muted)',
-                fontFamily: 'var(--font-mono)'
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.3rem',
+                marginTop: '0.25rem',
+                padding: '0.12rem 0.45rem',
+                borderRadius: '9999px',
+                background: 'rgba(59, 130, 246, 0.08)',
+                color: 'var(--accent-blue-light, #2563EB)',
+                fontSize: '0.68rem',
+                fontFamily: 'var(--font-mono)',
+                fontWeight: 600,
+                whiteSpace: 'nowrap'
               }}
             >
-              Applicant ID: {currentUser?.applicantId || (loading ? '…' : 'Pending')}
+              <span>CITIZEN</span>
+              <span>•</span>
+              <span style={{ letterSpacing: '0.02em' }}>
+                {currentUser?.applicantId || (loading ? '…' : 'CIT-DEMO')}
+              </span>
             </div>
           </div>
         )}
@@ -316,29 +338,30 @@ export const CitizenSidebar: React.FC<CitizenSidebarProps> = ({
               to={item.to}
               onClick={onClose}
               title={collapsed ? item.label : undefined}
+              className={`sidebar-nav-item ${isActive ? 'active' : ''}`}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: collapsed ? 'center' : 'space-between',
-                padding: collapsed ? '0.65rem 0.4rem' : '0.65rem 0.85rem',
-                borderRadius: 'var(--radius-sm)',
-                fontSize: '0.875rem',
+                padding: collapsed ? '0.7rem 0.5rem' : '0.65rem 1rem',
+                borderRadius: '9999px',
+                fontSize: '0.88rem',
                 fontWeight: isActive ? 600 : 500,
-                color: isActive ? 'var(--accent-blue-light, #3B82F6)' : 'var(--text-secondary)',
-                background: isActive ? 'var(--bg-accent-subtle)' : 'transparent',
-                border: isActive ? '1px solid var(--border-accent)' : '1px solid transparent',
+                color: isActive ? 'var(--accent-blue-light, #2563EB)' : 'var(--text-secondary)',
+                border: 'none',
                 textDecoration: 'none',
-                transition: 'all 0.18s ease',
+                transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
                 position: 'relative'
               }}
-              className="sidebar-nav-item"
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: collapsed ? '0' : '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: collapsed ? '0' : '0.85rem' }}>
                 <span
                   style={{
                     color: isActive ? 'var(--accent-blue)' : 'inherit',
                     display: 'flex',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    transform: isActive ? 'scale(1.05)' : 'scale(1)',
+                    transition: 'transform 0.18s ease'
                   }}
                 >
                   {item.icon}
@@ -351,12 +374,13 @@ export const CitizenSidebar: React.FC<CitizenSidebarProps> = ({
                     fontSize: '0.7rem',
                     fontFamily: 'var(--font-mono)',
                     fontWeight: 700,
-                    padding: collapsed ? '0.1rem 0.3rem' : '0.15rem 0.45rem',
+                    padding: '0.12rem 0.5rem',
                     borderRadius: '9999px',
                     background: 'var(--accent-blue)',
                     color: '#FFFFFF',
-                    minWidth: collapsed ? '14px' : '18px',
+                    minWidth: '18px',
                     textAlign: 'center',
+                    boxShadow: '0 2px 6px rgba(37, 99, 235, 0.3)',
                     ...(collapsed ? { position: 'absolute', top: '4px', right: '4px' } : {})
                   }}
                 >
@@ -373,12 +397,12 @@ export const CitizenSidebar: React.FC<CitizenSidebarProps> = ({
         style={{
           height: '1px',
           backgroundColor: 'var(--border-subtle)',
-          margin: '0 0.75rem'
+          margin: '0 0.85rem'
         }}
       />
 
-      {/* Logout Action (Theme toggle removed to maintain single global toggle in header) */}
-      <div style={{ padding: collapsed ? '0.75rem 0.35rem' : '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+      {/* Logout Action */}
+      <div style={{ padding: collapsed ? '0.75rem 0.35rem' : '0.75rem 0.85rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         <button
           type="button"
           onClick={handleLogout}
@@ -388,14 +412,14 @@ export const CitizenSidebar: React.FC<CitizenSidebarProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: collapsed ? 'center' : 'flex-start',
-            gap: collapsed ? '0' : '0.75rem',
-            padding: '0.65rem 0.85rem',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: '0.875rem',
+            gap: collapsed ? '0' : '0.85rem',
+            padding: collapsed ? '0.7rem 0.5rem' : '0.65rem 1rem',
+            borderRadius: '9999px',
+            fontSize: '0.88rem',
             fontWeight: 500,
             color: 'var(--text-secondary)',
             background: 'transparent',
-            border: '1px solid transparent',
+            border: 'none',
             cursor: 'pointer',
             transition: 'all 0.18s ease'
           }}

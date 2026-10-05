@@ -434,19 +434,18 @@ export const OfficerSidebar: React.FC<OfficerSidebarProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '0.38rem 0.6rem',
-                borderRadius: 'var(--radius-sm)',
-                fontSize: '0.8rem',
+                padding: '0.45rem 0.85rem',
+                borderRadius: '9999px',
+                fontSize: '0.82rem',
                 fontWeight: item.isActive ? 600 : 500,
-                color: item.isActive ? 'var(--accent-blue-light, #3B82F6)' : 'var(--text-secondary)',
-                background: item.isActive ? 'var(--bg-accent-subtle)' : 'transparent',
-                border: item.isActive ? '1px solid var(--border-accent)' : '1px solid transparent',
+                color: item.isActive ? 'var(--accent-blue-light, #2563EB)' : 'var(--text-secondary)',
+                border: 'none',
                 textDecoration: 'none',
-                transition: 'all 0.15s ease'
+                transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
               }}
-              className="sidebar-nav-item"
+              className={`sidebar-nav-item ${item.isActive ? 'active' : ''}`}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                 <span
                   style={{
                     color: item.isActive ? 'var(--accent-blue)' : 'inherit',
@@ -470,7 +469,7 @@ export const OfficerSidebar: React.FC<OfficerSidebarProps> = ({
             fontFamily: 'var(--font-mono)',
             textTransform: 'uppercase',
             color: 'var(--text-muted)',
-            padding: '0.45rem 0.6rem 0.1rem 0.6rem',
+            padding: '0.5rem 0.85rem 0.15rem 0.85rem',
             letterSpacing: '0.06em',
             fontWeight: 600
           }}
@@ -489,19 +488,18 @@ export const OfficerSidebar: React.FC<OfficerSidebarProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '0.38rem 0.6rem',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: '0.8rem',
+            padding: '0.45rem 0.85rem',
+            borderRadius: '9999px',
+            fontSize: '0.82rem',
             fontWeight: isNotificationsActive ? 600 : 500,
-            color: isNotificationsActive ? 'var(--accent-blue-light, #3B82F6)' : 'var(--text-secondary)',
-            background: isNotificationsActive ? 'var(--bg-accent-subtle)' : 'transparent',
-            border: isNotificationsActive ? '1px solid var(--border-accent)' : '1px solid transparent',
+            color: isNotificationsActive ? 'var(--accent-blue-light, #2563EB)' : 'var(--text-secondary)',
+            border: 'none',
             textDecoration: 'none',
-            transition: 'all 0.15s ease'
+            transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
           }}
-          className="sidebar-nav-item"
+          className={`sidebar-nav-item ${isNotificationsActive ? 'active' : ''}`}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
             <span style={{ color: isNotificationsActive ? 'var(--accent-blue)' : 'inherit', display: 'flex', alignItems: 'center' }}>
               <Bell size={16} />
             </span>
@@ -523,18 +521,17 @@ export const OfficerSidebar: React.FC<OfficerSidebarProps> = ({
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.55rem',
-            padding: '0.38rem 0.6rem',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: '0.8rem',
+            gap: '0.65rem',
+            padding: '0.45rem 0.85rem',
+            borderRadius: '9999px',
+            fontSize: '0.82rem',
             fontWeight: isProfileActive ? 600 : 500,
-            color: isProfileActive ? 'var(--accent-blue-light, #3B82F6)' : 'var(--text-secondary)',
-            background: isProfileActive ? 'var(--bg-accent-subtle)' : 'transparent',
-            border: isProfileActive ? '1px solid var(--border-accent)' : '1px solid transparent',
+            color: isProfileActive ? 'var(--accent-blue-light, #2563EB)' : 'var(--text-secondary)',
+            border: 'none',
             textDecoration: 'none',
-            transition: 'all 0.15s ease'
+            transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
           }}
-          className="sidebar-nav-item"
+          className={`sidebar-nav-item ${isProfileActive ? 'active' : ''}`}
         >
           <span style={{ color: isProfileActive ? 'var(--accent-blue)' : 'inherit', display: 'flex', alignItems: 'center' }}>
             <UserCheck size={16} />
@@ -548,7 +545,7 @@ export const OfficerSidebar: React.FC<OfficerSidebarProps> = ({
         style={{
           marginTop: 'auto',
           borderTop: '1px solid var(--border-subtle)',
-          padding: '0.45rem 0.6rem',
+          padding: '0.5rem 0.85rem',
           flexShrink: 0
         }}
       >
@@ -559,16 +556,16 @@ export const OfficerSidebar: React.FC<OfficerSidebarProps> = ({
             width: '100%',
             display: 'flex',
             alignItems: 'center',
-            gap: '0.55rem',
-            padding: '0.42rem 0.6rem',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: '0.8rem',
+            gap: '0.65rem',
+            padding: '0.45rem 0.85rem',
+            borderRadius: '9999px',
+            fontSize: '0.82rem',
             fontWeight: 500,
             color: 'var(--status-danger, #EF4444)',
             background: 'transparent',
-            border: '1px solid transparent',
+            border: 'none',
             cursor: 'pointer',
-            transition: 'all 0.15s ease'
+            transition: 'all 0.18s ease'
           }}
           className="sidebar-logout-btn"
         >

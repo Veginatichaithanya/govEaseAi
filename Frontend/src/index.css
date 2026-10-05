@@ -1132,9 +1132,33 @@ html.theme-transition *::after {
 /* ==================================================
    Citizen Dashboard Layout & Responsive Styling
 ================================================== */
+.sidebar-nav-item {
+  border-radius: 9999px !important;
+  border: none !important;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
 .sidebar-nav-item:hover:not(.active) {
   color: var(--text-primary) !important;
   background-color: var(--bg-secondary) !important;
+}
+
+[data-theme="light"] .sidebar-nav-item.active {
+  background-color: #E8F0FE !important;
+  color: #0B57D0 !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="dark"] .sidebar-nav-item.active {
+  background-color: rgba(59, 130, 246, 0.16) !important;
+  color: #60A5FA !important;
+  font-weight: 600 !important;
+}
+
+.sidebar-logout-btn {
+  border-radius: 9999px !important;
+  border: none !important;
+  transition: all 0.18s ease !important;
 }
 
 .sidebar-logout-btn:hover {
