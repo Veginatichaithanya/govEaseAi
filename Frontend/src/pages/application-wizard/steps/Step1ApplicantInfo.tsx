@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { ArrowRight, Save, AlertCircle, User, Sparkles, Upload, Loader2 } from 'lucide-react';
+import { ArrowRight, Save, AlertCircle, User, Sparkles, Upload, Loader2, WifiOff } from 'lucide-react';
 import {
   TRADE_LICENSE_FORM_CONFIG,
   validateFormSections,
@@ -18,17 +18,36 @@ interface Step1Props {
 }
 
 const ID_FIELD_MAPPING: Record<string, { formKey: string; label: string }> = {
+  // Name aliases
   name: { formKey: 'fullName', label: 'Applicant Full Name' },
   applicant_name: { formKey: 'fullName', label: 'Applicant Full Name' },
+  full_name: { formKey: 'fullName', label: 'Applicant Full Name' },
+  // Father / Spouse name aliases
   father_name: { formKey: 'fatherSpouseName', label: 'Father / Spouse Name' },
+  father_spouse_name: { formKey: 'fatherSpouseName', label: 'Father / Spouse Name' },
+  spouse_name: { formKey: 'fatherSpouseName', label: 'Father / Spouse Name' },
+  // Gender
   gender: { formKey: 'gender', label: 'Gender' },
-  mobile: { formKey: 'mobile', label: 'Mobile Number' },
-  phone: { formKey: 'mobile', label: 'Mobile Number' },
+  // Mobile — form field is mobileNumber
+  mobile: { formKey: 'mobileNumber', label: 'Mobile Number' },
+  phone: { formKey: 'mobileNumber', label: 'Mobile Number' },
+  mobile_number: { formKey: 'mobileNumber', label: 'Mobile Number' },
+  // Email
   email: { formKey: 'email', label: 'Email Address' },
+  // Address aliases
   address: { formKey: 'address', label: 'Residential Address' },
+  residential_address: { formKey: 'address', label: 'Residential Address' },
+  // City / District
   city: { formKey: 'city', label: 'City / District' },
-  pincode: { formKey: 'pincode', label: 'Postal Pincode' },
+  district: { formKey: 'city', label: 'City / District' },
+  // Pincode — form field is postalCode
+  pincode: { formKey: 'postalCode', label: 'Postal Pincode' },
+  postal_code: { formKey: 'postalCode', label: 'Postal Pincode' },
+  // State
   state: { formKey: 'state', label: 'State' },
+  // Date of Birth (PAN card field)
+  date_of_birth: { formKey: 'dateOfBirth', label: 'Date of Birth' },
+  dob: { formKey: 'dateOfBirth', label: 'Date of Birth' },
 };
 
 const section = TRADE_LICENSE_FORM_CONFIG.sections[0]; // Applicant Info section
@@ -43,6 +62,7 @@ export const Step1ApplicantInfo: React.FC<Step1Props> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [extraction, setExtraction] = useState<ExtractionResult | null>(null);
   const [isExtracting, setIsExtracting] = useState<boolean>(false);
+  const [extractionError, setExtractionError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleChange = (field: FormFieldConfig, value: any) => {
@@ -90,73 +110,41 @@ export const Step1ApplicantInfo: React.FC<Step1Props> = ({
     if (!file) return;
 
     setIsExtracting(true);
+    setExtraction(null);
+    setExtractionError(null);
 
     try {
-      const res = await analyzeFile(file, 'Extract identity proof fields: full name, address, father name, date of birth, mobile, etc.');
+      const res = await analyzeFile(
+        file,
+        'Extract all identity proof fields from this document: full name, father name or spouse name, date of birth, gender, PAN number, Aadhaar number, mobile number, email, residential address, city, pincode, state. Return only what is clearly visible in the document — do not invent or guess any values.'
+      );
       if (res.success && res.extraction) {
-        setExtraction(res.extraction);
-      } else {
-        // Fallback demo extraction
+        // Only keep fields that actually have non-null, non-empty values from the document
+        const cleanedFields: Record<string, string | null> = {};
+        const cleanedConfidence: Record<string, number> = {};
+        for (const [key, value] of Object.entries(res.extraction.extracted_fields)) {
+          if (value !== null && value !== undefined && String(value).trim() !== '' && String(value).toLowerCase() !== 'n/a' && String(value).toLowerCase() !== 'not found') {
+            cleanedFields[key] = value;
+            cleanedConfidence[key] = res.extraction.confidence?.[key] ?? 0;
+          }
+        }
         setExtraction({
-          document_type: 'Identity Proof Document',
-          extracted_fields: {
-            name: formData.fullName || 'Ravi Kumar',
-            father_name: 'Suresh Kumar',
-            gender: 'Male',
-            mobile: formData.mobile || '9876543210',
-            email: formData.email || 'citizen@govease.ai',
-            address: 'Flat 402, Banjara Hills, Road No 12',
-            city: 'Hyderabad',
-            pincode: '500034',
-            state: 'Telangana',
-          },
-          confidence: {
-            name: 0.98,
-            father_name: 0.95,
-            gender: 0.99,
-            mobile: 0.92,
-            email: 0.96,
-            address: 0.94,
-            city: 0.98,
-            pincode: 0.97,
-            state: 0.99,
-          },
-          warnings: [],
-          missing_fields: [],
-          needs_human_review: false,
-          extraction_notes: 'Fields extracted and cross-validated with multimodal AI.',
+          ...res.extraction,
+          extracted_fields: cleanedFields,
+          confidence: cleanedConfidence,
         });
+      } else {
+        // Real API failed — show error, do NOT inject fake data
+        setExtractionError(
+          res.error ||
+          'AI document extraction is currently unavailable. Please fill in the form manually.'
+        );
       }
     } catch {
-      setExtraction({
-        document_type: 'Identity Proof Document',
-        extracted_fields: {
-          name: formData.fullName || 'Ravi Kumar',
-          father_name: 'Suresh Kumar',
-          gender: 'Male',
-          mobile: formData.mobile || '9876543210',
-          email: formData.email || 'citizen@govease.ai',
-          address: 'Flat 402, Banjara Hills, Road No 12',
-          city: 'Hyderabad',
-          pincode: '500034',
-          state: 'Telangana',
-        },
-        confidence: {
-          name: 0.98,
-          father_name: 0.95,
-          gender: 0.99,
-          mobile: 0.92,
-          email: 0.96,
-          address: 0.94,
-          city: 0.98,
-          pincode: 0.97,
-          state: 0.99,
-        },
-        warnings: [],
-        missing_fields: [],
-        needs_human_review: false,
-        extraction_notes: 'Fields extracted and cross-validated with multimodal AI.',
-      });
+      // Network or other error — show error, do NOT inject fake data
+      setExtractionError(
+        'Could not connect to the AI service. Please ensure the backend is running, then try again.'
+      );
     } finally {
       setIsExtracting(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -288,6 +276,37 @@ export const Step1ApplicantInfo: React.FC<Step1Props> = ({
           </button>
         </div>
       </div>
+
+      {/* AI Extraction Error Banner */}
+      {extractionError && !isExtracting && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '0.65rem',
+            padding: '0.85rem 1.1rem',
+            borderRadius: 'var(--radius-md)',
+            background: 'rgba(234, 179, 8, 0.08)',
+            border: '1px solid rgba(234, 179, 8, 0.3)',
+            color: '#D97706',
+            fontSize: '0.85rem',
+          }}
+        >
+          <WifiOff size={17} style={{ flexShrink: 0, marginTop: '0.1rem' }} />
+          <div>
+            <div style={{ fontWeight: 600, marginBottom: '0.15rem' }}>AI Extraction Unavailable</div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{extractionError}</div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setExtractionError(null)}
+            style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', flexShrink: 0, padding: '0.1rem' }}
+            title="Dismiss"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* AI Autofill Review & Edit Panel */}
       {extraction && (
