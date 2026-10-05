@@ -654,87 +654,131 @@ html.theme-transition *::after {
 }
 
 /* ==================================================
-   Google Material Outlined Field Style (Notched Outline - Image 2)
+   Google Material Outlined Field (Dynamic Float: Image 1 <-> Image 2)
 ================================================== */
 .google-field-group {
   position: relative;
   display: flex;
   flex-direction: column;
-  margin-top: 0.85rem;
+  margin-top: 1.15rem;
 }
 
 .google-field-input {
   width: 100%;
   height: 54px;
-  padding: 0.85rem 1rem;
-  font-size: 0.95rem;
+  padding: 0.95rem 1rem;
+  font-size: 1rem;
   font-family: inherit;
   border-radius: 4px;
   background: var(--bg-card, #FFFFFF);
   color: var(--text-primary);
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
 }
 
+.google-field-input::placeholder {
+  color: transparent !important;
+  opacity: 0 !important;
+}
+
+/* Resting State (Image 1): Label inside the input box */
 .google-field-label {
   position: absolute;
-  left: 0.75rem;
-  top: -0.55rem;
-  padding: 0 0.35rem;
-  font-size: 0.78rem;
-  font-weight: 500;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  font-weight: 400;
   line-height: 1;
-  background: var(--bg-card, #FFFFFF);
   pointer-events: none;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  background: transparent;
+  padding: 0 2px;
   z-index: 2;
-  transition: color 0.2s ease;
 }
 
-/* Light Theme - Exact Match to Google Sign-in Image 2 */
+/* Floating Notched State (Image 2): When focused, containing value, autofilled or flagged */
+.google-field-input:focus ~ .google-field-label,
+.google-field-input:not(:placeholder-shown) ~ .google-field-label,
+.google-field-input:-webkit-autofill ~ .google-field-label,
+.google-field-group.is-floating .google-field-label {
+  top: 0;
+  transform: translateY(-50%);
+  left: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0 4px;
+  background: var(--bg-card, #FFFFFF);
+}
+
+/* ── Light Theme ── */
 [data-theme="light"] .google-field-input {
   background: #FFFFFF !important;
-  border: 1.5px solid #1A73E8 !important;
-  color: #1E293B !important;
-}
-
-[data-theme="light"] .google-field-input:focus {
-  border-color: #1A73E8 !important;
-  border-width: 2px !important;
-  box-shadow: 0 0 0 1px #1A73E8 !important;
+  border: 1px solid #747775 !important; /* Image 1 grey outline */
+  color: #1F1F1F !important;
 }
 
 [data-theme="light"] .google-field-label {
-  background: #FFFFFF !important;
-  color: #1A73E8 !important;
+  color: #5F6368;
 }
 
-/* Dark Theme - Obsidian with Google Blue */
+/* Focused State (Image 2) */
+[data-theme="light"] .google-field-input:focus,
+[data-theme="light"] .google-field-group.is-focused .google-field-input {
+  border: 2px solid #0B57D0 !important; /* Image 2 Google Blue */
+  padding: calc(0.95rem - 1px) calc(1rem - 1px);
+}
+
+[data-theme="light"] .google-field-input:focus ~ .google-field-label,
+[data-theme="light"] .google-field-group.is-focused .google-field-label {
+  color: #0B57D0 !important;
+  background: #FFFFFF !important;
+}
+
+[data-theme="light"] .google-field-group.has-value:not(.is-focused) .google-field-label,
+[data-theme="light"] .google-field-input:not(:focus):not(:placeholder-shown) ~ .google-field-label {
+  color: #5F6368 !important;
+  background: #FFFFFF !important;
+}
+
+/* ── Dark Theme ── */
 [data-theme="dark"] .google-field-input {
   background: #111114 !important;
-  border: 1.5px solid #3B82F6 !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
   color: #F8FAFC !important;
 }
 
-[data-theme="dark"] .google-field-input:focus {
-  border-color: #60A5FA !important;
-  border-width: 2px !important;
-  box-shadow: 0 0 0 1px #60A5FA !important;
-}
-
 [data-theme="dark"] .google-field-label {
-  background: #111114 !important;
-  color: #60A5FA !important;
+  color: #94A3B8;
 }
 
-/* Error States */
+[data-theme="dark"] .google-field-input:focus,
+[data-theme="dark"] .google-field-group.is-focused .google-field-input {
+  border: 2px solid #3B82F6 !important;
+  padding: calc(0.95rem - 1px) calc(1rem - 1px);
+}
+
+[data-theme="dark"] .google-field-input:focus ~ .google-field-label,
+[data-theme="dark"] .google-field-group.is-focused .google-field-label {
+  color: #60A5FA !important;
+  background: #111114 !important;
+}
+
+[data-theme="dark"] .google-field-group.has-value:not(.is-focused) .google-field-label,
+[data-theme="dark"] .google-field-input:not(:focus):not(:placeholder-shown) ~ .google-field-label {
+  color: #94A3B8 !important;
+  background: #111114 !important;
+}
+
+/* ── Error States ── */
 .google-field-input.input-error,
 .google-field-group.has-error .google-field-input {
-  border-color: #EF4444 !important;
-  box-shadow: none !important;
+  border-color: #B3261E !important;
 }
 
 .google-field-group.has-error .google-field-label {
-  color: #EF4444 !important;
+  color: #B3261E !important;
 }
 
 /* ==================================================

@@ -109,6 +109,10 @@ export const LoginPage: React.FC = () => {
   const [identifierError, setIdentifierError] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
+  // Google Material Outline Focus States (Image 1 <-> Image 2)
+  const [isIdentifierFocused, setIsIdentifierFocused] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+
   // Backend Health Diagnostic & Cloud URL Config State
   const [apiHealth, setApiHealth] = useState<HealthCheckResult | null>(null);
   const [isCheckingHealth, setIsCheckingHealth] = useState(false);
@@ -514,13 +518,22 @@ export const LoginPage: React.FC = () => {
               </div>
             )}
 
-            {/* Google Outlined Notched Email Field (Exact Match to Image 2, Phone Removed) */}
-            <div className={`google-field-group ${identifierError ? 'has-error' : ''}`}>
+            {/* Google Outlined Notched Email Field (Exact Match to Image 1 & 2) */}
+            <div
+              className={`google-field-group ${
+                isIdentifierFocused || identifier.trim() ? 'is-floating' : ''
+              } ${isIdentifierFocused ? 'is-focused' : ''} ${
+                identifier.trim() ? 'has-value' : ''
+              } ${identifierError ? 'has-error' : ''}`}
+            >
               <input
                 id="login-identifier"
                 name="citizen_login_identifier"
                 type="email"
                 value={identifier}
+                placeholder=" "
+                onFocus={() => setIsIdentifierFocused(true)}
+                onBlur={() => setIsIdentifierFocused(false)}
                 onChange={(e) => {
                   setIdentifier(e.target.value);
                   setIdentifierError('');
@@ -539,22 +552,31 @@ export const LoginPage: React.FC = () => {
               {identifierError && (
                 <span
                   id="identifier-error"
-                  style={{ fontSize: '0.78rem', color: '#EF4444', marginTop: '0.25rem', paddingLeft: '0.25rem' }}
+                  style={{ fontSize: '0.78rem', color: '#B3261E', marginTop: '0.25rem', paddingLeft: '0.25rem' }}
                 >
                   {identifierError}
                 </span>
               )}
             </div>
 
-            {/* Google Outlined Notched Password Field (Exact Match to Image 2) */}
+            {/* Google Outlined Notched Password Field (Exact Match to Image 1 & 2) */}
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <div className={`google-field-group ${passwordError ? 'has-error' : ''}`}>
+              <div
+                className={`google-field-group ${
+                  isPasswordFocused || password.trim() ? 'is-floating' : ''
+                } ${isPasswordFocused ? 'is-focused' : ''} ${
+                  password.trim() ? 'has-value' : ''
+                } ${passwordError ? 'has-error' : ''}`}
+              >
                 <input
                   ref={passwordInputRef}
                   id="login-password"
                   name="citizen_login_password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
+                  placeholder=" "
+                  onFocus={() => setIsPasswordFocused(true)}
+                  onBlur={() => setIsPasswordFocused(false)}
                   onChange={(e) => {
                     setPassword(e.target.value);
                     setPasswordError('');
@@ -591,7 +613,7 @@ export const LoginPage: React.FC = () => {
                   id="forgot-password-link"
                   style={{
                     fontSize: '0.82rem',
-                    color: 'var(--accent-blue-light, #1A73E8)',
+                    color: 'var(--accent-blue-light, #0B57D0)',
                     textDecoration: 'none',
                     fontWeight: 600,
                     transition: 'color 0.2s'
@@ -606,7 +628,7 @@ export const LoginPage: React.FC = () => {
               {passwordError && (
                 <span
                   id="password-error"
-                  style={{ fontSize: '0.78rem', color: '#EF4444', marginTop: '0.1rem', paddingLeft: '0.25rem' }}
+                  style={{ fontSize: '0.78rem', color: '#B3261E', marginTop: '0.1rem', paddingLeft: '0.25rem' }}
                 >
                   {passwordError}
                 </span>
