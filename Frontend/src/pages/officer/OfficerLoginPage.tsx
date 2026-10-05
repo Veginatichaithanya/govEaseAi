@@ -63,10 +63,9 @@ export const OfficerLoginPage: React.FC = () => {
   const navigate = useNavigate();
 
   // Initial department: Municipal Licensing Division
-  const defaultDept = GOVERNMENT_DEPARTMENTS['municipal-licensing'];
   const [selectedDeptId, setSelectedDeptId] = useState<string>('municipal-licensing');
-  const [email, setEmail] = useState<string>(defaultDept?.defaultOfficer?.email || 'licensing@goveaseai.gov');
-  const [password, setPassword] = useState<string>(defaultDept?.defaultOfficer?.password || 'License@123');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -446,6 +445,7 @@ export const OfficerLoginPage: React.FC = () => {
           <form
             onSubmit={handleSubmit}
             noValidate
+            autoComplete="off"
             style={{ display: 'flex', flexDirection: 'column', gap: '1.35rem' }}
           >
             {/* Error banner */}
@@ -545,6 +545,7 @@ export const OfficerLoginPage: React.FC = () => {
                 />
                 <input
                   id="officer-email"
+                  name="officer_email_address"
                   type="email"
                   value={email}
                   onChange={(e) => {
@@ -555,7 +556,7 @@ export const OfficerLoginPage: React.FC = () => {
                   placeholder="officer@goveaseai.gov"
                   className="login-input"
                   style={{ paddingLeft: '2.5rem' }}
-                  autoComplete="username"
+                  autoComplete="off"
                   disabled={isLoading}
                   aria-invalid={!!emailError}
                   aria-describedby={emailError ? 'officer-email-error' : undefined}
@@ -590,6 +591,7 @@ export const OfficerLoginPage: React.FC = () => {
                 />
                 <input
                   id="officer-password"
+                  name="officer_password_input"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => {
@@ -599,8 +601,8 @@ export const OfficerLoginPage: React.FC = () => {
                   }}
                   placeholder="Enter officer password"
                   className="login-input"
-                  style={{ paddingLeft: '2.5rem', paddingRight: '2.75rem' }}
-                  autoComplete="current-password"
+                  style={{ paddingLeft: '2.5rem', paddingRight: '2.85rem' }}
+                  autoComplete="new-password"
                   disabled={isLoading}
                   aria-invalid={!!passwordError}
                   aria-describedby={passwordError ? 'officer-password-error' : undefined}

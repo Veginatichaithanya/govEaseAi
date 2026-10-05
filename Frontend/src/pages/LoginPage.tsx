@@ -140,6 +140,26 @@ export const LoginPage: React.FC = () => {
     }
   }, [regIdentifier]);
 
+  // Prevent browser from auto-filling officer or saved credentials into citizen form on mount
+  useEffect(() => {
+    if (!regIdentifier) {
+      setIdentifier('');
+    }
+    setPassword('');
+    const t1 = setTimeout(() => {
+      if (!regIdentifier) setIdentifier('');
+      setPassword('');
+    }, 50);
+    const t2 = setTimeout(() => {
+      if (!regIdentifier) setIdentifier('');
+      setPassword('');
+    }, 250);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [regIdentifier]);
+
 
   const handleSaveApiUrl = () => {
     setStoredApiUrl(customUrlInput);
@@ -475,6 +495,7 @@ export const LoginPage: React.FC = () => {
           <form
             onSubmit={handleSubmit}
             noValidate
+            autoComplete="off"
             style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}
           >
             {/* Success notice after registration */}
@@ -514,6 +535,7 @@ export const LoginPage: React.FC = () => {
                 />
                 <input
                   id="login-identifier"
+                  name="citizen_login_identifier"
                   type="text"
                   value={identifier}
                   onChange={(e) => {
@@ -525,7 +547,7 @@ export const LoginPage: React.FC = () => {
                   placeholder="name@example.com or 10-digit mobile"
                   className={`login-input ${identifierError ? 'input-error' : ''}`}
                   style={{ paddingLeft: '2.5rem' }}
-                  autoComplete="username email"
+                  autoComplete="off"
                   disabled={isLoading}
                   aria-invalid={!!identifierError}
                   aria-describedby={identifierError ? 'identifier-error' : undefined}
@@ -578,6 +600,7 @@ export const LoginPage: React.FC = () => {
                 <input
                   ref={passwordInputRef}
                   id="login-password"
+                  name="citizen_login_password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => {
@@ -589,7 +612,7 @@ export const LoginPage: React.FC = () => {
                   placeholder="Enter your password"
                   className={`login-input ${passwordError ? 'input-error' : ''}`}
                   style={{ paddingLeft: '2.5rem', paddingRight: '2.85rem' }}
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   autoCapitalize="none"
                   autoCorrect="off"
                   spellCheck={false}
