@@ -150,18 +150,21 @@ export const Navbar: React.FC = () => {
           >
             Home
           </Link>
-          <Link
-            to="/services"
+          <a
+            href="/#services"
+            onClick={(e) => scrollToSection(e, 'services')}
             style={{
               fontFamily: 'var(--font-display)',
               fontSize: '0.925rem',
               fontWeight: 500,
-              color: location.pathname.startsWith('/services') ? 'var(--accent-blue-light)' : 'var(--text-secondary)',
-              transition: 'color 0.15s ease'
+              color: location.hash === '#services' ? 'var(--accent-blue-light)' : 'var(--text-secondary)',
+              transition: 'color 0.15s ease',
+              textDecoration: 'none',
+              cursor: 'pointer'
             }}
           >
             Services
-          </Link>
+          </a>
           <a
             href="/#how-it-works"
             onClick={(e) => scrollToSection(e, 'how-it-works')}
@@ -284,18 +287,23 @@ export const Navbar: React.FC = () => {
           >
             Home
           </Link>
-          <Link
-            to="/services"
-            onClick={() => setMobileMenuOpen(false)}
+          <a
+            href="/#services"
+            onClick={(e) => {
+              scrollToSection(e, 'services');
+              setMobileMenuOpen(false);
+            }}
             style={{
               fontSize: '1.05rem',
               fontWeight: 600,
               color: 'var(--text-secondary)',
-              padding: '0.5rem 0'
+              padding: '0.5rem 0',
+              textDecoration: 'none',
+              cursor: 'pointer'
             }}
           >
             Government Services
-          </Link>
+          </a>
           <a
             href="/#how-it-works"
             onClick={(e) => {

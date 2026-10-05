@@ -27,6 +27,20 @@ export const Hero: React.FC = () => {
     }
   };
 
+  const scrollToServices = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    window.history.pushState(null, '', '#services');
+    const el = document.getElementById('services');
+    if (el) {
+      const navHeight = 72;
+      const elementPosition = el.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({
+        top: Math.max(0, elementPosition - navHeight - 16),
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
     <section
       className="hero-section"
@@ -61,9 +75,14 @@ export const Hero: React.FC = () => {
 
             {/* CTAs */}
             <div className="hero-cta-group">
-              <Link to="/services" className="btn btn-primary hover-lift" style={{ padding: '0.85rem 1.65rem' }}>
+              <a
+                href="#services"
+                onClick={scrollToServices}
+                className="btn btn-primary hover-lift"
+                style={{ padding: '0.85rem 1.65rem' }}
+              >
                 Explore Government Services <ArrowRight size={17} />
-              </Link>
+              </a>
 
               <a
                 href="#how-it-works"
