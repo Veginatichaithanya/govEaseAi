@@ -48,10 +48,17 @@ export const AIAutofillPanel: React.FC<AIAutofillPanelProps> = ({
   // Build initial field suggestions from extraction
   const buildSuggestions = (): FieldSuggestion[] => {
     const suggestions: FieldSuggestion[] = [];
+    const seenFormKeys = new Set<string>();
     for (const [aiKey, mapping] of Object.entries(fieldMapping)) {
       const aiValue = extraction.extracted_fields?.[aiKey];
       const confidence = extraction.confidence?.[aiKey] ?? 0;
-      if (aiValue !== undefined && aiValue !== null) {
+      if (
+        aiValue !== undefined &&
+        aiValue !== null &&
+        String(aiValue).trim() !== '' &&
+        !seenFormKeys.has(mapping.formKey)
+      ) {
+        seenFormKeys.add(mapping.formKey);
         suggestions.push({
           fieldKey: aiKey,
           fieldLabel: mapping.label,
