@@ -441,16 +441,40 @@ export const OfficerSidebar: React.FC<OfficerSidebarProps> = ({
                 color: item.isActive ? 'var(--accent-blue-light, #2563EB)' : 'var(--text-secondary)',
                 border: 'none',
                 textDecoration: 'none',
-                transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
+                transition: 'all 0.18s cubic-bezier(0.2, 0, 0, 1)',
+                position: 'relative'
               }}
               className={`sidebar-nav-item ${item.isActive ? 'active' : ''}`}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+              {item.isActive && (
+                <span
+                  style={{
+                    position: 'absolute',
+                    left: '4px',
+                    width: '3.5px',
+                    height: '16px',
+                    borderRadius: '9999px',
+                    backgroundColor: 'var(--accent-blue)',
+                    boxShadow: '0 0 8px rgba(37, 99, 235, 0.45)'
+                  }}
+                />
+              )}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.65rem',
+                  paddingLeft: item.isActive ? '0.2rem' : '0',
+                  transition: 'padding-left 0.18s ease'
+                }}
+              >
                 <span
                   style={{
                     color: item.isActive ? 'var(--accent-blue)' : 'inherit',
                     display: 'flex',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    transform: item.isActive ? 'scale(1.08)' : 'scale(1)',
+                    transition: 'all 0.18s ease'
                   }}
                 >
                   {item.icon}
@@ -495,11 +519,33 @@ export const OfficerSidebar: React.FC<OfficerSidebarProps> = ({
             color: isNotificationsActive ? 'var(--accent-blue-light, #2563EB)' : 'var(--text-secondary)',
             border: 'none',
             textDecoration: 'none',
-            transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
+            transition: 'all 0.18s cubic-bezier(0.2, 0, 0, 1)',
+            position: 'relative'
           }}
           className={`sidebar-nav-item ${isNotificationsActive ? 'active' : ''}`}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+          {isNotificationsActive && (
+            <span
+              style={{
+                position: 'absolute',
+                left: '4px',
+                width: '3.5px',
+                height: '16px',
+                borderRadius: '9999px',
+                backgroundColor: 'var(--accent-blue)',
+                boxShadow: '0 0 8px rgba(37, 99, 235, 0.45)'
+              }}
+            />
+          )}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.65rem',
+              paddingLeft: isNotificationsActive ? '0.2rem' : '0',
+              transition: 'padding-left 0.18s ease'
+            }}
+          >
             <span style={{ color: isNotificationsActive ? 'var(--accent-blue)' : 'inherit', display: 'flex', alignItems: 'center' }}>
               <Bell size={16} />
             </span>
@@ -529,14 +575,38 @@ export const OfficerSidebar: React.FC<OfficerSidebarProps> = ({
             color: isProfileActive ? 'var(--accent-blue-light, #2563EB)' : 'var(--text-secondary)',
             border: 'none',
             textDecoration: 'none',
-            transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
+            transition: 'all 0.18s cubic-bezier(0.2, 0, 0, 1)',
+            position: 'relative'
           }}
           className={`sidebar-nav-item ${isProfileActive ? 'active' : ''}`}
         >
-          <span style={{ color: isProfileActive ? 'var(--accent-blue)' : 'inherit', display: 'flex', alignItems: 'center' }}>
-            <UserCheck size={16} />
-          </span>
-          <span>Profile</span>
+          {isProfileActive && (
+            <span
+              style={{
+                position: 'absolute',
+                left: '4px',
+                width: '3.5px',
+                height: '16px',
+                borderRadius: '9999px',
+                backgroundColor: 'var(--accent-blue)',
+                boxShadow: '0 0 8px rgba(37, 99, 235, 0.45)'
+              }}
+            />
+          )}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.65rem',
+              paddingLeft: isProfileActive ? '0.2rem' : '0',
+              transition: 'padding-left 0.18s ease'
+            }}
+          >
+            <span style={{ color: isProfileActive ? 'var(--accent-blue)' : 'inherit', display: 'flex', alignItems: 'center' }}>
+              <UserCheck size={16} />
+            </span>
+            <span>Profile</span>
+          </div>
         </NavLink>
       </nav>
 

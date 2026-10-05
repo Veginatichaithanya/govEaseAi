@@ -236,47 +236,70 @@ export const CitizenSidebar: React.FC<CitizenSidebarProps> = ({
         )}
       </div>
 
-      {/* User Info Strip in Sidebar */}
+      {/* Compact & Elegant Citizen Profile Card */}
       <div
         style={{
-          padding: collapsed ? '0.85rem 0.5rem' : '1rem 1.15rem',
-          borderBottom: '1px solid var(--border-subtle)',
+          margin: collapsed ? '0.75rem 0.4rem 0.5rem 0.4rem' : '0.85rem 0.85rem 0.6rem 0.85rem',
+          padding: collapsed ? '0.5rem 0.25rem' : '0.65rem 0.75rem',
+          background: 'var(--bg-secondary)',
+          borderRadius: '12px',
+          border: '1px solid var(--border-subtle)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: collapsed ? 'center' : 'flex-start',
-          gap: '0.85rem'
+          gap: '0.75rem',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)'
         }}
+        className="citizen-sidebar-profile-card"
         title={currentUser?.fullName || currentUser?.name || 'Citizen'}
       >
-        <div
-          style={{
-            width: '38px',
-            height: '38px',
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, #2563EB 0%, #06B6D4 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#FFFFFF',
-            fontWeight: 700,
-            fontSize: '0.95rem',
-            boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)',
-            flexShrink: 0
-          }}
-        >
-          {loading ? '…' : (currentUser?.fullName?.charAt(0) || currentUser?.name?.charAt(0) || 'C')}
+        <div style={{ position: 'relative', flexShrink: 0 }}>
+          <div
+            style={{
+              width: '34px',
+              height: '34px',
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #2563EB 0%, #06B6D4 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#FFFFFF',
+              fontWeight: 700,
+              fontSize: '0.88rem',
+              boxShadow: '0 2px 8px rgba(37, 99, 235, 0.28)'
+            }}
+          >
+            {loading ? '…' : (currentUser?.fullName?.charAt(0) || currentUser?.name?.charAt(0) || 'C')}
+          </div>
+          {/* Active Status Dot */}
+          <span
+            style={{
+              position: 'absolute',
+              bottom: '-1px',
+              right: '-1px',
+              width: '9px',
+              height: '9px',
+              borderRadius: '50%',
+              backgroundColor: '#10B981',
+              border: '2px solid var(--bg-secondary)',
+              boxShadow: '0 0 4px rgba(16, 185, 129, 0.4)'
+            }}
+            title="Active Citizen Account"
+          />
         </div>
+
         {!collapsed && (
           <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
             <div
               style={{
-                fontSize: '0.9rem',
+                fontSize: '0.86rem',
                 fontWeight: 600,
                 color: 'var(--text-primary)',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                lineHeight: 1.25
+                lineHeight: 1.25,
+                letterSpacing: '-0.01em'
               }}
             >
               {loading
@@ -294,20 +317,20 @@ export const CitizenSidebar: React.FC<CitizenSidebarProps> = ({
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.3rem',
-                marginTop: '0.25rem',
-                padding: '0.12rem 0.45rem',
-                borderRadius: '9999px',
+                marginTop: '0.2rem',
+                padding: '0.1rem 0.4rem',
+                borderRadius: '6px',
                 background: 'rgba(59, 130, 246, 0.08)',
                 color: 'var(--accent-blue-light, #2563EB)',
-                fontSize: '0.68rem',
+                fontSize: '0.65rem',
                 fontFamily: 'var(--font-mono)',
                 fontWeight: 600,
                 whiteSpace: 'nowrap'
               }}
             >
-              <span>CITIZEN</span>
+              <span style={{ letterSpacing: '0.04em' }}>CITIZEN</span>
               <span>•</span>
-              <span style={{ letterSpacing: '0.02em' }}>
+              <span style={{ letterSpacing: '0.02em', opacity: 0.9 }}>
                 {currentUser?.applicantId || (loading ? '…' : 'CIT-DEMO')}
               </span>
             </div>
@@ -319,10 +342,10 @@ export const CitizenSidebar: React.FC<CitizenSidebarProps> = ({
       <nav
         style={{
           flex: 1,
-          padding: collapsed ? '1rem 0.35rem' : '1rem 0.75rem',
+          padding: collapsed ? '0.5rem 0.35rem' : '0.5rem 0.75rem',
           display: 'flex',
           flexDirection: 'column',
-          gap: '0.35rem',
+          gap: '0.25rem',
           overflowY: 'auto'
         }}
       >
@@ -343,38 +366,74 @@ export const CitizenSidebar: React.FC<CitizenSidebarProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: collapsed ? 'center' : 'space-between',
-                padding: collapsed ? '0.7rem 0.5rem' : '0.65rem 1rem',
+                padding: collapsed ? '0.65rem 0.5rem' : '0.62rem 0.95rem',
                 borderRadius: '9999px',
-                fontSize: '0.88rem',
+                fontSize: '0.86rem',
                 fontWeight: isActive ? 600 : 500,
                 color: isActive ? 'var(--accent-blue-light, #2563EB)' : 'var(--text-secondary)',
                 border: 'none',
                 textDecoration: 'none',
-                transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
+                transition: 'all 0.18s cubic-bezier(0.2, 0, 0, 1)',
                 position: 'relative'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: collapsed ? '0' : '0.85rem' }}>
+              {/* Active left accent pill indicator (Gemini signature) */}
+              {isActive && (
+                <span
+                  style={{
+                    position: 'absolute',
+                    left: collapsed ? '3px' : '4px',
+                    width: '3.5px',
+                    height: '18px',
+                    borderRadius: '9999px',
+                    backgroundColor: 'var(--accent-blue)',
+                    boxShadow: '0 0 8px rgba(37, 99, 235, 0.45)'
+                  }}
+                />
+              )}
+
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: collapsed ? '0' : '0.8rem',
+                  paddingLeft: isActive && !collapsed ? '0.25rem' : '0',
+                  transition: 'padding-left 0.18s ease'
+                }}
+              >
                 <span
                   style={{
                     color: isActive ? 'var(--accent-blue)' : 'inherit',
                     display: 'flex',
                     alignItems: 'center',
-                    transform: isActive ? 'scale(1.05)' : 'scale(1)',
-                    transition: 'transform 0.18s ease'
+                    justifyContent: 'center',
+                    width: '20px',
+                    transform: isActive ? 'scale(1.08)' : 'scale(1)',
+                    transition: 'all 0.18s ease'
                   }}
                 >
                   {item.icon}
                 </span>
-                {!collapsed && <span>{item.label}</span>}
+                {!collapsed && (
+                  <span
+                    style={{
+                      letterSpacing: '-0.01em',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}
+                  >
+                    {item.label}
+                  </span>
+                )}
               </div>
               {item.badge !== undefined && (
                 <span
                   style={{
-                    fontSize: '0.7rem',
+                    fontSize: '0.68rem',
                     fontFamily: 'var(--font-mono)',
                     fontWeight: 700,
-                    padding: '0.12rem 0.5rem',
+                    padding: '0.12rem 0.48rem',
                     borderRadius: '9999px',
                     background: 'var(--accent-blue)',
                     color: '#FFFFFF',
@@ -397,12 +456,19 @@ export const CitizenSidebar: React.FC<CitizenSidebarProps> = ({
         style={{
           height: '1px',
           backgroundColor: 'var(--border-subtle)',
-          margin: '0 0.85rem'
+          margin: '0.35rem 0.85rem'
         }}
       />
 
       {/* Logout Action */}
-      <div style={{ padding: collapsed ? '0.75rem 0.35rem' : '0.75rem 0.85rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+      <div
+        style={{
+          padding: collapsed ? '0.6rem 0.35rem' : '0.6rem 0.85rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0.35rem'
+        }}
+      >
         <button
           type="button"
           onClick={handleLogout}
@@ -412,10 +478,10 @@ export const CitizenSidebar: React.FC<CitizenSidebarProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: collapsed ? 'center' : 'flex-start',
-            gap: collapsed ? '0' : '0.85rem',
-            padding: collapsed ? '0.7rem 0.5rem' : '0.65rem 1rem',
+            gap: collapsed ? '0' : '0.8rem',
+            padding: collapsed ? '0.65rem 0.5rem' : '0.62rem 0.95rem',
             borderRadius: '9999px',
-            fontSize: '0.88rem',
+            fontSize: '0.86rem',
             fontWeight: 500,
             color: 'var(--text-secondary)',
             background: 'transparent',
@@ -425,7 +491,9 @@ export const CitizenSidebar: React.FC<CitizenSidebarProps> = ({
           }}
           className="sidebar-logout-btn"
         >
-          <LogOut size={18} />
+          <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '20px' }}>
+            <LogOut size={18} />
+          </span>
           {!collapsed && <span>Logout</span>}
         </button>
       </div>

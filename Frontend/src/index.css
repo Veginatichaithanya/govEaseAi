@@ -1133,26 +1133,30 @@ html.theme-transition *::after {
    Citizen Dashboard Layout & Responsive Styling
 ================================================== */
 .sidebar-nav-item {
+  position: relative !important;
   border-radius: 9999px !important;
   border: none !important;
-  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1) !important;
 }
 
 .sidebar-nav-item:hover:not(.active) {
   color: var(--text-primary) !important;
   background-color: var(--bg-secondary) !important;
+  transform: translateX(2px) !important;
 }
 
 [data-theme="light"] .sidebar-nav-item.active {
   background-color: #E8F0FE !important;
   color: #0B57D0 !important;
   font-weight: 600 !important;
+  box-shadow: 0 1px 3px rgba(11, 87, 208, 0.08) !important;
 }
 
 [data-theme="dark"] .sidebar-nav-item.active {
   background-color: rgba(59, 130, 246, 0.16) !important;
   color: #60A5FA !important;
   font-weight: 600 !important;
+  box-shadow: 0 0 14px rgba(59, 130, 246, 0.14) !important;
 }
 
 .sidebar-logout-btn {
@@ -1164,6 +1168,16 @@ html.theme-transition *::after {
 .sidebar-logout-btn:hover {
   color: #EF4444 !important;
   background-color: rgba(239, 68, 68, 0.08) !important;
+  transform: translateX(2px) !important;
+}
+
+.citizen-sidebar-profile-card {
+  transition: all 0.2s ease !important;
+}
+
+.citizen-sidebar-profile-card:hover {
+  border-color: var(--border-accent) !important;
+  background-color: var(--bg-accent-subtle) !important;
 }
 
 /* Officer Sidebar Subtle Scrollbar & Navigation */
