@@ -13,7 +13,9 @@ import {
   Loader2,
   RefreshCw,
   Sliders,
-  Server
+  Server,
+  Mail,
+  Lock
 } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext';
@@ -493,41 +495,86 @@ export const LoginPage: React.FC = () => {
               </div>
             )}
 
-            {/* Email Field with Outlined Floating Label */}
-            <div className={`floating-field-group ${identifier ? 'is-floating' : ''}`}>
-              <input
-                id="login-identifier"
-                type="text"
-                value={identifier}
-                onChange={(e) => {
-                  setIdentifier(e.target.value);
-                  setIdentifierError('');
-                  setErrorMsg(null);
-                  setSuccessNotice(null);
-                }}
-                placeholder=" "
-                className={`floating-input ${identifierError ? 'input-error' : ''}`}
-                autoComplete="email"
-                disabled={isLoading}
-                aria-invalid={!!identifierError}
-                aria-describedby={identifierError ? 'identifier-error' : undefined}
-              />
-              <label htmlFor="login-identifier" className="floating-label">
-                Email
+            {/* Email / Mobile Field */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <label htmlFor="login-identifier" className="form-label">
+                Email or Mobile Number
               </label>
+              <div style={{ position: 'relative' }}>
+                <Mail
+                  size={16}
+                  style={{
+                    position: 'absolute',
+                    left: '0.9rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: 'var(--text-muted)',
+                    pointerEvents: 'none'
+                  }}
+                />
+                <input
+                  id="login-identifier"
+                  type="text"
+                  value={identifier}
+                  onChange={(e) => {
+                    setIdentifier(e.target.value);
+                    setIdentifierError('');
+                    setErrorMsg(null);
+                    setSuccessNotice(null);
+                  }}
+                  placeholder="name@example.com or 10-digit mobile"
+                  className={`login-input ${identifierError ? 'input-error' : ''}`}
+                  style={{ paddingLeft: '2.5rem' }}
+                  autoComplete="username email"
+                  disabled={isLoading}
+                  aria-invalid={!!identifierError}
+                  aria-describedby={identifierError ? 'identifier-error' : undefined}
+                />
+              </div>
               {identifierError && (
                 <span
                   id="identifier-error"
-                  style={{ fontSize: '0.78rem', color: '#F87171', marginTop: '0.25rem', paddingLeft: '0.25rem' }}
+                  style={{ fontSize: '0.78rem', color: '#F87171', marginTop: '0.1rem', paddingLeft: '0.25rem' }}
                 >
                   {identifierError}
                 </span>
               )}
             </div>
 
-            {/* Password Field with Outlined Floating Label */}
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <div className={`floating-field-group ${password ? 'is-floating' : ''}`} style={{ position: 'relative' }}>
+            {/* Password Field */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label htmlFor="login-password" className="form-label" style={{ marginBottom: 0 }}>
+                  Password
+                </label>
+                <Link
+                  to="/forgot-password"
+                  id="forgot-password-link"
+                  style={{
+                    fontSize: '0.8rem',
+                    color: 'var(--accent-blue-light)',
+                    textDecoration: 'none',
+                    fontWeight: 600,
+                    transition: 'color 0.2s'
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
+                  onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
+                >
+                  Forgot Password?
+                </Link>
+              </div>
+              <div style={{ position: 'relative' }}>
+                <Lock
+                  size={16}
+                  style={{
+                    position: 'absolute',
+                    left: '0.9rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: 'var(--text-muted)',
+                    pointerEvents: 'none'
+                  }}
+                />
                 <input
                   ref={passwordInputRef}
                   id="login-password"
@@ -539,9 +586,9 @@ export const LoginPage: React.FC = () => {
                     setErrorMsg(null);
                     setSuccessNotice(null);
                   }}
-                  placeholder=" "
-                  className={`floating-input ${passwordError ? 'input-error' : ''}`}
-                  style={{ paddingRight: '2.85rem' }}
+                  placeholder="Enter your password"
+                  className={`login-input ${passwordError ? 'input-error' : ''}`}
+                  style={{ paddingLeft: '2.5rem', paddingRight: '2.85rem' }}
                   autoComplete="current-password"
                   autoCapitalize="none"
                   autoCorrect="off"
@@ -550,9 +597,6 @@ export const LoginPage: React.FC = () => {
                   aria-invalid={!!passwordError}
                   aria-describedby={passwordError ? 'password-error' : undefined}
                 />
-                <label htmlFor="login-password" className="floating-label">
-                  Password
-                </label>
                 <button
                   type="button"
                   style={eyeBtn}
@@ -563,32 +607,14 @@ export const LoginPage: React.FC = () => {
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.35rem' }}>
-                {passwordError ? (
-                  <span
-                    id="password-error"
-                    style={{ fontSize: '0.78rem', color: '#F87171', paddingLeft: '0.25rem' }}
-                  >
-                    {passwordError}
-                  </span>
-                ) : <span />}
-                <Link
-                  to="/forgot-password"
-                  id="forgot-password-link"
-                  style={{
-                    fontSize: '0.8rem',
-                    color: 'var(--accent-blue)',
-                    fontWeight: 600,
-                    textDecoration: 'none',
-                    cursor: 'pointer'
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
-                  onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
+              {passwordError && (
+                <span
+                  id="password-error"
+                  style={{ fontSize: '0.78rem', color: '#F87171', marginTop: '0.1rem', paddingLeft: '0.25rem' }}
                 >
-                  Forgot Password?
-                </Link>
-              </div>
+                  {passwordError}
+                </span>
+              )}
             </div>
 
             {/* API error banner */}
