@@ -13,9 +13,7 @@ import {
   Loader2,
   RefreshCw,
   Sliders,
-  Server,
-  Mail,
-  Lock
+  Server
 } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext';
@@ -516,87 +514,41 @@ export const LoginPage: React.FC = () => {
               </div>
             )}
 
-            {/* Email / Mobile Field */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              <label htmlFor="login-identifier" className="form-label">
-                Email or Mobile Number
+            {/* Google Outlined Notched Email Field (Exact Match to Image 2, Phone Removed) */}
+            <div className={`google-field-group ${identifierError ? 'has-error' : ''}`}>
+              <input
+                id="login-identifier"
+                name="citizen_login_identifier"
+                type="email"
+                value={identifier}
+                onChange={(e) => {
+                  setIdentifier(e.target.value);
+                  setIdentifierError('');
+                  setErrorMsg(null);
+                  setSuccessNotice(null);
+                }}
+                className={`google-field-input ${identifierError ? 'input-error' : ''}`}
+                autoComplete="off"
+                disabled={isLoading}
+                aria-invalid={!!identifierError}
+                aria-describedby={identifierError ? 'identifier-error' : undefined}
+              />
+              <label htmlFor="login-identifier" className="google-field-label">
+                Email
               </label>
-              <div style={{ position: 'relative' }}>
-                <Mail
-                  size={16}
-                  style={{
-                    position: 'absolute',
-                    left: '0.9rem',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    color: 'var(--text-muted)',
-                    pointerEvents: 'none'
-                  }}
-                />
-                <input
-                  id="login-identifier"
-                  name="citizen_login_identifier"
-                  type="text"
-                  value={identifier}
-                  onChange={(e) => {
-                    setIdentifier(e.target.value);
-                    setIdentifierError('');
-                    setErrorMsg(null);
-                    setSuccessNotice(null);
-                  }}
-                  placeholder="name@example.com or 10-digit mobile"
-                  className={`login-input ${identifierError ? 'input-error' : ''}`}
-                  style={{ paddingLeft: '2.5rem' }}
-                  autoComplete="off"
-                  disabled={isLoading}
-                  aria-invalid={!!identifierError}
-                  aria-describedby={identifierError ? 'identifier-error' : undefined}
-                />
-              </div>
               {identifierError && (
                 <span
                   id="identifier-error"
-                  style={{ fontSize: '0.78rem', color: '#F87171', marginTop: '0.1rem', paddingLeft: '0.25rem' }}
+                  style={{ fontSize: '0.78rem', color: '#EF4444', marginTop: '0.25rem', paddingLeft: '0.25rem' }}
                 >
                   {identifierError}
                 </span>
               )}
             </div>
 
-            {/* Password Field */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <label htmlFor="login-password" className="form-label" style={{ marginBottom: 0 }}>
-                  Password
-                </label>
-                <Link
-                  to="/forgot-password"
-                  id="forgot-password-link"
-                  style={{
-                    fontSize: '0.8rem',
-                    color: 'var(--accent-blue-light)',
-                    textDecoration: 'none',
-                    fontWeight: 600,
-                    transition: 'color 0.2s'
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
-                  onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
-                >
-                  Forgot Password?
-                </Link>
-              </div>
-              <div style={{ position: 'relative' }}>
-                <Lock
-                  size={16}
-                  style={{
-                    position: 'absolute',
-                    left: '0.9rem',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    color: 'var(--text-muted)',
-                    pointerEvents: 'none'
-                  }}
-                />
+            {/* Google Outlined Notched Password Field (Exact Match to Image 2) */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div className={`google-field-group ${passwordError ? 'has-error' : ''}`}>
                 <input
                   ref={passwordInputRef}
                   id="login-password"
@@ -609,9 +561,8 @@ export const LoginPage: React.FC = () => {
                     setErrorMsg(null);
                     setSuccessNotice(null);
                   }}
-                  placeholder="Enter your password"
-                  className={`login-input ${passwordError ? 'input-error' : ''}`}
-                  style={{ paddingLeft: '2.5rem', paddingRight: '2.85rem' }}
+                  className={`google-field-input ${passwordError ? 'input-error' : ''}`}
+                  style={{ paddingRight: '2.85rem' }}
                   autoComplete="new-password"
                   autoCapitalize="none"
                   autoCorrect="off"
@@ -620,6 +571,9 @@ export const LoginPage: React.FC = () => {
                   aria-invalid={!!passwordError}
                   aria-describedby={passwordError ? 'password-error' : undefined}
                 />
+                <label htmlFor="login-password" className="google-field-label">
+                  Password
+                </label>
                 <button
                   type="button"
                   style={eyeBtn}
@@ -630,10 +584,29 @@ export const LoginPage: React.FC = () => {
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.45rem' }}>
+                <Link
+                  to="/forgot-password"
+                  id="forgot-password-link"
+                  style={{
+                    fontSize: '0.82rem',
+                    color: 'var(--accent-blue-light, #1A73E8)',
+                    textDecoration: 'none',
+                    fontWeight: 600,
+                    transition: 'color 0.2s'
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
+                  onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
+                >
+                  Forgot Password?
+                </Link>
+              </div>
+
               {passwordError && (
                 <span
                   id="password-error"
-                  style={{ fontSize: '0.78rem', color: '#F87171', marginTop: '0.1rem', paddingLeft: '0.25rem' }}
+                  style={{ fontSize: '0.78rem', color: '#EF4444', marginTop: '0.1rem', paddingLeft: '0.25rem' }}
                 >
                   {passwordError}
                 </span>

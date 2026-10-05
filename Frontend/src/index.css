@@ -654,110 +654,86 @@ html.theme-transition *::after {
 }
 
 /* ==================================================
-   Outlined Floating Label Input (Material Notched Style)
+   Google Material Outlined Field Style (Notched Outline - Image 2)
 ================================================== */
-.floating-field-group {
+.google-field-group {
   position: relative;
   display: flex;
   flex-direction: column;
+  margin-top: 0.85rem;
 }
 
-.floating-input {
+.google-field-input {
   width: 100%;
-  height: 52px;
-  padding: 0.9rem 1rem;
+  height: 54px;
+  padding: 0.85rem 1rem;
   font-size: 0.95rem;
   font-family: inherit;
-  border-radius: 8px;
-  border: 1.5px solid var(--input-border, #CBD5E1);
-  background: var(--input-bg, #FFFFFF);
-  color: var(--input-text, #0F172A);
-  outline: none;
-  transition: border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.floating-input::placeholder {
-  color: transparent !important;
-  opacity: 0 !important;
-}
-
-.floating-label {
-  position: absolute;
-  left: 0.85rem;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.95rem;
-  color: var(--text-muted, #64748B);
-  pointer-events: none;
-  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 0 0.35rem;
-  line-height: 1;
-  z-index: 1;
-}
-
-/* Floating notched state when focused or containing value */
-.floating-input:focus ~ .floating-label,
-.floating-input:not(:placeholder-shown) ~ .floating-label,
-.floating-field-group.is-floating .floating-label {
-  top: 0;
-  transform: translateY(-50%) scale(0.85);
-  transform-origin: left center;
-  font-weight: 600;
-  color: var(--accent-blue, #2563EB);
+  border-radius: 4px;
   background: var(--bg-card, #FFFFFF);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-[data-theme="light"] .floating-input {
+.google-field-label {
+  position: absolute;
+  left: 0.75rem;
+  top: -0.55rem;
+  padding: 0 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1;
+  background: var(--bg-card, #FFFFFF);
+  pointer-events: none;
+  z-index: 2;
+  transition: color 0.2s ease;
+}
+
+/* Light Theme - Exact Match to Google Sign-in Image 2 */
+[data-theme="light"] .google-field-input {
   background: #FFFFFF !important;
-  border: 1.5px solid #94A3B8 !important;
-  color: #0F172A !important;
+  border: 1.5px solid #1A73E8 !important;
+  color: #1E293B !important;
 }
 
-[data-theme="light"] .floating-input:focus {
-  border-color: #1D4ED8 !important;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) !important;
+[data-theme="light"] .google-field-input:focus {
+  border-color: #1A73E8 !important;
+  border-width: 2px !important;
+  box-shadow: 0 0 0 1px #1A73E8 !important;
 }
 
-[data-theme="light"] .floating-label {
-  color: #64748B;
-}
-
-[data-theme="light"] .floating-input:focus ~ .floating-label,
-[data-theme="light"] .floating-input:not(:placeholder-shown) ~ .floating-label,
-[data-theme="light"] .floating-field-group.is-floating .floating-label {
+[data-theme="light"] .google-field-label {
   background: #FFFFFF !important;
-  color: #1D4ED8 !important;
+  color: #1A73E8 !important;
 }
 
-[data-theme="dark"] .floating-input {
-  background: #141418 !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
-  color: #FFFFFF !important;
+/* Dark Theme - Obsidian with Google Blue */
+[data-theme="dark"] .google-field-input {
+  background: #111114 !important;
+  border: 1.5px solid #3B82F6 !important;
+  color: #F8FAFC !important;
 }
 
-[data-theme="dark"] .floating-input:focus {
-  border-color: #3B82F6 !important;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25) !important;
+[data-theme="dark"] .google-field-input:focus {
+  border-color: #60A5FA !important;
+  border-width: 2px !important;
+  box-shadow: 0 0 0 1px #60A5FA !important;
 }
 
-[data-theme="dark"] .floating-label {
-  color: #A1A1AA;
-}
-
-[data-theme="dark"] .floating-input:focus ~ .floating-label,
-[data-theme="dark"] .floating-input:not(:placeholder-shown) ~ .floating-label,
-[data-theme="dark"] .floating-field-group.is-floating .floating-label {
-  background: #141418 !important;
+[data-theme="dark"] .google-field-label {
+  background: #111114 !important;
   color: #60A5FA !important;
 }
 
-.floating-input.input-error,
-.floating-input[aria-invalid="true"] {
+/* Error States */
+.google-field-input.input-error,
+.google-field-group.has-error .google-field-input {
   border-color: #EF4444 !important;
+  box-shadow: none !important;
 }
 
-.floating-input.input-error ~ .floating-label,
-.floating-input[aria-invalid="true"] ~ .floating-label {
+.google-field-group.has-error .google-field-label {
   color: #EF4444 !important;
 }
 
