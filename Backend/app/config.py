@@ -13,7 +13,9 @@ class Settings(BaseSettings):
     )
 
     PORT: int = 5000
-    DATABASE_URL: str = "postgresql+psycopg://postgres:Naga%401432@localhost:5432/goveaseai"
+    # Default to PostgreSQL; for local development you can override via .env.
+    # Or use SQLite for a simple out‑of‑the‑box setup.
+    DATABASE_URL: str = "sqlite:///./dev.db"
 
     # ── AgentRouter ─────────────────────────────────────────────────────────────
     AGENTROUTER_API_KEY: str = ""
