@@ -1,0 +1,540 @@
+import React, { useState, useRef } from 'react';
+import { ArrowRight, Save, AlertCircle, User, Sparkles, Upload, Loader2, XCircle, RefreshCw } from 'lucide-react';
+import {
+  TRADE_LICENSE_FORM_CONFIG,
+  validateFormSections,
+  validateField,
+  type FormFieldConfig
+} from '../../../config/formConfig';
+import { AIAutofillPanel } from '../../../components/AIAutofillPanel';
+import { analyzeFile, type ExtractionResult } from '../../../services/aiMultimodalService';
+
+interface Step1Props {
+  formData: Record<string, any>;
+  onChange: (data: Record<string, any>) => void;
+  onNext: () => void;
+  onSaveDraft: () => void;
+  isSaving: boolean;
+}
+
+const ID_FIELD_MAPPING: Record<string, { formKey: string; label: string }> = {
+  name: { formKey: 'fullName', label: 'Applicant Full Name' },
+  applicant_name: { formKey: 'fullName', label: 'Applicant Full Name' },
+  father_name: { formKey: 'fatherSpouseName', label: 'Father / Spouse Name' },
+  gender: { formKey: 'gender', label: 'Gender' },
+  mobile: { formKey: 'mobile', label: 'Mobile Number' },
+  phone: { formKey: 'mobile', label: 'Mobile Number' },
+  email: { formKey: 'email', label: 'Email Address' },
+  address: { formKey: 'address', label: 'Residential Address' },
+  city: { formKey: 'city', label: 'City / District' },
+  pincode: { formKey: 'pincode', label: 'Postal Pincode' },
+  state: { formKey: 'state', label: 'State' },
+};
+
+const section = TRADE_LICENSE_FORM_CONFIG.sections[0]; // Applicant Info section
+
+export const Step1ApplicantInfo: React.FC<Step1Props> = ({
+  formData,
+  onChange,
+  onNext,
+  onSaveDraft,
+  isSaving
+}) => {
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [extraction, setExtraction] = useState<ExtractionResult | null>(null);
+  const [isExtracting, setIsExtracting] = useState<boolean>(false);
+  const [extractionError, setExtractionError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleChange = (field: FormFieldConfig, value: any) => {
+    onChange({ ...formData, [field.name]: value });
+    // Clear error when field becomes valid
+    if (errors[field.name]) {
+      const error = validateField(field, value);
+      if (!error) {
+        setErrors((prev) => {
+          const next = { ...prev };
+          delete next[field.name];
+          return next;
+        });
+      }
+    }
+  };
+
+  const handleBlur = (field: FormFieldConfig) => {
+    const error = validateField(field, formData[field.name]);
+    if (error) {
+      setErrors((prev) => ({ ...prev, [field.name]: error }));
+    } else {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[field.name];
+        return next;
+      });
+    }
+  };
+
+  const handleNext = () => {
+    const sectionErrors = validateFormSections([section], formData);
+    if (Object.keys(sectionErrors).length > 0) {
+      setErrors(sectionErrors);
+      const firstKey = Object.keys(sectionErrors)[0];
+      const el = document.getElementById(`field-${firstKey}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    onNext();
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Clear any previous extraction result and error before starting a new upload
+    setExtraction(null);
+    setExtractionError(null);
+    setIsExtracting(true);
+
+    // Dev-mode logging: file metadata (no raw content, no base64 exposed in UI)
+    if (import.meta.env.DEV) {
+      console.group('[GovEaseAI] Document upload started');
+      console.log('Filename :', file.name);
+      console.log('MIME type:', file.type);
+      console.log('Size     :', `${(file.size / 1024).toFixed(1)} KB`);
+      console.groupEnd();
+    }
+
+    try {
+      const res = await analyzeFile(
+        file,
+        'Extract identity proof fields: full name, father or spouse name, gender, mobile number, email, complete address, city or district, pincode, state.'
+      );
+
+      if (import.meta.env.DEV) {
+        console.group('[GovEaseAI] Extraction response');
+        console.log('success:', res.success);
+        if (res.error) console.warn('error:', res.error);
+        if (res.extraction) {
+          console.log('document_type:', res.extraction.document_type);
+          console.log('extracted fields:', Object.keys(res.extraction.extracted_fields));
+          console.log('confidence:', res.extraction.confidence);
+        }
+        console.groupEnd();
+      }
+
+      if (res.success && res.extraction) {
+        // Real extraction succeeded — show the AI suggestions panel
+        setExtraction(res.extraction);
+      } else {
+        // API returned success=false or missing extraction — show error, do NOT populate form
+        const msg = res.error || 'Unable to extract information from this document. Please try again.';
+        setExtractionError(msg);
+        if (import.meta.env.DEV) {
+          console.warn('[GovEaseAI] Extraction failed (API returned success=false):', msg);
+        }
+      }
+    } catch (err: unknown) {
+      // Network error, timeout, or unexpected exception
+      const errMsg = err instanceof Error ? err.message : 'Unknown error';
+      if (import.meta.env.DEV) {
+        console.error('[GovEaseAI] Extraction exception:', errMsg, err);
+      }
+
+      // Map common errors to user-friendly messages
+      let userMsg = 'Unable to extract information from this document. Please try again.';
+      if (errMsg.includes('timed out') || errMsg.includes('timeout')) {
+        userMsg = 'AI analysis timed out. Please try again with a smaller or clearer image.';
+      } else if (errMsg.includes('connect') || errMsg.includes('Network') || errMsg.includes('fetch')) {
+        userMsg = 'Cannot reach the AI service. Please check that the backend is running and try again.';
+      } else if (errMsg.includes('invalid') || errMsg.includes('JSON')) {
+        userMsg = 'AI returned an invalid extraction response. Please retry.';
+      }
+
+      setExtractionError(userMsg);
+    } finally {
+      setIsExtracting(false);
+      // Reset file input so the same file can be re-uploaded if needed
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+
+  const handleApplyAutofill = (appliedFields: Record<string, string>) => {
+    onChange({ ...formData, ...appliedFields });
+    setExtraction(null);
+    setExtractionError(null);
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      {/* Step Header */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '1rem',
+          padding: '1.25rem 1.5rem',
+          borderRadius: 'var(--radius-md)',
+          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%)',
+          border: '1px solid rgba(59, 130, 246, 0.25)'
+        }}
+      >
+        <div
+          style={{
+            width: '44px',
+            height: '44px',
+            borderRadius: '12px',
+            background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0
+          }}
+        >
+          <User size={22} color="#FFFFFF" />
+        </div>
+        <div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: '#60A5FA', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.2rem' }}>
+            Step 1 of 6
+          </div>
+          <h2 style={{ fontSize: '1.2rem', color: 'var(--heading-color)', margin: 0, fontWeight: 700 }}>
+            {section.title}
+          </h2>
+          {section.description && (
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '0.2rem 0 0 0' }}>
+              {section.description}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* AI Autofill Prompt Card */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '1rem 1.25rem',
+          borderRadius: 'var(--radius-md)',
+          background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.04) 100%)',
+          border: '1px solid rgba(99, 102, 241, 0.25)',
+          flexWrap: 'wrap',
+          gap: '0.75rem'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              background: 'rgba(99, 102, 241, 0.15)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#6366F1'
+            }}
+          >
+            <Sparkles size={18} />
+          </div>
+          <div>
+            <div style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--heading-color)' }}>
+              AI Auto-Fill from Identity Proof
+            </div>
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+              Upload Aadhaar, PAN, Voter ID, or Passport to auto-populate applicant details with AI assistance.
+            </div>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            accept=".pdf,.jpg,.jpeg,.png,.webp"
+            style={{ display: 'none' }}
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isExtracting}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              padding: '0.5rem 0.95rem',
+              borderRadius: 'var(--radius-sm)',
+              background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
+              color: '#FFFFFF',
+              border: 'none',
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              cursor: isExtracting ? 'not-allowed' : 'pointer',
+              opacity: isExtracting ? 0.7 : 1,
+            }}
+          >
+            {isExtracting ? (
+              <>
+                <Loader2 size={14} className="spin-animation" /> Extracting with AI...
+              </>
+            ) : (
+              <>
+                <Upload size={14} /> Upload ID & Auto-Fill
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Extraction Error Panel — shown when AI extraction fails */}
+      {extractionError && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '0.75rem',
+            padding: '0.9rem 1.1rem',
+            borderRadius: 'var(--radius-md)',
+            background: 'rgba(239, 68, 68, 0.06)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+          }}
+        >
+          <XCircle size={18} color="#EF4444" style={{ flexShrink: 0, marginTop: '1px' }} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontWeight: 600, fontSize: '0.85rem', color: '#DC2626', marginBottom: '0.2rem' }}>
+              Document Extraction Failed
+            </div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+              {extractionError}
+            </div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.3rem' }}>
+              You can fill in the form manually or upload a clearer image and try again.
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setExtractionError(null);
+              fileInputRef.current?.click();
+            }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.3rem',
+              padding: '0.35rem 0.7rem',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid rgba(239, 68, 68, 0.4)',
+              background: 'transparent',
+              color: '#DC2626',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              flexShrink: 0,
+            }}
+          >
+            <RefreshCw size={12} /> Retry
+          </button>
+        </div>
+      )}
+
+      {/* AI Autofill Review & Edit Panel — shown only when extraction succeeds */}
+      {extraction && (
+        <AIAutofillPanel
+          extraction={extraction}
+          fieldMapping={ID_FIELD_MAPPING}
+          onApply={handleApplyAutofill}
+          onDismiss={() => setExtraction(null)}
+          currentFormValues={formData}
+        />
+      )}
+
+      {/* Form Card */}
+      <div
+        className="glass-panel"
+        style={{
+          padding: '2rem',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-subtle)'
+        }}
+      >
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: '1.25rem'
+          }}
+          className="wizard-form-grid"
+        >
+          {section.fields.map((field) => {
+            const fieldId = `field-${field.name}`;
+            const isFullWidth = field.type === 'textarea' || field.name === 'address';
+            const fieldError = errors[field.name];
+
+            return (
+              <div
+                key={field.name}
+                id={fieldId}
+                style={{
+                  gridColumn: isFullWidth ? '1 / -1' : undefined,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.35rem'
+                }}
+              >
+                <label
+                  htmlFor={`input-${field.name}`}
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: '0.825rem',
+                    fontWeight: 600,
+                    color: fieldError ? '#F87171' : 'var(--text-primary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem'
+                  }}
+                >
+                  <span>{field.label}</span>
+                  {field.required && <span style={{ color: '#EF4444' }}>*</span>}
+                </label>
+
+                {field.type === 'textarea' ? (
+                  <textarea
+                    id={`input-${field.name}`}
+                    name={field.name}
+                    rows={field.rows || 3}
+                    placeholder={field.placeholder}
+                    value={formData[field.name] || ''}
+                    onChange={(e) => handleChange(field, e.target.value)}
+                    onBlur={() => handleBlur(field)}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 1rem',
+                      borderRadius: 'var(--radius-sm)',
+                      background: 'var(--input-bg)',
+                      border: fieldError ? '1px solid #EF4444' : '1px solid var(--input-border)',
+                      color: 'var(--input-text)',
+                      fontFamily: 'inherit',
+                      fontSize: '0.925rem',
+                      resize: 'vertical',
+                      outline: 'none',
+                      transition: 'border-color 0.2s',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                ) : field.type === 'select' ? (
+                  <select
+                    id={`input-${field.name}`}
+                    name={field.name}
+                    value={formData[field.name] || ''}
+                    onChange={(e) => handleChange(field, e.target.value)}
+                    onBlur={() => handleBlur(field)}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 1rem',
+                      borderRadius: 'var(--radius-sm)',
+                      background: 'var(--input-bg)',
+                      border: fieldError ? '1px solid #EF4444' : '1px solid var(--input-border)',
+                      color: formData[field.name] ? 'var(--input-text)' : 'var(--text-secondary)',
+                      fontFamily: 'inherit',
+                      fontSize: '0.925rem',
+                      outline: 'none',
+                      cursor: 'pointer',
+                      boxSizing: 'border-box'
+                    }}
+                  >
+                    {field.options?.map((opt) => (
+                      <option key={opt.value} value={opt.value} style={{ background: 'var(--input-bg)', color: 'var(--input-text)' }}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    id={`input-${field.name}`}
+                    name={field.name}
+                    type={field.type === 'telephone' ? 'tel' : field.type}
+                    placeholder={field.placeholder}
+                    value={formData[field.name] || ''}
+                    onChange={(e) => handleChange(field, e.target.value)}
+                    onBlur={() => handleBlur(field)}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 1rem',
+                      borderRadius: 'var(--radius-sm)',
+                      background: 'var(--input-bg)',
+                      border: fieldError ? '1px solid #EF4444' : '1px solid var(--input-border)',
+                      color: 'var(--input-text)',
+                      fontFamily: 'inherit',
+                      fontSize: '0.925rem',
+                      outline: 'none',
+                      transition: 'border-color 0.2s',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                )}
+
+                {fieldError && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      color: '#F87171',
+                      fontSize: '0.78rem'
+                    }}
+                  >
+                    <AlertCircle size={13} style={{ flexShrink: 0 }} />
+                    <span>{fieldError}</span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Action Bar */}
+      <div
+        className="glass-panel"
+        style={{
+          padding: '1.25rem 2rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '1rem',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-accent)'
+        }}
+      >
+        <div style={{ fontSize: '0.83rem', color: 'var(--text-secondary)' }}>
+          Fields marked <span style={{ color: '#EF4444', fontWeight: 700 }}>*</span> are required
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            onClick={onSaveDraft}
+            disabled={isSaving}
+            className="btn btn-secondary"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+          >
+            <Save size={16} />
+            {isSaving ? 'Saving...' : 'Save Draft'}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleNext}
+            className="btn btn-primary"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+          >
+            Continue <ArrowRight size={16} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Step1ApplicantInfo;

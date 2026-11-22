@@ -1,0 +1,21 @@
+# GovEaseAI Root Git Ignore
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+build/
+.playwright/
+.playwright-cli/
+.agents/
+scratch/
+Backend/uploads/
+*.log
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.vscode/
+.idea/
+.DS_Store
+*.local
