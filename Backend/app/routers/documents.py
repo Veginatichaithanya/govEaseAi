@@ -1,5 +1,6 @@
 import os
 import uuid
+import logging
 from pathlib import Path
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, status
@@ -11,6 +12,9 @@ from app.models.document import ApplicationDocument
 from app.models.user import User
 from app.routers.deps import get_current_user
 from app.schemas.application import DocumentItemSchema
+from app.services.ai.ocr_provider import OCRProvider
+
+logger = logging.getLogger("goveaseai.documents")
 
 router = APIRouter(prefix="/api/applications/{application_id}/documents", tags=["Application Documents"])
 
@@ -60,7 +64,7 @@ async def upload_document(
             detail=f"File exceeds maximum size limit of 10 MB."
         )
 
-    # Save to disk
+    # Save to disk FIRST (OCR needs the file to exist)
     app_folder = UPLOAD_DIR / application_id
     app_folder.mkdir(parents=True, exist_ok=True)
     safe_filename = f"{uuid.uuid4().hex[:8]}_{file.filename}"
@@ -68,6 +72,16 @@ async def upload_document(
 
     with open(file_path, "wb") as f:
         f.write(contents)
+
+    # Run OCR extraction after file is saved
+    ocr_provider = OCRProvider()
+    try:
+        extraction = await ocr_provider.extract_document(str(file_path), file.content_type or "application/octet-stream")
+        verification_result = extraction.get('parsed_json', {})
+        logger.info(f"Extraction complete for {safe_filename}: keys={list(verification_result.keys())}")
+    except Exception as e:
+        logger.exception(f"OCR extraction failed for {file_path}: {e}")
+        verification_result = {"error": "OCR extraction failed", "detail": str(e)}
 
     # Check if document already exists for this application
     existing_doc = db.query(ApplicationDocument).filter(
@@ -83,6 +97,7 @@ async def upload_document(
         existing_doc.mime_type = file.content_type
         existing_doc.file_size = file_size
         existing_doc.status = "VERIFIED"
+        existing_doc.verification_result = verification_result
         doc_record = existing_doc
     else:
         # Determine unique primary key
@@ -101,7 +116,7 @@ async def upload_document(
             mime_type=file.content_type,
             file_size=file_size,
             status="VERIFIED",
-            verification_result={"match": True, "note": "Pre-validation checks passed."}
+            verification_result=verification_result if verification_result else {"match": True, "note": "Pre-validation checks passed."}
         )
         db.add(doc_record)
 

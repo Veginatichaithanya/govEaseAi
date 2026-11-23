@@ -293,6 +293,7 @@ class AIService:
             logger.error("[AIService] No providers available for modality '%s'", modality)
             return {"success": False, "error": "No AI providers available for this operation."}
 
+        last_error = None
         for idx, provider in enumerate(chain):
             try:
                 logger.info(
@@ -316,6 +317,7 @@ class AIService:
                     "[AIService] Provider %s failed for %s: %s. Trying next provider.",
                     provider.provider_name, method, result.get("error"),
                 )
+                last_error = result.get("error")
             except Exception as e:
                 logger.warning(
                     "[AIService] Provider %s exception for %s: %s",
@@ -337,7 +339,7 @@ class AIService:
         )
         return {
             "success": False,
-            "error": "AI service is temporarily unavailable. Please try again.",
+            "error": last_error or "AI service is temporarily unavailable. Please try again.",
         }
 
 

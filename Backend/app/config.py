@@ -12,7 +12,7 @@ class Settings(BaseSettings):
         extra="ignore"
     )
 
-    PORT: int = 5000
+    PORT: int = 8001
     # Default to PostgreSQL; for local development you can override via .env.
     # Or use SQLite for a simple out‑of‑the‑box setup.
     DATABASE_URL: str = "sqlite:///./dev.db"
@@ -61,3 +61,27 @@ class Settings(BaseSettings):
     FRONTEND_URL: str = "http://localhost:5173"
 
 settings = Settings()
+
+# Validate that the selected AI provider has a corresponding API key configured.
+def _validate_ai_provider():
+    provider = settings.AI_PROVIDER.lower().strip()
+    # Map provider to its required key attribute name in Settings
+    key_map = {
+        "gemini": "GEMINI_API_KEY",
+        "openrouter": "OPENROUTER_API_KEY",
+        "agentrouter": "AGENTROUTER_API_KEY",
+    }
+    required_key = key_map.get(provider)
+    if required_key:
+        api_key = getattr(settings, required_key, "")
+        if not api_key:
+            raise RuntimeError(
+                f"AI provider '{provider}' is selected but the required API key environment variable '{required_key}' is missing or empty. "
+                "Please set it in the .env file or environment before starting the server."
+            )
+    else:
+        raise RuntimeError(f"Unsupported AI_PROVIDER value '{provider}'. Expected one of: gemini, openrouter, agentrouter.")
+
+# Run validation at import time so the app fails fast if mis‑configured.
+_validate_ai_provider()
+

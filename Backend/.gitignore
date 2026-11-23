@@ -1,11 +1,32 @@
+# Node
 node_modules/
+dist/
+*.log
+
+# Environment and secrets
 .env
 .env.*
 !.env.example
-*.log
+
+# Python virtual environments
+venv/
+.venv/
+Backend/venv/
+backend/venv/
+
+# Python cache
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Uploaded files and temporary files
 uploads/
 scratch/
 
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,13 @@
+{
+  "health_status": 200,
+  "signup_status": 200,
+  "login_status": 200,
+  "extract_status": 200,
+  "extract_json": {
+    "success": false,
+    "extraction": null,
+    "raw_answer": null,
+    "error": "AI service temporarily unavailable.",
+    "analysis_id": "1c2ef2e0-f23b-46bf-8d45-2f89be1df47b"
+  }
+}
