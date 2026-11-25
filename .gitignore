@@ -10,8 +10,6 @@ build/
 .agents/
 scratch/
 Backend/uploads/
-*.db
-*.sqlite
 *.log
 __pycache__/
 *.py[cod]
