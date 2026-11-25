@@ -187,9 +187,10 @@ export async function apiRequest<T = any>(
     ? `${baseWithoutApi}${path}`
     : path;
 
-  // Use 45s timeout to comfortably accommodate Render free-tier cold-start spins
+  // Use 120s timeout: Gemini Vision OCR can take 60–90s on large documents.
+  // This also accommodates Render free-tier cold-start spins (~45–60s).
   const controller = new AbortController();
-  const timeoutMs = 45000;
+  const timeoutMs = 120000;
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
@@ -234,9 +235,9 @@ export async function apiRequest<T = any>(
     const isTimeout = err?.name === 'AbortError';
     const isNetworkError = err?.message === 'Failed to fetch' || err?.name === 'TypeError' || isTimeout;
     const friendlyMsg = isTimeout
-      ? 'The request timed out waiting for the server. Render free-tier instances may take 45–60s to wake up on the first request. Please try again.'
+      ? 'The request timed out. Document OCR processing via AI can take up to 90 seconds. Please try again — if the problem persists, the AI service may be temporarily overloaded.'
       : isNetworkError
-      ? 'Unable to connect to the backend server. If the server is in sleep mode, it may take up to 45 seconds to wake up. Please check your network and try again.'
+      ? 'Unable to connect to the backend server. If the server is in sleep mode, it may take up to 60 seconds to wake up. Please check your network and try again.'
       : (err.message || 'Network connectivity failure.');
     return {
       error: friendlyMsg,

@@ -14,6 +14,7 @@ export interface DocumentUpload {
   fileType: string;
   status: 'PENDING' | 'PROCESSING' | 'VERIFIED' | 'ERROR';
   uploadedAt: string;
+  verificationResult?: Record<string, any>;
 }
 
 export type ApplicationStatus =

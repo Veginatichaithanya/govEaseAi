@@ -345,7 +345,7 @@ export async function analyzeFile(
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 45000);
+  const timeout = setTimeout(() => controller.abort(), 90000);
   try {
     const res = await fetch(resolveUrl('/api/ai/analyze-file'), {
       method: 'POST',
@@ -354,7 +354,12 @@ export async function analyzeFile(
       signal: controller.signal,
     });
     clearTimeout(timeout);
-    const data = await res.json();
+    let data: any = null;
+    try {
+      data = await res.json();
+    } catch {
+      data = null;
+    }
     if (!res.ok) {
       return { success: false, error: data?.detail || data?.error || `HTTP ${res.status}` };
     }

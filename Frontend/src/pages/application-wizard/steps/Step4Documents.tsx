@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -8,15 +8,25 @@ import {
   AlertCircle,
   X,
   FileText,
-  Info
+  Info,
+  Sparkles,
+  Loader2,
+  RefreshCw,
 } from 'lucide-react';
 import type { DocumentUpload } from '../../../mock/applicationService';
 import { MOCK_SERVICES } from '../../../mock/services';
+import { apiClient } from '../../../services/apiClient';
+import { mapOcrToFormFields, mappedFieldsToExtractionResult, buildAutofillMapping, type MappedField } from '../../../services/documentFieldMapper';
+import { AIAutofillPanel } from '../../../components/AIAutofillPanel';
+import type { ExtractionResult } from '../../../services/aiMultimodalService';
 
 interface Step4Props {
   serviceId: string;
+  applicationId: string;
   uploadedDocs: DocumentUpload[];
   onDocsChange: (docs: DocumentUpload[]) => void;
+  onFormAutoFill: (fields: Record<string, string>, metadata: Record<string, { source: 'AI_EXTRACTED'; confidence?: number }>) => void;
+  currentFormData?: Record<string, any>;
   onNext: () => void;
   onBack: () => void;
 }
@@ -31,16 +41,27 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+interface AutofillState {
+  extraction: ExtractionResult;
+  fieldMapping: Record<string, { formKey: string; label: string }>;
+  mappedFields: MappedField[];
+  documentName: string;
+}
+
 export const Step4Documents: React.FC<Step4Props> = ({
   serviceId,
+  applicationId,
   uploadedDocs,
   onDocsChange,
+  onFormAutoFill,
+  currentFormData = {},
   onNext,
   onBack
 }) => {
   const [fileErrors, setFileErrors] = useState<Record<string, string>>({});
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [autofillState, setAutofillState] = useState<AutofillState | null>(null);
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   // Get required documents from service config
@@ -50,7 +71,7 @@ export const Step4Documents: React.FC<Step4Props> = ({
   const getUploadedDoc = (docId: string): DocumentUpload | undefined =>
     uploadedDocs.find((d) => d.documentId === docId);
 
-  const handleFileSelect = async (docId: string, docName: string, file: File) => {
+  const handleFileSelect = useCallback(async (docId: string, docName: string, file: File) => {
     // Clear previous error for this doc
     setFileErrors((prev) => {
       const next = { ...prev };
@@ -77,33 +98,108 @@ export const Step4Documents: React.FC<Step4Props> = ({
       return;
     }
 
-    // Add to processing state
+    // Prevent duplicate upload while processing
+    if (processingIds.has(docId)) return;
+
+    // Set processing state
     setProcessingIds((prev) => new Set([...prev, docId]));
 
-    // Simulate upload + processing delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    const newDoc: DocumentUpload = {
+    // Add a PROCESSING-state placeholder immediately
+    const processingDoc: DocumentUpload = {
       documentId: docId,
       documentName: docName,
       fileName: file.name,
       fileSize: file.size,
       fileType: file.type || `application/${extension.replace('.', '')}`,
-      status: 'VERIFIED',
+      status: 'PROCESSING',
       uploadedAt: new Date().toISOString()
     };
+    const docsWithProcessing = uploadedDocs.filter((d) => d.documentId !== docId);
+    docsWithProcessing.push(processingDoc);
+    onDocsChange(docsWithProcessing);
 
-    // Replace or add document
-    const updatedDocs = uploadedDocs.filter((d) => d.documentId !== docId);
-    updatedDocs.push(newDoc);
-    onDocsChange(updatedDocs);
+    try {
+      // Build FormData for real backend upload
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('documentId', docId);
+      formData.append('documentName', docName);
 
-    setProcessingIds((prev) => {
-      const next = new Set(prev);
-      next.delete(docId);
-      return next;
-    });
-  };
+      // POST to backend document upload endpoint
+      const response = await apiClient.post<any>(
+        `/applications/${applicationId}/documents`,
+        formData
+      );
+
+      if (!response.ok) {
+        throw new Error(response.error || `Upload failed (HTTP ${response.status})`);
+      }
+
+      const data = response.data;
+
+      // Build DocumentUpload from backend response
+      const newDoc: DocumentUpload = {
+        documentId: docId,
+        documentName: data.documentName || docName,
+        fileName: data.fileName || file.name,
+        fileSize: data.fileSize || file.size,
+        fileType: data.fileType || file.type,
+        status: data.status || 'VERIFIED',
+        uploadedAt: data.uploadedAt || new Date().toISOString(),
+        verificationResult: data.verificationResult || undefined,
+      };
+
+      // Replace placeholder with actual result
+      const updatedDocs = uploadedDocs.filter((d) => d.documentId !== docId);
+      updatedDocs.push(newDoc);
+      onDocsChange(updatedDocs);
+
+      // If OCR returned extracted data, trigger auto-fill panel
+      if (data.verificationResult && !data.verificationResult.error) {
+        const mappedFields = mapOcrToFormFields(data.verificationResult, docName);
+        if (mappedFields.length > 0) {
+          const extraction = mappedFieldsToExtractionResult(
+            mappedFields,
+            data.verificationResult?.document_type
+          );
+          const fieldMapping = buildAutofillMapping(mappedFields);
+          setAutofillState({
+            extraction,
+            fieldMapping,
+            mappedFields,
+            documentName: docName,
+          });
+        }
+      }
+    } catch (err: any) {
+      console.error('Document upload failed:', err);
+
+      // Set error state on the document
+      const errorDoc: DocumentUpload = {
+        documentId: docId,
+        documentName: docName,
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type || `application/${extension.replace('.', '')}`,
+        status: 'ERROR',
+        uploadedAt: new Date().toISOString()
+      };
+      const errorDocs = uploadedDocs.filter((d) => d.documentId !== docId);
+      errorDocs.push(errorDoc);
+      onDocsChange(errorDocs);
+
+      setFileErrors((prev) => ({
+        ...prev,
+        [docId]: err.message || 'Upload failed. Please try again.'
+      }));
+    } finally {
+      setProcessingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(docId);
+        return next;
+      });
+    }
+  }, [applicationId, uploadedDocs, onDocsChange, processingIds]);
 
   const handleRemoveDoc = (docId: string) => {
     onDocsChange(uploadedDocs.filter((d) => d.documentId !== docId));
@@ -111,6 +207,33 @@ export const Step4Documents: React.FC<Step4Props> = ({
     if (fileInputRefs.current[docId]) {
       fileInputRefs.current[docId]!.value = '';
     }
+    // Clear any error
+    setFileErrors((prev) => {
+      const next = { ...prev };
+      delete next[docId];
+      return next;
+    });
+  };
+
+  const handleAutoFillApply = (fields: Record<string, string>) => {
+    // Build metadata for each AI-filled field
+    const metadata: Record<string, { source: 'AI_EXTRACTED'; confidence?: number }> = {};
+    if (autofillState) {
+      for (const field of autofillState.mappedFields) {
+        if (fields[field.formKey]) {
+          metadata[field.formKey] = {
+            source: 'AI_EXTRACTED',
+            confidence: field.confidence,
+          };
+        }
+      }
+    }
+    onFormAutoFill(fields, metadata);
+    setAutofillState(null);
+  };
+
+  const handleAutoFillDismiss = () => {
+    setAutofillState(null);
   };
 
   const handleContinue = () => {
@@ -125,7 +248,30 @@ export const Step4Documents: React.FC<Step4Props> = ({
       );
       return;
     }
+    // Check none are still in ERROR state
+    const errorDocs = uploadedDocs.filter(d => d.status === 'ERROR');
+    if (errorDocs.length > 0) {
+      setSubmitError(
+        `Some documents failed processing. Please re-upload: ${errorDocs.map(d => d.documentName).join(', ')}`
+      );
+      return;
+    }
     onNext();
+  };
+
+  const getStatusDisplay = (status: DocumentUpload['status']) => {
+    switch (status) {
+      case 'VERIFIED':
+        return { label: 'Verified', color: '#10B981', bg: 'rgba(16, 185, 129, 0.1)', border: 'rgba(16, 185, 129, 0.2)' };
+      case 'PROCESSING':
+        return { label: 'Processing...', color: '#60A5FA', bg: 'rgba(59, 130, 246, 0.1)', border: 'rgba(59, 130, 246, 0.2)' };
+      case 'ERROR':
+        return { label: 'Processing Failed', color: '#F87171', bg: 'rgba(239, 68, 68, 0.1)', border: 'rgba(239, 68, 68, 0.2)' };
+      case 'PENDING':
+        return { label: 'Pending', color: '#FBBF24', bg: 'rgba(245, 158, 11, 0.1)', border: 'rgba(245, 158, 11, 0.2)' };
+      default:
+        return { label: status, color: '#94A3B8', bg: 'rgba(100, 116, 139, 0.1)', border: 'rgba(100, 116, 139, 0.2)' };
+    }
   };
 
   return (
@@ -186,8 +332,25 @@ export const Step4Documents: React.FC<Step4Props> = ({
           <strong style={{ color: 'var(--text-primary)' }}>Upload Guidelines:</strong> Accepted formats: PDF, JPG, PNG.
           Maximum file size: {MAX_FILE_SIZE_MB} MB per document. Ensure all documents are clear and legible.
           Documents marked <span style={{ color: '#EF4444', fontWeight: 700 }}>Required</span> must be uploaded before proceeding.
+          <br />
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', marginTop: '0.3rem' }}>
+            <Sparkles size={13} color="#6366F1" />
+            <strong style={{ color: '#6366F1' }}>AI Auto-Fill:</strong> Uploaded documents are processed by AI to automatically extract and suggest form field values.
+          </span>
         </div>
       </div>
+
+      {/* AI Auto-Fill Panel (shown after OCR extraction) */}
+      {autofillState && (
+        <AIAutofillPanel
+          key={`${autofillState.documentName}-${Date.now()}`}
+          extraction={autofillState.extraction}
+          fieldMapping={autofillState.fieldMapping}
+          onApply={handleAutoFillApply}
+          onDismiss={handleAutoFillDismiss}
+          currentFormValues={currentFormData as Record<string, string>}
+        />
+      )}
 
       {/* Submit Error */}
       {submitError && (
@@ -216,6 +379,7 @@ export const Step4Documents: React.FC<Step4Props> = ({
           const isProcessing = processingIds.has(doc.id);
           const fileError = fileErrors[doc.id];
           const isUploaded = !!uploadedDoc && !isProcessing;
+          const statusDisplay = uploadedDoc ? getStatusDisplay(uploadedDoc.status) : null;
 
           return (
             <div
@@ -224,8 +388,10 @@ export const Step4Documents: React.FC<Step4Props> = ({
               style={{
                 padding: '1.5rem',
                 background: 'var(--bg-card)',
-                border: isUploaded
+                border: isUploaded && uploadedDoc?.status === 'VERIFIED'
                   ? '1px solid rgba(16, 185, 129, 0.35)'
+                  : isUploaded && uploadedDoc?.status === 'ERROR'
+                  ? '1px solid rgba(239, 68, 68, 0.35)'
                   : fileError
                   ? '1px solid rgba(239, 68, 68, 0.35)'
                   : '1px solid var(--border-subtle)',
@@ -297,7 +463,7 @@ export const Step4Documents: React.FC<Step4Props> = ({
                   </p>
 
                   {/* Uploaded File Info */}
-                  {isUploaded && uploadedDoc && (
+                  {isUploaded && uploadedDoc && statusDisplay && (
                     <div
                       style={{
                         marginTop: '0.75rem',
@@ -306,17 +472,23 @@ export const Step4Documents: React.FC<Step4Props> = ({
                         gap: '0.6rem',
                         padding: '0.6rem 0.9rem',
                         borderRadius: 'var(--radius-sm)',
-                        background: 'rgba(16, 185, 129, 0.1)',
-                        border: '1px solid rgba(16, 185, 129, 0.2)'
+                        background: statusDisplay.bg,
+                        border: `1px solid ${statusDisplay.border}`
                       }}
                     >
-                      <CheckCircle2 size={16} style={{ color: '#10B981', flexShrink: 0 }} />
+                      {uploadedDoc.status === 'VERIFIED' ? (
+                        <CheckCircle2 size={16} style={{ color: statusDisplay.color, flexShrink: 0 }} />
+                      ) : uploadedDoc.status === 'ERROR' ? (
+                        <AlertCircle size={16} style={{ color: statusDisplay.color, flexShrink: 0 }} />
+                      ) : (
+                        <FileText size={16} style={{ color: statusDisplay.color, flexShrink: 0 }} />
+                      )}
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div
                           style={{
                             fontSize: '0.82rem',
                             fontWeight: 600,
-                            color: '#34D399',
+                            color: statusDisplay.color,
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap'
@@ -324,30 +496,60 @@ export const Step4Documents: React.FC<Step4Props> = ({
                         >
                           {uploadedDoc.fileName}
                         </div>
-                        <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
-                          {formatFileSize(uploadedDoc.fileSize)} · Verified
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                          {formatFileSize(uploadedDoc.fileSize)} · {statusDisplay.label}
+                          {uploadedDoc.verificationResult?.document_type && (
+                            <span style={{ color: '#6366F1' }}>
+                              · {uploadedDoc.verificationResult.document_type}
+                            </span>
+                          )}
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveDoc(doc.id)}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          cursor: 'pointer',
-                          color: '#94A3B8',
-                          padding: '0.2rem',
-                          display: 'flex',
-                          alignItems: 'center',
-                          borderRadius: '4px',
-                          transition: 'color 0.2s'
-                        }}
-                        title="Remove document"
-                        onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = '#F87171')}
-                        onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = '#94A3B8')}
-                      >
-                        <X size={16} />
-                      </button>
+                      <div style={{ display: 'flex', gap: '0.3rem' }}>
+                        {uploadedDoc.status === 'ERROR' && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (fileInputRefs.current[doc.id]) {
+                                fileInputRefs.current[doc.id]!.click();
+                              }
+                            }}
+                            style={{
+                              background: 'none',
+                              border: '1px solid rgba(245, 158, 11, 0.4)',
+                              cursor: 'pointer',
+                              color: '#FBBF24',
+                              padding: '0.3rem',
+                              display: 'flex',
+                              alignItems: 'center',
+                              borderRadius: '4px',
+                            }}
+                            title="Retry upload"
+                          >
+                            <RefreshCw size={14} />
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveDoc(doc.id)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: '#94A3B8',
+                            padding: '0.2rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            borderRadius: '4px',
+                            transition: 'color 0.2s'
+                          }}
+                          title="Remove document"
+                          onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = '#F87171')}
+                          onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = '#94A3B8')}
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
                     </div>
                   )}
 
@@ -367,18 +569,14 @@ export const Step4Documents: React.FC<Step4Props> = ({
                         fontSize: '0.83rem'
                       }}
                     >
-                      <div
+                      <Loader2
+                        size={14}
                         style={{
-                          width: '14px',
-                          height: '14px',
-                          borderRadius: '50%',
-                          border: '2px solid rgba(59, 130, 246, 0.3)',
-                          borderTopColor: '#60A5FA',
-                          animation: 'spin 0.8s linear infinite',
-                          flexShrink: 0
+                          flexShrink: 0,
+                          animation: 'spin 1s linear infinite',
                         }}
                       />
-                      Processing document...
+                      Uploading & processing with AI...
                     </div>
                   )}
 
@@ -411,6 +609,8 @@ export const Step4Documents: React.FC<Step4Props> = ({
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) handleFileSelect(doc.id, doc.name, file);
+                      // Reset input so the same file can be re-selected
+                      e.target.value = '';
                     }}
                   />
                   <label
@@ -421,9 +621,13 @@ export const Step4Documents: React.FC<Step4Props> = ({
                       gap: '0.5rem',
                       padding: '0.65rem 1.1rem',
                       borderRadius: 'var(--radius-sm)',
-                      background: isUploaded ? 'rgba(16, 185, 129, 0.12)' : 'var(--accent-blue)',
-                      border: isUploaded ? '1px solid rgba(16, 185, 129, 0.35)' : 'none',
-                      color: isUploaded ? '#34D399' : '#FFFFFF',
+                      background: isUploaded && uploadedDoc?.status === 'VERIFIED'
+                        ? 'rgba(16, 185, 129, 0.12)'
+                        : 'var(--accent-blue)',
+                      border: isUploaded && uploadedDoc?.status === 'VERIFIED'
+                        ? '1px solid rgba(16, 185, 129, 0.35)'
+                        : 'none',
+                      color: isUploaded && uploadedDoc?.status === 'VERIFIED' ? '#34D399' : '#FFFFFF',
                       fontSize: '0.83rem',
                       fontWeight: 600,
                       cursor: isProcessing ? 'not-allowed' : 'pointer',
@@ -476,6 +680,18 @@ export const Step4Documents: React.FC<Step4Props> = ({
           </strong>{' '}
           required completed
         </span>
+        <span>·</span>
+        <span>
+          <strong style={{ color: '#10B981' }}>
+            {uploadedDocs.filter(d => d.status === 'VERIFIED').length}
+          </strong>{' '}
+          verified
+          {uploadedDocs.filter(d => d.status === 'ERROR').length > 0 && (
+            <span style={{ color: '#F87171', marginLeft: '0.5rem' }}>
+              · <strong>{uploadedDocs.filter(d => d.status === 'ERROR').length}</strong> failed
+            </span>
+          )}
+        </span>
       </div>
 
       {/* Action Bar */}
@@ -506,8 +722,18 @@ export const Step4Documents: React.FC<Step4Props> = ({
           onClick={handleContinue}
           className="btn btn-primary"
           style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+          disabled={processingIds.size > 0}
         >
-          Continue to AI Verification <ArrowRight size={16} />
+          {processingIds.size > 0 ? (
+            <>
+              <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+              Processing...
+            </>
+          ) : (
+            <>
+              Continue to AI Verification <ArrowRight size={16} />
+            </>
+          )}
         </button>
       </div>
     </div>

@@ -109,10 +109,20 @@ class AIService:
         self._openrouter = OpenRouterProvider()
         self._gemini = GeminiProvider()
 
+    def _is_provider_configured(self, provider: BaseAIProvider) -> bool:
+        """Return True only when the provider has a non-empty API key configured."""
+        if isinstance(provider, GeminiProvider):
+            return bool((settings.GEMINI_API_KEY or "").strip())
+        if isinstance(provider, OpenRouterProvider):
+            return bool((settings.OPENROUTER_API_KEY or "").strip())
+        if isinstance(provider, AgentRouterProvider):
+            return bool((settings.AGENTROUTER_API_KEY or "").strip())
+        return True
+
     def _get_provider_chain(self, modality: str) -> List[BaseAIProvider]:
         """
         Return the ordered list of providers configured for this deployment,
-        filtered strictly to those supporting the requested modality.
+        filtered strictly to configured providers supporting the requested modality.
         """
         prov = (settings.AI_PROVIDER or "agentrouter").lower().strip()
         if prov == "agentrouter":
@@ -122,8 +132,11 @@ class AIService:
         else:
             ordered = [self._openrouter, self._agentrouter, self._gemini]
 
-        # Filter to providers that explicitly support the given modality
-        capable = [p for p in ordered if p.supports_modality(modality)]
+        # Filter to providers that both have an API key and support the given modality
+        capable = [
+            p for p in ordered
+            if p.supports_modality(modality) and self._is_provider_configured(p)
+        ]
         return capable
 
     async def check_health(self) -> Dict[str, Any]:
@@ -488,7 +501,20 @@ class AIService:
                 "raw_answer": result["answer"],
             }
 
-        return {"success": True, "extraction": parsed, "raw_answer": result["answer"]}
+        # Programmatically mask Aadhaar numbers in extracted_fields and raw_answer before returning
+        ext_fields = parsed.get("extracted_fields")
+        if isinstance(ext_fields, dict):
+            doc_type_lower = str(parsed.get("document_type") or "").lower()
+            for k, v in list(ext_fields.items()):
+                if not isinstance(v, str) or not v.strip():
+                    continue
+                digits = re.sub(r'[\s\-]', '', v.strip())
+                is_aadhaar_key = "aadhaar" in k.lower() or (k.lower() == "id_number" and "aadhaar" in doc_type_lower)
+                if (is_aadhaar_key or len(digits) == 12) and digits.isdigit() and len(digits) == 12:
+                    ext_fields[k] = f"XXXX-XXXX-{digits[-4:]}"
+
+        masked_raw = re.sub(r'\b(\d{4})[\s\-]?(\d{4})[\s\-]?(\d{4})\b', r'XXXX-XXXX-\3', result["answer"])
+        return {"success": True, "extraction": parsed, "raw_answer": masked_raw}
 
     async def ai_verify_document(
         self,

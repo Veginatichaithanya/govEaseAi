@@ -5,6 +5,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 # Base backend directory
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv(str(BACKEND_DIR / ".env"), override=True)
+except Exception:
+    pass
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=str(BACKEND_DIR / ".env"),
@@ -75,13 +81,17 @@ def _validate_ai_provider():
     if required_key:
         api_key = getattr(settings, required_key, "")
         if not api_key:
-            raise RuntimeError(
-                f"AI provider '{provider}' is selected but the required API key environment variable '{required_key}' is missing or empty. "
-                "Please set it in the .env file or environment before starting the server."
+            import logging
+            logging.getLogger("goveaseai.config").warning(
+                f"AI provider '{provider}' is selected but '{required_key}' is not set. "
+                "Document OCR will run in fallback mode until configured."
             )
     else:
-        raise RuntimeError(f"Unsupported AI_PROVIDER value '{provider}'. Expected one of: gemini, openrouter, agentrouter.")
+        import logging
+        logging.getLogger("goveaseai.config").warning(
+            f"Unsupported AI_PROVIDER value '{provider}'. Expected one of: gemini, openrouter, agentrouter."
+        )
 
-# Run validation at import time so the app fails fast if mis‑configured.
+# Run validation at import time
 _validate_ai_provider()
 
