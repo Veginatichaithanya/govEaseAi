@@ -491,13 +491,18 @@ async def analyze_uploaded_file(
         )
 
     modality = "image" if mime in ALLOWED_IMAGE_TYPES else "pdf"
+    active_model = (
+        settings.GEMINI_MODEL
+        if settings.AI_PROVIDER.lower().strip() == "gemini"
+        else (settings.OPENROUTER_VISION_MODEL if modality == "image" else settings.OPENROUTER_DOCUMENT_MODEL)
+    )
     record = _store_analysis(
         db=db,
         user_id=current_user.id,
         analysis_type="IMAGE_ANALYSIS" if modality == "image" else "PDF_ANALYSIS",
         status_val="COMPLETED" if success else "FAILED",
         result={"extraction": result.get("extraction")} if success else {},
-        model_used=settings.OPENROUTER_VISION_MODEL if modality == "image" else settings.OPENROUTER_DOCUMENT_MODEL,
+        model_used=active_model,
         application_id=application_id,
         input_hash=input_hash,
         error_message=result.get("error") if not success else None,

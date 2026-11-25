@@ -2,7 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MOCK_SERVICES } from '../mock/services';
 import { authService } from '../mock/auth';
-import { applicationService, type ApplicationRecord, type DocumentUpload } from '../mock/applicationService';
+import { applicationService, mergeApplicationsIntoStorage, type ApplicationRecord, type DocumentUpload } from '../mock/applicationService';
+import { apiClient } from '../services/apiClient';
 import { AlertCircle, Clock, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import DashboardLayout from '../components/DashboardLayout';
@@ -45,40 +46,90 @@ export const ApplicationFormPage: React.FC = () => {
       return;
     }
 
-    try {
-      const user = authService.getCurrentUser();
-      if (!user) {
-        navigate('/login', { replace: true });
-        return;
-      }
-      const userId = user.id;
-
-      let app = applicationService.getDraftByUserAndService(userId, serviceId);
-      if (!app) {
-        const initialFields: Record<string, any> = {
-          fullName: user.fullName || user.name || '',
-          email: user.email || '',
-          state: 'Telangana',
-          businessState: 'Telangana'
-        };
-        app = applicationService.createApplication(userId, serviceId, service.name, initialFields);
-      }
-
-      setApplication(app);
-      setFormData(app.formData || {});
-      setUploadedDocs(app.uploadedDocuments || []);
-      setIsInitializing(false);
-    } catch (err) {
-      console.error('Failed to initialize application:', err);
-      setErrorMessage('Failed to initialize application. Please refresh the page.');
-      setIsInitializing(false);
+    const user = authService.getCurrentUser();
+    if (!user) {
+      navigate('/login', { replace: true });
+      return;
     }
+    const userId = user.id;
+
+    // Run initialization asynchronously so we can await the backend ID
+    const initialize = async () => {
+      try {
+        // Step 1: Get or create a local draft (immediate, synchronous) with empty fields
+        let localApp = applicationService.getDraftByUserAndService(userId, serviceId);
+        if (!localApp) {
+          localApp = applicationService.createApplication(userId, serviceId, service.name, {});
+        }
+
+        // Step 2: Sync with backend to get the REAL database application ID.
+        // Document uploads POST to /api/applications/{id}/documents, so the ID
+        // must exist in the backend database, not just in localStorage.
+        let canonicalApp: ApplicationRecord = localApp;
+
+        try {
+          const serverRes = await apiClient.post<ApplicationRecord>('/applications', {
+            serviceId,
+            initialFormData: {}
+          });
+
+          if (serverRes.ok && serverRes.data?.id) {
+            // Backend returned the canonical record (new or existing DRAFT).
+            // Merge into localStorage so all other views are consistent.
+            const serverApp = serverRes.data as ApplicationRecord;
+            mergeApplicationsIntoStorage([serverApp]);
+            canonicalApp = serverApp;
+          }
+          // If backend is unreachable, fall back to localApp silently.
+        } catch (backendErr) {
+          console.warn('[ApplicationFormPage] Backend sync failed; using local draft ID:', backendErr);
+        }
+
+        setApplication(canonicalApp);
+        setFormData(canonicalApp.formData || {});
+        setUploadedDocs(canonicalApp.uploadedDocuments || []);
+        setIsInitializing(false);
+      } catch (err) {
+        console.error('Failed to initialize application:', err);
+        setErrorMessage('Failed to initialize application. Please refresh the page.');
+        setIsInitializing(false);
+      }
+    };
+
+    initialize();
   }, [service, serviceId, navigate]);
 
   // === HANDLERS === //
 
   const handleFormChange = (data: Record<string, any>) => {
     setFormData(data);
+
+    // If an AI-extracted field was edited manually, update its source to MANUAL
+    if (application) {
+      const currentMeta = application.fieldMetadata || {};
+      let metaChanged = false;
+      const nextMeta = { ...currentMeta };
+
+      for (const [key, value] of Object.entries(data)) {
+        if (
+          currentMeta[key]?.source === 'AI_EXTRACTED' &&
+          formData[key] !== undefined &&
+          formData[key] !== value
+        ) {
+          nextMeta[key] = { source: 'MANUAL' };
+          metaChanged = true;
+        }
+      }
+
+      if (metaChanged) {
+        setApplication((prev) => (prev ? { ...prev, fieldMetadata: nextMeta } : prev));
+        try {
+          applicationService.updateApplication(application.id, { fieldMetadata: nextMeta });
+        } catch (e) {
+          console.warn('Failed to update field metadata:', e);
+        }
+      }
+    }
   };
 
   const handleDocsChange = (docs: DocumentUpload[]) => {
@@ -90,6 +141,43 @@ export const ApplicationFormPage: React.FC = () => {
       } catch (err) {
         console.error('Failed to update documents:', err);
       }
+    }
+  };
+
+  const handleFormAutoFill = (
+    fields: Record<string, string>,
+    metadata: Record<string, { source: 'AI_EXTRACTED'; confidence?: number }>
+  ) => {
+    if (!application) return;
+
+    // Merge explicitly accepted AI fields into formData
+    const updatedFormData = { ...formData, ...fields };
+    const updatedMetadata = { ...(application.fieldMetadata || {}) };
+
+    for (const [key, value] of Object.entries(fields)) {
+      if (value !== undefined && value !== null && String(value).trim()) {
+        updatedMetadata[key] = {
+          source: 'AI_EXTRACTED' as const,
+          confidence: metadata[key]?.confidence ?? 0.85,
+        };
+      }
+    }
+
+    setFormData(updatedFormData);
+
+    // Persist to application record with metadata
+    try {
+      applicationService.updateApplication(application.id, {
+        formData: updatedFormData,
+        fieldMetadata: updatedMetadata,
+      });
+      setApplication((prev) =>
+        prev ? { ...prev, formData: updatedFormData, fieldMetadata: updatedMetadata } : prev
+      );
+      setSuccessMessage('AI-extracted fields confirmed and applied to your application form.');
+      setTimeout(() => setSuccessMessage(null), 4000);
+    } catch (err) {
+      console.error('Failed to save AI auto-fill:', err);
     }
   };
 
@@ -288,6 +376,7 @@ export const ApplicationFormPage: React.FC = () => {
         <Step1ApplicantInfo
           formData={formData}
           onChange={handleFormChange}
+          onFormAutoFill={handleFormAutoFill}
           onNext={handleNext}
           onSaveDraft={handleSaveDraft}
           isSaving={isSaving}
@@ -319,8 +408,11 @@ export const ApplicationFormPage: React.FC = () => {
       {currentStep === 4 && (
         <Step4Documents
           serviceId={serviceId!}
+          applicationId={application.id}
           uploadedDocs={uploadedDocs}
           onDocsChange={handleDocsChange}
+          onFormAutoFill={handleFormAutoFill}
+          currentFormData={formData}
           onNext={handleNext}
           onBack={handleBack}
         />
@@ -329,6 +421,7 @@ export const ApplicationFormPage: React.FC = () => {
       {currentStep === 5 && (
         <Step5AIVerification
           formData={formData}
+          applicationId={application.id}
           onNext={handleNext}
           onBack={handleBack}
         />

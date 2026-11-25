@@ -198,12 +198,17 @@ def update_application(
             detail="You are not authorized to edit this application."
         )
 
+    if req.fieldMetadata is not None:
+        current_meta = dict(app.field_metadata or {})
+        current_meta.update(req.fieldMetadata)
+        app.field_metadata = current_meta
+
     if req.formData is not None:
         merged_form = dict(app.form_data or {})
         merged_form.update(req.formData)
         app.form_data = merged_form
 
-        # Update field metadata
+        # Ensure any newly introduced fields have a default metadata entry
         current_meta = dict(app.field_metadata or {})
         for k in req.formData.keys():
             if k not in current_meta:

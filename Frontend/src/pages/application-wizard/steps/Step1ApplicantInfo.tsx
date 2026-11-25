@@ -1,7 +1,8 @@
-import React, { useState, useRef } from 'react';
-import { ArrowRight, Save, AlertCircle, User, Sparkles, Upload, Loader2, XCircle, RefreshCw } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { ArrowRight, Save, AlertCircle, User, Sparkles, Upload, XCircle, RefreshCw, RotateCcw } from 'lucide-react';
 import {
   TRADE_LICENSE_FORM_CONFIG,
+  INDIAN_STATES,
   validateFormSections,
   validateField,
   type FormFieldConfig
@@ -12,30 +13,97 @@ import { analyzeFile, type ExtractionResult } from '../../../services/aiMultimod
 interface Step1Props {
   formData: Record<string, any>;
   onChange: (data: Record<string, any>) => void;
+  onFormAutoFill?: (
+    fields: Record<string, string>,
+    metadata: Record<string, { source: 'AI_EXTRACTED'; confidence?: number }>
+  ) => void;
   onNext: () => void;
   onSaveDraft: () => void;
   isSaving: boolean;
 }
 
 const ID_FIELD_MAPPING: Record<string, { formKey: string; label: string }> = {
-  name: { formKey: 'fullName', label: 'Applicant Full Name' },
-  applicant_name: { formKey: 'fullName', label: 'Applicant Full Name' },
-  father_name: { formKey: 'fatherSpouseName', label: 'Father / Spouse Name' },
-  gender: { formKey: 'gender', label: 'Gender' },
-  mobile: { formKey: 'mobile', label: 'Mobile Number' },
-  phone: { formKey: 'mobile', label: 'Mobile Number' },
-  email: { formKey: 'email', label: 'Email Address' },
-  address: { formKey: 'address', label: 'Residential Address' },
-  city: { formKey: 'city', label: 'City / District' },
-  pincode: { formKey: 'pincode', label: 'Postal Pincode' },
+  fullName: { formKey: 'fullName', label: 'Full Name' },
+  email: { formKey: 'email', label: 'Email' },
+  mobileNumber: { formKey: 'mobileNumber', label: 'Mobile Number' },
+  dateOfBirth: { formKey: 'dateOfBirth', label: 'Date of Birth' },
+  address: { formKey: 'address', label: 'Address' },
+  city: { formKey: 'city', label: 'City' },
   state: { formKey: 'state', label: 'State' },
+  postalCode: { formKey: 'postalCode', label: 'Postal Code' },
 };
+
+const FIELD_ALIASES: Record<string, string[]> = {
+  fullName: ['fullName', 'full_name', 'name', 'applicant_name'],
+  email: ['email', 'email_address'],
+  mobileNumber: ['mobileNumber', 'mobile_number', 'mobile', 'phone_number', 'phone'],
+  dateOfBirth: ['dateOfBirth', 'date_of_birth', 'dob'],
+  address: ['address', 'residential_address', 'permanent_address', 'full_address'],
+  city: ['city', 'district', 'town'],
+  state: ['state', 'state_name'],
+  postalCode: ['postalCode', 'postal_code', 'pincode', 'pin_code', 'pin'],
+};
+
+function normalizeDateForInput(raw: string): string {
+  const s = raw.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const dmy = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
+  if (dmy) {
+    const day = dmy[1].padStart(2, '0');
+    const month = dmy[2].padStart(2, '0');
+    const year = dmy[3];
+    return `${year}-${month}-${day}`;
+  }
+  return s;
+}
+
+function normalizeStateOption(raw: string): string {
+  const clean = raw.trim().toLowerCase();
+  if (!clean) return '';
+  const exact = INDIAN_STATES.find((opt) => opt.value && opt.value.toLowerCase() === clean);
+  if (exact) return exact.value;
+  const partial = INDIAN_STATES.find(
+    (opt) => opt.value && (clean.includes(opt.value.toLowerCase()) || opt.value.toLowerCase().includes(clean))
+  );
+  return partial ? partial.value : raw.trim();
+}
+
+function normalizeStep1Extraction(raw: ExtractionResult): ExtractionResult {
+  const src = raw.extracted_fields || {};
+  const srcConf = raw.confidence || {};
+  const normalizedFields: Record<string, string | null> = {};
+  const normalizedConfidence: Record<string, number> = {};
+
+  for (const [canonicalKey, aliases] of Object.entries(FIELD_ALIASES)) {
+    for (const alias of aliases) {
+      const val = src[alias];
+      if (val && typeof val === 'string' && val.trim() && val.trim().toLowerCase() !== 'null') {
+        let finalVal = val.trim();
+        if (canonicalKey === 'dateOfBirth') {
+          finalVal = normalizeDateForInput(finalVal);
+        } else if (canonicalKey === 'state') {
+          finalVal = normalizeStateOption(finalVal);
+        }
+        normalizedFields[canonicalKey] = finalVal;
+        normalizedConfidence[canonicalKey] = srcConf[alias] ?? 0.85;
+        break;
+      }
+    }
+  }
+
+  return {
+    ...raw,
+    extracted_fields: normalizedFields,
+    confidence: normalizedConfidence,
+  };
+}
 
 const section = TRADE_LICENSE_FORM_CONFIG.sections[0]; // Applicant Info section
 
 export const Step1ApplicantInfo: React.FC<Step1Props> = ({
   formData,
   onChange,
+  onFormAutoFill,
   onNext,
   onSaveDraft,
   isSaving
@@ -43,8 +111,27 @@ export const Step1ApplicantInfo: React.FC<Step1Props> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [extraction, setExtraction] = useState<ExtractionResult | null>(null);
   const [isExtracting, setIsExtracting] = useState<boolean>(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [extractionError, setExtractionError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (!isExtracting) {
+      setUploadProgress(0);
+      return;
+    }
+
+    setUploadProgress(0);
+    const interval = setInterval(() => {
+      setUploadProgress((prev) => {
+        if (prev >= 94) return 94;
+        const step = prev < 50 ? 6 : prev < 80 ? 3 : 1;
+        return Math.min(94, prev + step);
+      });
+    }, 180);
+
+    return () => clearInterval(interval);
+  }, [isExtracting]);
 
   const handleChange = (field: FormFieldConfig, value: any) => {
     onChange({ ...formData, [field.name]: value });
@@ -123,8 +210,8 @@ export const Step1ApplicantInfo: React.FC<Step1Props> = ({
       }
 
       if (res.success && res.extraction) {
-        // Real extraction succeeded — show the AI suggestions panel
-        setExtraction(res.extraction);
+        // Real extraction succeeded — normalize Step 1 field keys and show AI suggestions panel
+        setExtraction(normalizeStep1Extraction(res.extraction));
       } else {
         // API returned success=false or missing extraction — show error, do NOT populate form
         const msg = res.error || 'Unable to extract information from this document. Please try again.';
@@ -160,7 +247,37 @@ export const Step1ApplicantInfo: React.FC<Step1Props> = ({
 
 
   const handleApplyAutofill = (appliedFields: Record<string, string>) => {
-    onChange({ ...formData, ...appliedFields });
+    const normalizedApplied = { ...appliedFields };
+    if (normalizedApplied.dateOfBirth) {
+      normalizedApplied.dateOfBirth = normalizeDateForInput(normalizedApplied.dateOfBirth);
+    }
+    if (normalizedApplied.state) {
+      normalizedApplied.state = normalizeStateOption(normalizedApplied.state);
+    }
+
+    if (onFormAutoFill) {
+      const metadata: Record<string, { source: 'AI_EXTRACTED'; confidence?: number }> = {};
+      for (const key of Object.keys(normalizedApplied)) {
+        metadata[key] = {
+          source: 'AI_EXTRACTED',
+          confidence: extraction?.confidence?.[key] ?? 0.85,
+        };
+      }
+      onFormAutoFill(normalizedApplied, metadata);
+    } else {
+      onChange({ ...formData, ...normalizedApplied });
+    }
+    setExtraction(null);
+    setExtractionError(null);
+  };
+
+  const handleClearFields = () => {
+    const cleared = { ...formData };
+    for (const field of section.fields) {
+      cleared[field.name] = '';
+    }
+    onChange(cleared);
+    setErrors({});
     setExtraction(null);
     setExtractionError(null);
   };
@@ -254,35 +371,82 @@ export const Step1ApplicantInfo: React.FC<Step1Props> = ({
             accept=".pdf,.jpg,.jpeg,.png,.webp"
             style={{ display: 'none' }}
           />
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isExtracting}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.45rem',
-              padding: '0.5rem 0.95rem',
-              borderRadius: 'var(--radius-sm)',
-              background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
-              color: '#FFFFFF',
-              border: 'none',
-              fontSize: '0.8rem',
-              fontWeight: 600,
-              cursor: isExtracting ? 'not-allowed' : 'pointer',
-              opacity: isExtracting ? 0.7 : 1,
-            }}
-          >
-            {isExtracting ? (
-              <>
-                <Loader2 size={14} className="spin-animation" /> Extracting with AI...
-              </>
-            ) : (
-              <>
-                <Upload size={14} /> Upload ID & Auto-Fill
-              </>
-            )}
-          </button>
+          {isExtracting ? (
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.6rem',
+                padding: '0.35rem 0.85rem',
+                borderRadius: 'var(--radius-sm)',
+                background: 'rgba(99, 102, 241, 0.14)',
+                border: '1px solid rgba(99, 102, 241, 0.35)',
+              }}
+            >
+              <div style={{ position: 'relative', width: '36px', height: '36px', flexShrink: 0 }}>
+                <svg width="36" height="36" viewBox="0 0 36 36" style={{ transform: 'rotate(-90deg)' }}>
+                  <circle
+                    cx="18"
+                    cy="18"
+                    r="15"
+                    fill="none"
+                    stroke="rgba(99, 102, 241, 0.25)"
+                    strokeWidth="3"
+                  />
+                  <circle
+                    cx="18"
+                    cy="18"
+                    r="15"
+                    fill="none"
+                    stroke="#6366F1"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeDasharray={2 * Math.PI * 15}
+                    strokeDashoffset={2 * Math.PI * 15 * (1 - uploadProgress / 100)}
+                    style={{ transition: 'stroke-dashoffset 0.18s ease-out' }}
+                  />
+                </svg>
+                <span
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '0.62rem',
+                    fontWeight: 700,
+                    fontFamily: 'var(--font-mono)',
+                    color: '#A5B4FC',
+                  }}
+                >
+                  {uploadProgress}%
+                </span>
+              </div>
+              <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#C7D2FE' }}>
+                Extracting with AI...
+              </span>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                padding: '0.5rem 0.95rem',
+                borderRadius: 'var(--radius-sm)',
+                background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
+                color: '#FFFFFF',
+                border: 'none',
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              <Upload size={14} /> Upload ID & Auto-Fill
+            </button>
+          )}
         </div>
       </div>
 
@@ -340,6 +504,7 @@ export const Step1ApplicantInfo: React.FC<Step1Props> = ({
       {/* AI Autofill Review & Edit Panel — shown only when extraction succeeds */}
       {extraction && (
         <AIAutofillPanel
+          key={JSON.stringify(extraction.extracted_fields)}
           extraction={extraction}
           fieldMapping={ID_FIELD_MAPPING}
           onApply={handleApplyAutofill}
@@ -512,6 +677,17 @@ export const Step1ApplicantInfo: React.FC<Step1Props> = ({
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            onClick={handleClearFields}
+            className="btn btn-secondary"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+            title="Clear all applicant fields"
+          >
+            <RotateCcw size={15} />
+            Clear Fields
+          </button>
+
           <button
             type="button"
             onClick={onSaveDraft}

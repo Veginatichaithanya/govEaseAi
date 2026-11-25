@@ -16,9 +16,9 @@ export default defineConfig({
     }
   },
   build: {
-    rolloutOptions: {
+    rollupOptions: {
       output: {
-        manualChunks(id) {
+        manualChunks(id: string) {
           if (id.includes('node_modules')) {
             if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
               return 'vendor-react'

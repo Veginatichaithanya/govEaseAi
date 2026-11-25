@@ -1,4 +1,5 @@
 import os
+import re
 import uuid
 import logging
 from pathlib import Path
@@ -75,13 +76,39 @@ async def upload_document(
 
     # Run OCR extraction after file is saved
     ocr_provider = OCRProvider()
+    ocr_success = False
     try:
         extraction = await ocr_provider.extract_document(str(file_path), file.content_type or "application/octet-stream")
         verification_result = extraction.get('parsed_json', {})
-        logger.info(f"Extraction complete for {safe_filename}: keys={list(verification_result.keys())}")
+        if not isinstance(verification_result, dict):
+            verification_result = {"error": "Invalid extraction result format"}
+
+        has_error = (
+            "error" in verification_result 
+            or "raw_response" in verification_result
+            or verification_result.get("summary") == "No text could be extracted from this file."
+        )
+
+        structured = verification_result.get("structured_fields") or {}
+        has_structured = any(v for v in structured.values() if v is not None and str(v).strip())
+        entities = verification_result.get("entities") or {}
+        has_entities = any(bool(v) for v in entities.values())
+        form_fields = verification_result.get("form_fields") or {}
+        has_form_fields = bool(form_fields)
+        ocr_text = (extraction.get("ocr_text") or "").strip()
+        has_text = bool(ocr_text and not ocr_text.startswith("[Image file"))
+
+        # OCR succeeds only if no error and actual text or structured fields were extracted
+        ocr_success = not has_error and bool(verification_result) and (has_structured or has_entities or has_form_fields or has_text)
+        logger.info(f"Extraction complete for {safe_filename}: keys={list(verification_result.keys())} success={ocr_success}")
     except Exception as e:
-        logger.exception(f"OCR extraction failed for {file_path}: {e}")
-        verification_result = {"error": "OCR extraction failed", "detail": str(e)}
+        safe_detail = re.sub(r'([?&]key=)[^&\s"\']+', r'\1[REDACTED]', str(e))
+        logger.exception(f"OCR extraction failed for {safe_filename}: {safe_detail}")
+        verification_result = {"error": "OCR extraction failed", "detail": safe_detail}
+        ocr_success = False
+
+    # VERIFIED is set only when OCR succeeds, otherwise set ERROR
+    doc_status = "VERIFIED" if ocr_success else "ERROR"
 
     # Check if document already exists for this application
     existing_doc = db.query(ApplicationDocument).filter(
@@ -96,7 +123,7 @@ async def upload_document(
         existing_doc.file_path = str(file_path)
         existing_doc.mime_type = file.content_type
         existing_doc.file_size = file_size
-        existing_doc.status = "VERIFIED"
+        existing_doc.status = doc_status
         existing_doc.verification_result = verification_result
         doc_record = existing_doc
     else:
@@ -115,8 +142,8 @@ async def upload_document(
             file_path=str(file_path),
             mime_type=file.content_type,
             file_size=file_size,
-            status="VERIFIED",
-            verification_result=verification_result if verification_result else {"match": True, "note": "Pre-validation checks passed."}
+            status=doc_status,
+            verification_result=verification_result if verification_result else {"note": "No extraction data available."}
         )
         db.add(doc_record)
 
